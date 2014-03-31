@@ -1,8 +1,8 @@
 module ROF
-  class NotFobjectError < Exception
+  class NotFobjectError < RuntimeError
   end
 
-  class MissingPidError < Exception
+  class MissingPidError < RuntimeError
   end
 
   # Ingest or update item in fedora
