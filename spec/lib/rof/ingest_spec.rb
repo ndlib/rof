@@ -18,5 +18,16 @@ module ROF
       }
       expect {ROF.Ingest(item)}.to raise_error(ROF::SourceError)
     end
+    it "uploads datastreams with apropos metadata" do
+      item = {"type" => "fobject",
+              "pid" => "test:1",
+              "af-model" => "GenericFile",
+              "content" => "jello",
+              "content-meta" => {"label" => "test stream 1",
+                                 "mime-type" => "application/jello"},
+              "other-meta" => {"label" => "test stream 2"},
+      }
+      expect(ROF.Ingest(item)).to eq(["content", "other"])
+    end
   end
 end
