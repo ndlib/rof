@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'rof'
+
+ROF::CLI.ingest_file(ARGV[0])
