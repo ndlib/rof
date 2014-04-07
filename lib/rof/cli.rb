@@ -38,7 +38,7 @@ module ROF
       overall_t = Benchmark.measure do
         items.each do |item|
           begin
-            outfile.write("#{n}. #{verb} #{item["pid"]}...")
+            outfile.write("#{n}. #{verb} #{item["pid"]} ...")
             n += 1
             t = Benchmark.measure do
               ROF.Ingest(item, fedora, search_paths)
