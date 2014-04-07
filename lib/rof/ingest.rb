@@ -165,7 +165,7 @@ module ROF
   end
 
   def self.update_rels_ext(models, item, fdoc)
-    rels_ext = item['rels-ext']
+    rels_ext = item['rels-ext'] || {}
     pid = item['pid']
     # this is ugly to work around addRelationship bug in 3.6.x
     # (See bugs FCREPO-1191 and FCREPO-1187)
@@ -174,13 +174,21 @@ module ROF
     models.each do |m|
       content += %Q{<ns0:hasModel rdf:resource="#{m}"/>}
     end
-    # TODO: handle rels_ext correctly
-    #content += %Q{<ns1:isPartOf rdf:resource="info:fedora/vecnet:xxx"/>}
+    rels_ext.each do |relation, targets|
+      # TODO(dbrower): handle rels_ext correctly. probably part of handling
+      # XML correctly
+      targets = [targets] if targets.is_a? String
+      targets.each do |t|
+        content += %Q{<ns1:#{relation} rdf:resource="#{t}"/>}
+      end
+    end
     content += '</rdf:Description></rdf:RDF>'
-    ds = fdoc['RELS-EXT']
-    ds.content = content
-    ds.mimeType = "application/rdf+xml"
-    ds.save
+    if fdoc
+      ds = fdoc['RELS-EXT']
+      ds.content = content
+      ds.mimeType = "application/rdf+xml"
+      ds.save
+    end
   end
 
   # find fname by looking through directories in search_path,
@@ -189,6 +197,10 @@ module ROF
   # Raises Errno::ENOENT if no file is found, otherwise
   # opens the file and returns a fd
   def self.find_file_and_open(fname, search_path, flags)
+    # don't search if file has an absolute path
+    if fname[0] == "/"
+      return File.open(fname, flags)
+    end
     search_path.each do |path|
       begin
         f = File.open(File.join(path,fname), flags)
