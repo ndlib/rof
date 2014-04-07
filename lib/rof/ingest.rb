@@ -30,11 +30,14 @@ module ROF
       # models.each do |m|
       #   doc.models << m unless doc.models.include?(m)
       # end
+
+      # it seems like we need to save the document before adding datastreams?!?
+      doc.save
     end
 
     ds_touched = []
     if doc
-      update_rels_ext(models, item['rels-ext'], doc)
+      update_rels_ext(models, item, doc)
       ds_touched << "rels-ext"
     end
     item.each do |k,v|
@@ -97,7 +100,7 @@ module ROF
     end
     if ds
       ds.content = ds_content if ds_content
-      ds.save!
+      ds.save
     end
     ds_content.close if need_close
   end
@@ -122,7 +125,7 @@ module ROF
       ds = fdoc['rightsMetadata']
       ds.mimeType = 'text/xml'
       ds.content = content
-      ds.save!
+      ds.save
     end
     content
   end
@@ -156,12 +159,14 @@ module ROF
       ds = fdoc['descMetadata']
       ds.mimeType = "text/plain"
       ds.content = content
-      ds.save!
+      ds.save
     end
     content
   end
 
-  def self.update_rels_ext(models, rels_ext, fdoc)
+  def self.update_rels_ext(models, item, fdoc)
+    rels_ext = item['rels-ext']
+    pid = item['pid']
     # this is ugly to work around addRelationship bug in 3.6.x
     # (See bugs FCREPO-1191 and FCREPO-1187)
     content = '<rdf:RDF xmlns:ns0="info:fedora/fedora-system:def/model#" xmlns:ns1="info:fedora/fedora-system:def/relations-external#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
@@ -175,7 +180,7 @@ module ROF
     ds = fdoc['RELS-EXT']
     ds.content = content
     ds.mimeType = "application/rdf+xml"
-    ds.save!
+    ds.save
   end
 
   # find fname by looking through directories in search_path,

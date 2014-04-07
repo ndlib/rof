@@ -1,9 +1,25 @@
 #!/usr/bin/env ruby -Ilib
 
 require 'rof'
+require 'optparse'
+
+fedora_info = {}
+opt = OptionParser.new do |opts|
+  opts.banner = "Usage: rof [options] <input file>"
+  opts.on("", "--fedora URL", "Base Fedora URL") do |url|
+    fedora_info[:url] = url
+  end
+  opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
+    fedora_info[:user], fedora_info[:password] = u.split(':')
+  end
+end
+
+opt.parse!
+
+fedora_info = nil if fedora_info.empty?
 
 if ARGV[0]
-  ROF::CLI.ingest_file(ARGV[0])
+  ROF::CLI.ingest_file(ARGV[0], ["."], STDOUT, fedora_info)
 else
-  puts "usage: rof <input file>"
+  puts opt.help
 end
