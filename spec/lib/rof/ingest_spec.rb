@@ -107,4 +107,10 @@ EOS
       end
     end
   end
+
+  describe "file_searching" do
+    it "raises an error on missing files" do
+      expect {ROF.find_file_and_open("file.txt",[],"r")}.to raise_error(Errno::ENOENT)
+    end
+  end
 end

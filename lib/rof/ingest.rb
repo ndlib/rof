@@ -14,7 +14,7 @@ module ROF
   # Otherwise fedora is a Rubydora::Reporitory object (for now...)
   # Returns a list of ingested datastreams, if everything is okay.
   # Otherwise raises an exception depending on the error.
-  def self.Ingest(item, fedora=nil)
+  def self.Ingest(item, fedora=nil, search_paths=[])
     raise NotFobjectError if item["type"] != "fobject"
     raise MissingPidError unless item["pid"].is_a? String
     models = string_nil_to_array(item["model"])
@@ -55,14 +55,14 @@ module ROF
         # ingest a datastream
         dsname = $1
         next if ds_touched.include?(dsname)
-        self.ingest_datastream(dsname, item, doc)
+        self.ingest_datastream(dsname, item, doc, search_paths)
         ds_touched << dsname
       end
     end
     return ds_touched
   end
 
-  def self.ingest_datastream(dsname, item, fdoc)
+  def self.ingest_datastream(dsname, item, fdoc, search_paths)
     # What kind of content is there?
     ds_content = item[dsname]
     ds_filename = item["#{dsname}-file"]
@@ -90,22 +90,16 @@ module ROF
       ds.versionable = md["versionable"]
       ds.mimeType = md["mime-type"]
     end
-    case
-    when ds_filename
-      File.open(ds_filename, "r") do |f|
-        if ds
-          ds.content = f
-          ds.save!
-        end
-      end
-    when ds_content
-      if ds
-        ds.content = ds_content
-        ds.save!
-      end
-    else
-      ds.save! if ds
+    need_close = false
+    if ds_filename
+      ds_content = self.find_file_and_open(ds_filename, search_paths, "r")
+      need_close = true
     end
+    if ds
+      ds.content = ds_content if ds_content
+      ds.save!
+    end
+    ds_content.close if need_close
   end
 
   def self.ingest_rights_metadata(item, fdoc)
@@ -156,7 +150,7 @@ module ROF
   def self.ingest_ld_metadata(item, fdoc)
     input = item['metadata']
     input["@id"] = "info:fedora/#{item['pid']}" unless input["@id"]
-    graph = RDF::Graph.new << JSON::LD::API.toRdf(input) 
+    graph = RDF::Graph.new << JSON::LD::API.toRdf(input)
     content = graph.dump(:ntriples)
     if fdoc
       ds = fdoc['descMetadata']
@@ -182,6 +176,22 @@ module ROF
     ds.content = content
     ds.mimeType = "application/rdf+xml"
     ds.save!
+  end
+
+  # find fname by looking through directories in search_path,
+  # an array of strings.
+  # Will not find any files if search_path is empty.
+  # Raises Errno::ENOENT if no file is found, otherwise
+  # opens the file and returns a fd
+  def self.find_file_and_open(fname, search_path, flags)
+    search_path.each do |path|
+      begin
+        f = File.open(File.join(path,fname), flags)
+        return f
+      rescue Errno::ENOENT
+      end
+    end
+    raise Errno::ENOENT.new(fname)
   end
 
   def self.af_model_name(model)
