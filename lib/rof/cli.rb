@@ -58,7 +58,8 @@ module ROF
       end
       outfile.write("Total time %0.3fs\n" % overall_t.real)
       outfile.write("#{error_count} errors\n")
-      outfile.close if need_close
+    ensure
+      outfile.close if outfile && need_close
     end
   end
 end
