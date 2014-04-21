@@ -36,15 +36,15 @@ module ROF
       item_count = 1
       error_count = 0
       verb = fedora.nil? ? "Verifying" : "Ingesting"
-      overall_t = Benchmark.measure do
+      overall_benchmark = Benchmark.measure do
         items.each do |item|
           begin
             outfile.write("#{item_count}. #{verb} #{item["pid"]} ...")
             item_count += 1
-            t = Benchmark.measure do
+            individual_benchmark = Benchmark.measure do
               ROF.Ingest(item, fedora, search_paths)
             end
-            outfile.write("ok. %0.3fs\n" % t.real)
+            outfile.write("ok. %0.3fs\n" % individual_benchmark.real)
           rescue Exception => e
             error_count += 1
             outfile.write("error. #{e.to_s}\n")
@@ -56,7 +56,7 @@ module ROF
           end
         end
       end
-      outfile.write("Total time %0.3fs\n" % overall_t.real)
+      outfile.write("Total time %0.3fs\n" % overall_benchmark.real)
       outfile.write("#{error_count} errors\n")
     ensure
       outfile.close if outfile && need_close
