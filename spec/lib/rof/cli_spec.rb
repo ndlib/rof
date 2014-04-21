@@ -8,6 +8,6 @@ describe ROF::CLI do
               "type" => "fobject"}]
     output = StringIO.new
     ROF::CLI.ingest_array(items, [], output)
-    expect(output.string).to match(/1\. Ingesting\.\.\.ok\..*\n2\. Ingesting\.\.\.ok\./)
+    expect(output.string).to match(/1\. Verifying test:1 \.\.\.ok\..*\n2\. Verifying test:2 \.\.\.ok\./)
   end
 end

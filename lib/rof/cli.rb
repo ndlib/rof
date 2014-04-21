@@ -1,6 +1,7 @@
 require 'benchmark'
 require 'json'
 require 'rubydora'
+require 'rof/ingest'
 module ROF
   module CLI
 
