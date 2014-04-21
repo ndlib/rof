@@ -5,16 +5,27 @@ module ROF
         new(attributes).call
       end
 
-      attr_reader :models, :item, :fdoc
+      attr_reader :models, :item, :fdoc, :pid
       def initialize(attributes = {})
         @models = attributes.fetch(:models)
         @item = attributes.fetch(:item)
+        @pid = item.fetch('pid')
         @fdoc = attributes.fetch(:fedora_document, nil)
       end
 
+      def rels_ext
+        item.fetch('rels-ext', {})
+      end
+
       def call
-        rels_ext = item['rels-ext'] || {}
-        pid = item['pid']
+        content = build_content
+        persist(content)
+        content
+      end
+
+      private
+
+      def build_content
         # this is ugly to work around addRelationship bug in 3.6.x
         # (See bugs FCREPO-1191 and FCREPO-1187)
         content = '<rdf:RDF xmlns:ns0="info:fedora/fedora-system:def/model#" xmlns:ns1="info:fedora/fedora-system:def/relations-external#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
@@ -31,13 +42,16 @@ module ROF
           end
         end
         content += '</rdf:Description></rdf:RDF>'
+      end
+      def persist(content)
         if fdoc
           ds = fdoc['RELS-EXT']
           ds.content = content
           ds.mimeType = "application/rdf+xml"
           ds.save
+        else
+          true
         end
-        content
       end
     end
   end
