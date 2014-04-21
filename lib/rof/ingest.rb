@@ -102,7 +102,8 @@ module ROF
       ds.content = ds_content if ds_content
       ds.save
     end
-    ds_content.close if need_close
+  ensure
+    ds_content.close if ds_content && need_close
   end
 
   def self.ingest_rights_metadata(item, fdoc)
