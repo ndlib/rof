@@ -21,6 +21,7 @@ module ROF
       self.ingest_array(items, search_paths, outfile, fedora)
     rescue JSON::ParserError => e
       outfile.puts("Error reading #{fname}:#{e.to_s}")
+      exit!(-1)
     end
 
     def self.ingest_array(items, search_paths=[], outfile=STDOUT, fedora=nil)
