@@ -33,14 +33,14 @@ module ROF
       if fedora
         fedora = Rubydora.connect(fedora)
       end
-      n = 1
+      item_count = 1
       error_count = 0
       verb = fedora.nil? ? "Verifying" : "Ingesting"
       overall_t = Benchmark.measure do
         items.each do |item|
           begin
-            outfile.write("#{n}. #{verb} #{item["pid"]} ...")
-            n += 1
+            outfile.write("#{item_count}. #{verb} #{item["pid"]} ...")
+            item_count += 1
             t = Benchmark.measure do
               ROF.Ingest(item, fedora, search_paths)
             end
