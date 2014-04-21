@@ -40,8 +40,8 @@ module ROF
       update_rels_ext(models, item, doc)
       ds_touched << "rels-ext"
     end
-    item.each do |k,v|
-      case k
+    item.each do |key,value|
+      case key
       # fields having special treatement
       when "rights"
         self.ingest_rights_metadata(item, doc)
