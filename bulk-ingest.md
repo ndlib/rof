@@ -1,16 +1,16 @@
 # Bulk Ingest
 
-Q. What does this hope to be?
+Q. What does this hope to be?  
 A. An intermediate representation we can use to process ingests to fedora. The
 idea is that we can accept any crazy format for bulk data and translate it into
 this format. Then another piece can load this format into Fedora. Perhaps it
 can also be used as an export format.
 
-Q. What is its name?
+Q. What is its name?  
 A. I don't know. I was calling it ROF for Raw Object Format. I'm open to
 suggestions. Jeremy?
 
-Q. What is it?
+Q. What is it?  
 A. ROF hopes to support many levels of abstraction. To begin with, it only
 specifies a low level format based around the Fedora object model, whereby one
 lists all the data streams which constitute each object. It handles some mild
@@ -19,7 +19,7 @@ rocks. It is designed to be easy for machines to process (NOT humans) and is
 uses JSON format as its base. I see it supporting more abstract data elements,
 say "article + dataset" in time.
 
-Q. At what level does it hope to model objects? That is, why not just use FOXML?
+Q. At what level does it hope to model objects? That is, why not just use FOXML?  
 A. Ideally, this will model our content using our data models. Unfortunately,
 our data models are not well defined, and are still changing. Because of this,
 if we did model the content at the data model level we would need to change the
@@ -30,13 +30,13 @@ log. Additionally, Hydra only uses a subset of Fedora. ROF will focus on the
 parts which are important to us. And then we can extend it over time to handle
 more abstract objects.
 
-Q. So what are the problems with this format?
+Q. So what are the problems with this format?  
 A. Ideally the interchange format should match our semantic object model, not
 the way things are laid out in fedora. I see this being addressed in time.
 Also, this is another format for which we will need to develop tools to
 support.
 
-Q. Ok, enough already, what is the actual format?
+Q. Ok, enough already, what is the actual format?  
 A. It uses JSON, so a valid ROF file will also be a valid JSON document. The
 reverse is not true, though. These are the restrictions.
 
@@ -53,29 +53,15 @@ The "fobject" type represents a basic fedora object. Each "fobject" record
 represents a single fedora object. It recognizes the following additional
 fields. A star is a wildcard and represents any sequence of characters.
 
-Field       Description
-pid         The pid to use for the object. If it includes a prefix, e.g.
-            "vecnet:12bc34g", then that is the objects fedora id. It it doesn't
-            have a prefix, then the prefix "und:" is added.
-
-rights      The hydra rights of this object. Takes an object. See §Rights below.
-
-rels-ext    The rels-ext data stream of this object. Takes an object.
-            See §Rels-ext below.
-
-metadata    Contents for the 'descMetadata' data stream.  Takes an object.
-            It is given in JSON-LD, and translated to N3 format to be saved
-            into fedora.
-
-*-file      Gives a filename to save as the contents of a data stream given.
-            Takes a string. This overwrites the previous content. For example,
-            the field 'hello-file' will save the file's contents into the data
-            stream 'hello'.
-
-*-meta      Gives the fedora metadata for a given data stream. Takes an object.
-            See §Meta below.
-
-*           Assigns the content directly to the named data stream. Takes a string.
+Field     |  Description
+----------|--------------
+pid       |  The pid to use for the object. If it includes a prefix, e.g. "vecnet:12bc34g", then that is the objects fedora id. It it doesn'thave a prefix, then the prefix "und:" is added.
+rights    |  The hydra rights of this object. Takes an object. See §Rights below.
+rels-ext  |  The rels-ext data stream of this object. Takes an object. See §Rels-ext below.
+metadata  |  Contents for the 'descMetadata' data stream.  Takes an object. It is given in JSON-LD, and translated to N3 format to be saved into fedora.
+*-file    |  Gives a filename to save as the contents of a data stream given. Takes a string. This overwrites the previous content. For example, the field 'hello-file' will save the file's contents into the data stream 'hello'.
+*-meta    |  Gives the fedora metadata for a given data stream. Takes an object. See §Meta below.
+*         |  Assigns the content directly to the named data stream. Takes a string.
 
 
 # Rights
@@ -85,9 +71,12 @@ takes an array of strings. The string "public" and "registered" have special
 meaning. Otherwise the strings are taken to be group or user names.
 
 Example:
-{"view" : ["public"],
+````json
+{
+ "view" : ["public"],
  "edit" : ["dbrower"]
 }
+````
 
 
 # Rels-Ext
@@ -98,9 +87,12 @@ objects this one is connected to.
 
 
 Example:
-{"isMemberOf" : ["xv57n93k"],
+````json
+{
+ "isMemberOf" : ["xv57n93k"],
  "relatedTo": ["user:12345"]
 }
+````
 
 
 # Meta
@@ -123,6 +115,7 @@ checksum    "SHA-1"         What checksum to use, or empty string to turn off.
 This is not normative. There are probably errors. The JSON-LD sections are
 likely wrong.
 
+```json
 [{
      "type" : "fobject",
      "pid" : "vecnet:d217qs82g",
@@ -198,7 +191,7 @@ likely wrong.
      }
      "thumbnail-file" : "..."
 }]
-
+````
 
 
 # Extensions
