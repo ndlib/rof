@@ -172,15 +172,15 @@ module ROF
     # (See bugs FCREPO-1191 and FCREPO-1187)
     content = '<rdf:RDF xmlns:ns0="info:fedora/fedora-system:def/model#" xmlns:ns1="info:fedora/fedora-system:def/relations-external#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
     content += %Q{<rdf:Description rdf:about="info:fedora/#{pid}">}
-    models.each do |m|
-      content += %Q{<ns0:hasModel rdf:resource="#{m}"/>}
+    models.each do |model|
+      content += %Q{<ns0:hasModel rdf:resource="#{model}"/>}
     end
     rels_ext.each do |relation, targets|
       # TODO(dbrower): handle rels_ext correctly. probably part of handling
       # XML correctly
       targets = [targets] if targets.is_a? String
-      targets.each do |t|
-        content += %Q{<ns1:#{relation} rdf:resource="#{t}"/>}
+      targets.each do |target|
+        content += %Q{<ns1:#{relation} rdf:resource="#{target}"/>}
       end
     end
     content += '</rdf:Description></rdf:RDF>'
