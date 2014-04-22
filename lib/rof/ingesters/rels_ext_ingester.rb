@@ -13,10 +13,6 @@ module ROF
         @fdoc = attributes.fetch(:fedora_document, nil)
       end
 
-      def rels_ext
-        item.fetch('rels-ext', {})
-      end
-
       def call
         content = build_content
         persist(content)
@@ -24,6 +20,10 @@ module ROF
       end
 
       private
+
+      def rels_ext
+        item.fetch('rels-ext', {})
+      end
 
       def build_content
         # this is ugly to work around addRelationship bug in 3.6.x
