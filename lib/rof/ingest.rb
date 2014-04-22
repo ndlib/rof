@@ -1,5 +1,6 @@
 require 'json/ld'
 require "rof/ingesters/rels_ext_ingester"
+require "rof/ingesters/rights_metadata_ingester"
 
 module ROF
   class NotFobjectError < RuntimeError
@@ -109,28 +110,7 @@ module ROF
   end
 
   def self.ingest_rights_metadata(item, fdoc)
-    rights = item["rights"]
-    return if rights.nil?
-    #
-    # we really should be building this using an xml engine.
-    #
-    content = %Q{<rightsMetadata xmlns="http://hydra-collab.stanford.edu/schemas/rightsMetadata/v1" version="0.1">\n}
-    # TODO(dbrower): Does the copyright need to be exposed in the rof?
-    content += %Q{  <copyright>\n    <human type="title"/>\n    <human type="description"/>\n    <machine type="uri"/>\n  </copyright>\n}
-    content += self.format_rights_section("discover", rights["discover"], rights["discover-groups"])
-    content += self.format_rights_section("read", rights["read"], rights["read-groups"])
-    content += self.format_rights_section("edit", rights["edit"], rights["edit-groups"])
-    # TODO(dbrower): expose embargo information
-    content += %Q{  <embargo>\n    <human/>\n    <machine/>\n  </embargo>\n}
-    content += %Q{</rightsMetadata>\n}
-
-    if fdoc
-      ds = fdoc['rightsMetadata']
-      ds.mimeType = 'text/xml'
-      ds.content = content
-      ds.save
-    end
-    content
+    Ingesters::RightsMetadataIngester.call(item: item, fedora_document: fdoc)
   end
 
   def self.format_rights_section(section_name, people, groups)
