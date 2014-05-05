@@ -5,7 +5,8 @@ module ROF
         new(attributes).call
       end
 
-      attr_reader :dsname, :item, :fdoc, :search_paths, :ds_content, :ds_filename
+      attr_reader :dsname, :item, :fdoc, :search_paths, :ds_content
+      attr_reader :metadata_payload, :ds_filename
       def initialize(attributes = {})
         @dsname = attributes.fetch(:dsname)
         @item = attributes.fetch(:item)
@@ -13,19 +14,15 @@ module ROF
         @fdoc = attributes.fetch(:fedora_document, nil)
         @ds_content = item[dsname]
         @ds_filename = item["#{dsname}-file"]
+        @metadata_payload = attributes.fetch(:metadata_payload) { default_metadata_payload }
         if ds_filename && ds_content
           raise SourceError.new("Both #{dsname} and #{dsname}-file are present.")
         end
       end
 
       def call
-        md = {"mime-type" => "text/plain",
-              "label" => "",
-              "versionable" => true,
-              "control-group" => "M",
-              }
         if item["#{dsname}-meta"]
-          md.merge!(item["#{dsname}-meta"])
+          metadata_payload.merge!(item["#{dsname}-meta"])
         end
 
         # NOTE(dbrower): this could be refactored a bit. I was trying to keep the
@@ -34,10 +31,10 @@ module ROF
         if fdoc
           ds = fdoc[dsname]
           # TODO(dbrower): maybe verify these options to be within bounds?
-          ds.controlGroup = md["control-group"]
-          ds.dsLabel = md["label"]
-          ds.versionable = md["versionable"]
-          ds.mimeType = md["mime-type"]
+          ds.controlGroup = metadata_payload.fetch("control-group")
+          ds.dsLabel = metadata_payload.fetch("label")
+          ds.versionable = metadata_payload.fetch("versionable")
+          ds.mimeType = metadata_payload.fetch("mime-type")
         end
         need_close = false
         if ds_filename
@@ -50,6 +47,16 @@ module ROF
         end
       ensure
         ds_content.close if ds_content && need_close
+      end
+
+      private
+      def default_metadata_payload
+        {
+          "mime-type" => "text/plain",
+          "label" => "",
+          "versionable" => true,
+          "control-group" => "M",
+        }
       end
     end
   end
