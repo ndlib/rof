@@ -5,22 +5,20 @@ module ROF
         new(attributes).call
       end
 
-      attr_reader :dsname, :item, :fdoc, :search_paths
+      attr_reader :dsname, :item, :fdoc, :search_paths, :ds_content, :ds_filename
       def initialize(attributes = {})
         @dsname = attributes.fetch(:dsname)
         @item = attributes.fetch(:item)
         @search_paths = attributes.fetch(:search_paths)
         @fdoc = attributes.fetch(:fedora_document, nil)
-      end
-
-      def call
-        # What kind of content is there?
-        ds_content = item[dsname]
-        ds_filename = item["#{dsname}-file"]
+        @ds_content = item[dsname]
+        @ds_filename = item["#{dsname}-file"]
         if ds_filename && ds_content
           raise SourceError.new("Both #{dsname} and #{dsname}-file are present.")
         end
+      end
 
+      def call
         md = {"mime-type" => "text/plain",
               "label" => "",
               "versionable" => true,
@@ -51,7 +49,8 @@ module ROF
           ds.save
         end
       ensure
-      ds_content.close if ds_content && need_close      end
+        ds_content.close if ds_content && need_close
+      end
     end
   end
 end
