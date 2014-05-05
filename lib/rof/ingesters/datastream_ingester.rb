@@ -21,9 +21,7 @@ module ROF
       end
 
       def call
-        if item["#{dsname}-meta"]
-          metadata_payload.merge!(item["#{dsname}-meta"])
-        end
+        override_custom_metadata_payload
 
         # NOTE(dbrower): this could be refactored a bit. I was trying to keep the
         # same path for whether fdoc is nil or not as much as possible.
@@ -57,6 +55,12 @@ module ROF
           "versionable" => true,
           "control-group" => "M",
         }
+      end
+
+      def override_custom_metadata_payload
+        if item["#{dsname}-meta"]
+          metadata_payload.merge!(item["#{dsname}-meta"])
+        end
       end
     end
   end
