@@ -1,6 +1,7 @@
 require 'json/ld'
-require "rof/ingesters/rels_ext_ingester"
-require "rof/ingesters/rights_metadata_ingester"
+require 'rof/ingesters/rels_ext_ingester'
+require 'rof/ingesters/rights_metadata_ingester'
+require 'rof/ingesters/datastream_ingester'
 
 module ROF
   class NotFobjectError < RuntimeError
@@ -69,6 +70,7 @@ module ROF
   end
 
   def self.ingest_datastream(dsname, item, fdoc, search_paths)
+    Ingesters::DatastreamIngester.call(dsname: dsname, item: item, fedora_document: fdoc, search_paths: search_paths)
     # What kind of content is there?
     ds_content = item[dsname]
     ds_filename = item["#{dsname}-file"]
