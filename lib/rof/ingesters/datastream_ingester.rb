@@ -22,8 +22,8 @@ module ROF
 
       def call
         override_custom_metadata_payload
-        ds = amend_fedora_document_datastream
-        write_content(ds)
+        data_stream = amend_fedora_document_datastream
+        write_content(data_stream)
       end
 
       private
