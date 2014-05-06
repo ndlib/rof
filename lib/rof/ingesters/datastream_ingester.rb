@@ -22,32 +22,12 @@ module ROF
 
       def call
         override_custom_metadata_payload
-
-        # NOTE(dbrower): this could be refactored a bit. I was trying to keep the
-        # same path for whether fdoc is nil or not as much as possible.
-        ds = nil
-        if fdoc
-          ds = fdoc[dsname]
-          # TODO(dbrower): maybe verify these options to be within bounds?
-          ds.controlGroup = metadata_payload.fetch("control-group")
-          ds.dsLabel = metadata_payload.fetch("label")
-          ds.versionable = metadata_payload.fetch("versionable")
-          ds.mimeType = metadata_payload.fetch("mime-type")
-        end
-        need_close = false
-        if ds_filename
-          ds_content = self.find_file_and_open(ds_filename, search_paths, "r")
-          need_close = true
-        end
-        if ds
-          ds.content = ds_content if ds_content
-          ds.save
-        end
-      ensure
-        ds_content.close if ds_content && need_close
+        ds = amend_fedora_document_datastream
+        write_content(ds)
       end
 
       private
+
       def default_metadata_payload
         {
           "mime-type" => "text/plain",
@@ -60,6 +40,34 @@ module ROF
       def override_custom_metadata_payload
         if item["#{dsname}-meta"]
           metadata_payload.merge!(item["#{dsname}-meta"])
+        end
+      end
+
+      def write_content(ds)
+        need_close = false
+        if ds_filename
+          ds_content = ROF.find_file_and_open(ds_filename, search_paths, "r")
+          need_close = true
+        end
+        if ds
+          ds.content = ds_content if ds_content
+          ds.save
+        end
+      ensure
+        ds_content.close if ds_content && need_close
+      end
+
+      def amend_fedora_document_datastream
+        # NOTE(dbrower): this could be refactored a bit. I was trying to keep the
+        # same path for whether fdoc is nil or not as much as possible.
+        ds = nil
+        if fdoc
+          ds = fdoc[dsname]
+          # TODO(dbrower): maybe verify these options to be within bounds?
+          ds.controlGroup = metadata_payload.fetch("control-group")
+          ds.dsLabel = metadata_payload.fetch("label")
+          ds.versionable = metadata_payload.fetch("versionable")
+          ds.mimeType = metadata_payload.fetch("mime-type")
         end
       end
     end
