@@ -119,7 +119,7 @@ likely wrong.
 [{
      "type" : "fobject",
      "pid" : "vecnet:d217qs82g",
-     "class" : "Citation",
+     "af-model" : "Citation",
      "rights" : {
           "read" : ["public"],
           "edit" : ["vecnet_batchuser"]
@@ -148,7 +148,7 @@ likely wrong.
 {
      "type" : "fobject",
      "pid" : "vecnet:h415pf50x",
-     "class" : "CitationFile",
+     "af-model" : "CitationFile",
      "rights" : {
           "read" : ["registered"],
           "edit" : ["vecnet_batchuser"]
