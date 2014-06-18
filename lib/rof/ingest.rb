@@ -148,7 +148,7 @@ module ROF
   end
 
   def self.update_rels_ext(models, item, fdoc)
-    Ingester::RelsExtIngester.call(models: models, item: item, fedora_document: fdoc)
+    Ingesters::RelsExtIngester.call(models: models, item: item, fedora_document: fdoc)
   end
 
   # find fname by looking through directories in search_path,
