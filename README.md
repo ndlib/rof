@@ -2,8 +2,8 @@
 
 [![Gem Version](https://badge.fury.io/rb/rof.png)](http://badge.fury.io/rb/rof)
 
-This is a pilot project to produce an intermediate data format that is simple
-to do a bulk ingest into the Fedora Commons repository software. While the goal
+This is a pilot project to produce an intermediate data format that makes the
+bulk ingest of data into the Fedora Commons repository software simple. While the goal
 is to provide as simple of a format as possible, some affordances are made for
 defining standard datastreams used by Hydra project front-ends, such as the
 `rightsMetadata` datastream.

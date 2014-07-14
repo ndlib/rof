@@ -66,14 +66,16 @@ metadata  |  Contents for the 'descMetadata' data stream.  Takes an object. It i
 
 # Rights
 
-Rights are given as a object with the keys "discover", "view", "edit". Each key
-takes an array of strings. The string "public" and "registered" have special
-meaning. Otherwise the strings are taken to be group or user names.
+Rights are given as a object with the keys "discover", "discover-groups",
+"view", "view-groups", "edit", and "edit-groups". Each key takes an array of strings,
+which are taken to be a list of group or user names.
+In Hydra rightsMetadata, the groups "public" and "registered" have special meaning.
+There is no special syntax for embargo dates yet.
 
 Example:
 ````json
 {
- "view" : ["public"],
+ "view-group" : ["public"],
  "edit" : ["dbrower"]
 }
 ````
@@ -121,28 +123,34 @@ likely wrong.
      "pid" : "vecnet:d217qs82g",
      "af-model" : "Citation",
      "rights" : {
-          "read" : ["public"],
+          "read-groups" : ["public"],
           "edit" : ["vecnet_batchuser"]
-          },
+     },
      "metadata" : {
-          "@context" : "...",
-          "id" : "...",
-          "dc:title" = "Molecular systematics and insecticide resistance in the major African malaria vector Anopheles funestus",
-          "dc:creator" = ["Coetzee, M.", "Koekemoer, L. L."],
-          "dc:identifier" = ["doi:10.1146/annurev-ento-120811-153628", "issn:1545-4487 (Electronic)", "issn:0066-4170 (Linking)", "23317045"],
-          "dc:description" = "Anopheles funestus is one of three major African vectors of malaria. Its distribution extends over much of the tropics and subtropics wherever suitable swampy breeding habitats are present. As with members of the Anopheles gambiae complex, An. funestus shows marked genetic heterogeneity across its range. Currently, two unnamed species are recognized in the group, with molecular and cytogenetic data indicating that more may be present. The control of malaria vectors in Africa has received increased attention in the past decade with the scaling up of insecticide-treated bed nets and indoor residual house spraying. Also in the past decade, the frequency of insecticide-resistant mosquitoes has increased exponentially. Whether this increase is in response to vector control initiatives or because of insecticide use in agriculture is debatable. In this article we examine the progress made on the systematics of the An. funestus group and review research on insecticide resistance and its mechanisms.",
-          "dc:language" = "eng",
-          "dc:type" = "Article",
-          "dc:source" = "Annual review of entomology",
-          "dc:references" = "Molecu2013",
-          "dc:bibliographicCitation" = "Annu Rev Entomol 58, 393-412. (2013)",
-          "rdf:seeAlso" = "http://www.ncbi.nlm.nih.gov/pubmed/23317045",
-          "dc:created" = "2013",
-          "dc:modified" = "2014-03-17Z"^^<http://www.w3.org/2001/XMLSchema#date>,
-          "rdf:domain" = "Citation"
+          "@context" : {
+               "dc" : "http://purl.org/dc/terms/",
+               "rdfs" : "http://www.w3.org/2000/01/rdf-schema#"
+          },
+          "dc:title" : "Molecular systematics and insecticide resistance in the major African malaria vector Anopheles funestus",
+          "dc:creator" : ["Coetzee, M.", "Koekemoer, L. L."],
+          "dc:identifier" : ["doi:10.1146/annurev-ento-120811-153628", "issn:1545-4487 (Electronic)", "issn:0066-4170 (Linking)", "23317045"],
+          "dc:description" : "Anopheles funestus is one of three major African vectors of malaria. Its distribution extends over much of the tropics and subtropics wherever suitable swampy breeding habitats are present. As with members of the Anopheles gambiae complex, An. funestus shows marked genetic heterogeneity across its range. Currently, two unnamed species are recognized in the group, with molecular and cytogenetic data indicating that more may be present. The control of malaria vectors in Africa has received increased attention in the past decade with the scaling up of insecticide-treated bed nets and indoor residual house spraying. Also in the past decade, the frequency of insecticide-resistant mosquitoes has increased exponentially. Whether this increase is in response to vector control initiatives or because of insecticide use in agriculture is debatable. In this article we examine the progress made on the systematics of the An. funestus group and review research on insecticide resistance and its mechanisms.",
+          "dc:language" : "eng",
+          "dc:type" : "Article",
+          "dc:source" : "Annual review of entomology",
+          "dc:references" : "Molecu2013",
+          "dc:bibliographicCitation" : "Annu Rev Entomol 58, 393-412. (2013)",
+          "rdf:seeAlso" : "http://www.ncbi.nlm.nih.gov/pubmed/23317045",
+          "dc:created" : "2013",
+          "dc:modified" : {
+              "@value":"2014-03-17Z",
+              "@type":"http://www.w3.org/2001/XMLSchema#date"
+          },
+          "rdf:domain" : "Citation"
      },
      "properties-meta" : {
-          "mime-type" : "text/xml",
+          "mime-type" : "text/xml"
+     },
      "properties" : "<fields><depositor>vecnet_batchuser</depositor></fields>"
 },
 {
@@ -150,17 +158,25 @@ likely wrong.
      "pid" : "vecnet:h415pf50x",
      "af-model" : "CitationFile",
      "rights" : {
-          "read" : ["registered"],
+          "read-groups" : ["registered"],
           "edit" : ["vecnet_batchuser"]
      },
      "metadata" : {
-          "@context" : "...",
-          "id": "...",
-         "dc:type" = "CitationFile",
-          "dc:dateSubmitted" =  "2014-03-17Z"^^<http://www.w3.org/2001/XMLSchema#date>,
-          "dc:modified" = "2014-03-17Z"^^<http://www.w3.org/2001/XMLSchema#date>,
-          "dc:creator" = [ "Vecnet Batchuser", "Maureen Coetzee and Lizette L. Koekemoer" ],
-          "dc:title" = "Molecular Systematics and Insecticide Resistance in the Major African Malaria Vector Anopheles funestus"
+          "@context" : {
+               "dc" : "http://purl.org/dc/terms/",
+               "rdfs" : "http://www.w3.org/2000/01/rdf-schema#"
+          },
+          "dc:type" : "CitationFile",
+          "dc:dateSubmitted" : {
+               "@value" : "2014-03-17Z",
+               "@type"  : "http://www.w3.org/2001/XMLSchema#date"
+          },
+          "dc:modified" : {
+               "@value" : "2014-03-17Z",
+               "@type"  : "http://www.w3.org/2001/XMLSchema#date"
+          },
+          "dc:creator" : [ "Vecnet Batchuser", "Maureen Coetzee and Lizette L. Koekemoer" ],
+          "dc:title" : "Molecular Systematics and Insecticide Resistance in the Major African Malaria Vector Anopheles funestus"
      },
      "rels-ext" : {
           "isPartOf" : ["vecnet:d217qs82g"]
@@ -176,7 +192,7 @@ likely wrong.
           "checksum": ""
      },
      "content-file" : "/opt/citations/pdf/5772.pdf",
-     "full_text-file" : "...",
+     "full_text-file" : "/opt/citations/text/5772.txt",
      "full_text-meta" : {
           "label" : "File Datastream",
           "checksum" : ""
@@ -189,7 +205,7 @@ likely wrong.
           "label" : "File Datastream",
           "checksum" : ""
      }
-     "thumbnail-file" : "..."
+     "thumbnail-file" : "/opt/citations/thumb/5772.png"
 }]
 ````
 
