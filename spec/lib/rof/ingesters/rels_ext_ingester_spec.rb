@@ -20,10 +20,10 @@ module ROF
         let(:fedora_document) { double }
         let(:rels_ext) { double }
         it 'should save the document' do
-          fedora_document.should_receive(:[]).with('RELS-EXT').and_return(rels_ext)
-          rels_ext.should_receive(:content=).with(expected_content)
-          rels_ext.should_receive(:mimeType=).with("application/rdf+xml")
-          rels_ext.should_receive(:save)
+          expect(fedora_document).to receive(:[]).with('RELS-EXT').and_return(rels_ext)
+          expect(rels_ext).to receive(:content=).with(expected_content)
+          expect(rels_ext).to receive(:mimeType=).with("application/rdf+xml")
+          expect(rels_ext).to receive(:save)
           subject.call
         end
       end
