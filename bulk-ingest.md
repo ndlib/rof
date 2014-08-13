@@ -67,19 +67,29 @@ metadata  |  Contents for the 'descMetadata' data stream.  Takes an object. It i
 # Rights
 
 Rights are given as a object with the keys "discover", "discover-groups",
-"view", "view-groups", "edit", and "edit-groups". Each key takes an array of strings,
+"read", "read-groups", "edit", and "edit-groups". Each key takes an array of strings,
 which are taken to be a list of group or user names.
 In Hydra rightsMetadata, the groups "public" and "registered" have special meaning.
-There is no special syntax for embargo dates yet.
+The key "embargo-date", if provided, will be saved. It must be in the form _year-month-day_, e.g. "2015-01-24" for January 24, 2015.
+The semantics are, the item is considered viewable only by the editors until the embargo date, after which the rest of the rights take effect.
+ROF does *not* validate the date provided is in the correct format.
 
-Example:
+Example: This object is viewable by anyone and editable only by the user `dbrower`.
 ````json
 {
- "view-group" : ["public"],
+ "read-groups" : ["public"],
  "edit" : ["dbrower"]
 }
 ````
 
+Example: This object is embargoed until Jan 24, 2015. Before that date it is viewable and editable only by user `dbrower`, afterward it is viewable by any logged in user and editable by user `dbrower`.
+````json
+{
+ "read-groups" : ["registered"],
+ "edit" : ["dbrower"],
+ "embargo-date" : "2015-01-24"
+}
+````
 
 # Rels-Ext
 

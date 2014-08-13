@@ -24,7 +24,15 @@ module ROF
         content += format_rights_section("read", rights["read"], rights["read-groups"])
         content += format_rights_section("edit", rights["edit"], rights["edit-groups"])
         # TODO(dbrower): expose embargo information
-        content += %Q{  <embargo>\n    <human/>\n    <machine/>\n  </embargo>\n}
+        content += %Q{  <embargo>\n    <human/>\n}
+        if rights["embargo-date"]
+          content += %Q{    <machine>\n}
+          content += %Q{      <date>#{rights["embargo-date"]}</date>\n}
+          content += %Q{    </machine>\n}
+        else
+          content += %Q{    <machine/>\n}
+        end
+        content += %Q{  </embargo>\n}
         content += %Q{</rightsMetadata>\n}
 
         if fdoc
