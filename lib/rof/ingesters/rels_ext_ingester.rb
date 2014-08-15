@@ -38,7 +38,7 @@ module ROF
           # XML correctly
           targets = [targets] if targets.is_a? String
           targets.each do |target|
-            content += "<ns1:#{relation} rdf:resource=\"#{target}\"/>"
+            content += "<ns1:#{relation} rdf:resource=\"info:fedora/#{target}\"/>"
           end
         end
         content += '</rdf:Description></rdf:RDF>'
