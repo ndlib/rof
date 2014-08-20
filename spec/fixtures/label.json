@@ -1,0 +1,20 @@
+[
+{
+    "type" : "fobject",
+    "pid" : "$(label-1)"
+},
+{
+    "type" : "fobject",
+    "rels-ext" : {
+        "partOf" : ["$(label-1)"],
+        "refines" : ["$(label-2)"]
+    }
+},
+{
+    "type" : "fobject",
+    "pid" : "$(label-2)",
+    "rels-ext" : {
+        "partOf" : ["$(label-2)", "$(label-1)", "another"]
+    }
+}
+]

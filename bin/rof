@@ -4,13 +4,30 @@ require 'rof'
 require 'optparse'
 
 fedora_info = {}
+noids = {}
+prefix = nil
 opt = OptionParser.new do |opts|
-  opts.banner = "Usage: rof [options] <input file>"
+  opts.banner = %q{Usage: rof [options] <command> <input files>
+  command is one of:
+    ingest
+    validate
+    filter <filter name>
+
+  Filtering sends transformed objects to stdout.
+
+  Possible filters are: label}
+
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
   end
   opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
     fedora_info[:user], fedora_info[:password] = u.split(':')
+  end
+  opts.on("", "--noids STRING", "Noids server path and pool name (colon separated)") do |u|
+    noids[:noid_server], _, noids[:pool_name] = u.rpartition(':')
+  end
+  opts.on("", "--prefix STRING", "Prefix for label identifiers") do |s|
+    prefix = s
   end
 end
 
@@ -18,8 +35,19 @@ opt.parse!
 
 fedora_info = nil if fedora_info.empty?
 
-if ARGV[0]
-  ROF::CLI.ingest_file(ARGV[0], ["."], STDOUT, fedora_info)
+case ARGV[0]
+when "ingest", "validate"
+  ROF::CLI.ingest_file(ARGV[1], ["."], STDOUT, fedora_info)
+when "filter"
+  filter = case ARGV[1]
+           when "label"
+             ROF::Filters::Label.new(prefix, noids)
+           else
+             puts "Unknown filter #{ARGV[1]}"
+             exit
+           end
+  ROF::CLI.filter_file(filter, ARGV[2], STDOUT)
 else
+  puts "Unknown command #{ARGV[0]}"
   puts opt.help
 end

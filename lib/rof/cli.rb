@@ -14,15 +14,8 @@ module ROF
     #
     # All output is sent to `outfile`.
     def self.ingest_file(fname, search_paths=[], outfile=STDOUT, fedora=nil)
-      items = nil
-      File.open(fname, 'r') do |f|
-        items = JSON.parse(f.read)
-      end
-      items = [items] unless items.is_a? Array
+      items = self.load_items_from_file(fname, outfile)
       self.ingest_array(items, search_paths, outfile, fedora)
-    rescue JSON::ParserError => e
-      outfile.puts("Error reading #{fname}:#{e.to_s}")
-      exit!(-1)
     end
 
     def self.ingest_array(items, search_paths=[], outfile=STDOUT, fedora=nil)
@@ -61,6 +54,30 @@ module ROF
       outfile.write("#{error_count} errors\n")
     ensure
       outfile.close if outfile && need_close
+    end
+
+    def self.filter_file(filter, fname, outfile=STDOUT)
+      items = self.load_items_from_file(fname, STDERR)
+      self.filter_array(filter, items, outfile)
+    end
+
+    def self.filter_array(filter, items, outfile=STDOUT)
+      # filter will transform the items array in place
+      filter.process(items)
+      outfile.write(JSON.pretty_generate(items))
+    end
+
+    protected
+    def self.load_items_from_file(fname, outfile)
+      items = nil
+      File.open(fname, 'r') do |f|
+        items = JSON.parse(f.read)
+      end
+      items = [items] unless items.is_a? Array
+      items
+    rescue JSON::ParserError => e
+      outfile.puts("Error reading #{fname}:#{e.to_s}")
+      exit!(-1)
     end
   end
 end
