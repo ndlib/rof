@@ -37,6 +37,7 @@ Total time 0.111s
 ```
 
 There is a filter which will assign objects identifiers. This requires an external [noids](https://github.com/ndlib/noids) service to provide the identifiers.
+See [labels.md](labels.md).
 
 ```
 $ bin/rof filter label spec/fixtures/label.json --noids localhost:13001:test-pool --prefix temp
@@ -77,3 +78,13 @@ Other ideas for transformations:
 
 * A service to expand higher-level objects, say an `image-collection`, into a sequence of `fobjects`.
 * The ability to run file characterizations and create derivatives before ingest.
+
+# Other
+
+Since the files are JSON, any tool for working with JSON files will work with these.
+For example, the [jq](http://stedolan.github.io/jq/) tool makes it easy to extract all
+the `pid` field from every object in a file, and return it as a JSON array:
+
+```
+jq '[.[]|.pid]' < spec/fixtures/vecnet-citation.json
+```
