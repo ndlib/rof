@@ -7,5 +7,9 @@ module ROF
 end
 
 # work around Rubydora expecting a logger
-def logger
+unless defined?(logger)
+  def logger
+    require 'logger'
+    @logger ||= Logger.new(STDOUT)
+  end
 end
