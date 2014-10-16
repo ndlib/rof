@@ -29,6 +29,18 @@ module ROF
       }
       expect(ROF.Ingest(item)).to eq(["content", "other"])
     end
+
+    it "treats id as a surrogate for pid when pid is missing" do
+      item = {"type" => "fobject",
+              "id" => "test:1",
+              "af-model" => "GenericFile",
+              "content" => "jello",
+              "content-meta" => {"label" => "test stream 1",
+                                 "mime-type" => "application/jello"},
+              "other-meta" => {"label" => "test stream 2"},
+      }
+      expect(ROF.Ingest(item)).to eq(["content", "other"])
+    end
     describe "RDF Metadata" do
       it "loads JSON-LD" do
         item = {"pid" => "test:1",
