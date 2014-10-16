@@ -10,6 +10,10 @@ module ROF
       item = {"type" => "fobject"}
       expect {ROF.Ingest(item)}.to raise_error(ROF::MissingPidError)
     end
+    it "disallows both id and pid" do
+      item = {"type" => "fobject", "id" => '1', "pid" => '1'}
+      expect {ROF.Ingest(item)}.to raise_error(ROF::TooManyIdentitiesError)
+    end
     it "rejects two ways of giving a datastream" do
       item = {"type" => "fobject",
               "pid" => "test:1",
@@ -21,6 +25,18 @@ module ROF
     it "uploads datastreams with apropos metadata" do
       item = {"type" => "fobject",
               "pid" => "test:1",
+              "af-model" => "GenericFile",
+              "content" => "jello",
+              "content-meta" => {"label" => "test stream 1",
+                                 "mime-type" => "application/jello"},
+              "other-meta" => {"label" => "test stream 2"},
+      }
+      expect(ROF.Ingest(item)).to eq(["content", "other"])
+    end
+
+    it "treats id as a surrogate for pid when pid is missing" do
+      item = {"type" => "fobject",
+              "id" => "test:1",
               "af-model" => "GenericFile",
               "content" => "jello",
               "content-meta" => {"label" => "test stream 1",

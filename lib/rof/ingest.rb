@@ -9,6 +9,9 @@ module ROF
   class MissingPidError < RuntimeError
   end
 
+  class TooManyIdentitiesError < RuntimeError
+  end
+
   class SourceError < RuntimeError
   end
 
@@ -19,6 +22,8 @@ module ROF
   # Otherwise raises an exception depending on the error.
   def self.Ingest(item, fedora=nil, search_paths=[])
     raise NotFobjectError if item["type"] != "fobject"
+    raise TooManyIdentitiesError if item.key?("id") && item.key?("pid")
+    item["pid"] = item["id"] unless item.key?("pid")
     raise MissingPidError unless item["pid"].is_a? String
     models = string_nil_to_array(item["model"])
     models += string_nil_to_array(item["af-model"]).map { |m| af_model_name(m) }
@@ -54,7 +59,7 @@ module ROF
         ds_touched << "descMetadata"
 
       # ignore these fields
-      when "type", "pid", "model", "af-model", "rels-ext"
+      when "type", "pid", "model", "id", "af-model", "rels-ext"
 
       # datastream fields
       when /\A(.+)-file\Z/, /\A(.+)-meta\Z/, /\A(.+)\Z/
