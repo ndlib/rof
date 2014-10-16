@@ -10,6 +10,10 @@ module ROF
       item = {"type" => "fobject"}
       expect {ROF.Ingest(item)}.to raise_error(ROF::MissingPidError)
     end
+    it "disallows both id and pid" do
+      item = {"type" => "fobject", "id" => '1', "pid" => '1'}
+      expect {ROF.Ingest(item)}.to raise_error(ROF::TooManyIdentitiesError)
+    end
     it "rejects two ways of giving a datastream" do
       item = {"type" => "fobject",
               "pid" => "test:1",
