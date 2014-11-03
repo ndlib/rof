@@ -2,6 +2,7 @@ require "rof/ingest"
 require "rof/version"
 require "rof/cli"
 require "rof/access"
+require "rof/translate_csv"
 require "rof/filters/label"
 
 module ROF
