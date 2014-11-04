@@ -20,12 +20,41 @@ module ROF
       expect{TranslateCSV.run(s)}.to raise_error
     end
 
-    it "does not split the access field on pipe" do
+    it "deocdes the access field into rights" do
       s = %q{type,owner,access
       Work,user1,"private,edit:user2|user3"
       }
       rof = TranslateCSV.run(s)
-      expect(rof).to eq([{"type" => "Work", "owner" => "user1", "access" => "private,edit:user2|user3"}])
+      expect(rof).to eq([{"type" => "Work", "owner" => "user1", "rights" => {"edit" => ["user1", "user2", "user3"]}}])
+    end
+
+    it "puts metadata into substructure" do
+      s = %q{type,owner,dc:title,foaf:name
+      Work,user1,"Q, A Letter",Jane Smith|Zander
+      }
+      rof = TranslateCSV.run(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "rights" => {"edit" => ["user1"]},
+        "metadata" => {
+          "@context" => Namespaces,
+          "dc:title" => "Q, A Letter",
+          "foaf:name" => ["Jane Smith", "Zander"]}
+      }])
+    end
+
+    it "renames curate_id to pid" do
+      s = %q{type,owner,curate_id
+      Work,user1,abcdefg
+      }
+      rof = TranslateCSV.run(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "pid" => "abcdefg",
+        "rights" => {"edit" => ["user1"]}
+      }])
     end
 
   end

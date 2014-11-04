@@ -22,15 +22,19 @@ module ROF
   # owner -- mandatory. The owner of this object and any children objects. Must be a Curate User name
   # access -- optional. The access policy of this object. defaults to "public". See below
   #
-  # access is described by an "access string". The following are valid access strings:
+  # access is described by an "access string".
   #
-  #   "public"
-  #   "restricted"
-  #   "private"
-  #   "read:"+username,
-  #   "edit:"+username,
+  # fields with a name of the form XXX:YYY will be treated as descriptive metadata.
+  #
   class TranslateCSV
     class ParseError < RuntimeError
+    end
+
+    class UnknownNamespace < RuntimeError
+      attr_reader :ns
+      def initialize(ns)
+        @ns = ns
+      end
     end
 
     def self.run(csv_contents)
@@ -61,9 +65,32 @@ module ROF
         if result["type"].nil? or result["owner"].nil?
           raise ParseError
         end
+        result["rights"] = ROF::Access.decode(result.fetch("access", "private"), result["owner"])
+        result.delete("access")
+        result = self.collect_metadata(result)
         rof_contents << result
       end
       rof_contents
+    end
+
+    def self.collect_metadata(rof)
+      # pull any fields of the form XXX:YYY into
+      # a metadata section and add a "@context" key
+      metadata = {}
+      rof = rof.delete_if do |k,v|
+        if k =~ /([^:]+):.+/
+          xv = v.first if v.length == 1
+          metadata[k] = v.length == 1 ? v.first : v
+          true
+        else
+          false
+        end
+      end
+      return rof if metadata.empty?
+      # TODO(dbrower): check there are no unknown namespaces
+      metadata["@context"] = ROF::Namespaces
+      rof["metadata"] = metadata
+      rof
     end
   end
 end
