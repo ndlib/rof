@@ -42,6 +42,8 @@ when "filter"
   filter = case ARGV[1]
            when "label"
              ROF::Filters::Label.new(prefix, noids)
+           when "work"
+             ROF::Filters::Work.new
            else
              puts "Unknown filter #{ARGV[1]}"
              exit
