@@ -10,7 +10,7 @@ module ROF
     class Work
 
       def initialize
-        @random = Random.new
+        @seq = 0
       end
 
       def process(obj_list)
@@ -28,7 +28,7 @@ module ROF
         main_obj = {
           "type" => "fobject",
           "af-model" => model,
-          "pid" => obj.fetch("pid", "$(#{@random.rand})"),
+          "pid" => obj.fetch("pid", next_label),
           "rights" => obj["rights"],
           "properties" => properties_ds(obj["owner"]),
           "properties-meta" => {
@@ -66,6 +66,10 @@ module ROF
 <owner>#{owner}</owner>
 </fields>
 }
+      end
+
+      def next_label
+        "$(#{@seq})".tap { |_| @seq += 1 }
       end
     end
   end
