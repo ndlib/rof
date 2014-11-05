@@ -6,6 +6,7 @@ require 'optparse'
 fedora_info = {}
 noids = {}
 prefix = nil
+search_path = ["."]
 opt = OptionParser.new do |opts|
   opts.banner = %q{Usage: rof [options] <command> <input files>
   command is one of:
@@ -15,7 +16,7 @@ opt = OptionParser.new do |opts|
 
   Filtering sends transformed objects to stdout.
 
-  Possible filters are: label}
+  Possible filters are: label, work}
 
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
@@ -29,6 +30,9 @@ opt = OptionParser.new do |opts|
   opts.on("", "--prefix STRING", "Prefix for label identifiers") do |s|
     prefix = s
   end
+  opts.on("", "--path PATH", "Colon seperated search path for files for ingest or validation. Defaults to the current directory") do |s|
+    search_path = s.split(":")
+  end
 end
 
 opt.parse!
@@ -37,7 +41,8 @@ fedora_info = nil if fedora_info.empty?
 
 case ARGV[0]
 when "ingest", "validate"
-  ROF::CLI.ingest_file(ARGV[1], ["."], STDOUT, fedora_info)
+  error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info)
+  exit 1 if error_count > 0
 when "filter"
   filter = case ARGV[1]
            when "label"

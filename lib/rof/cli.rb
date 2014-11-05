@@ -13,6 +13,8 @@ module ROF
     # effect of verifying the format of `fname`.
     #
     # All output is sent to `outfile`.
+    #
+    # Returns the number of errors.
     def self.ingest_file(fname, search_paths=[], outfile=STDOUT, fedora=nil)
       items = self.load_items_from_file(fname, outfile)
       self.ingest_array(items, search_paths, outfile, fedora)
@@ -52,6 +54,7 @@ module ROF
       end
       outfile.write("Total time %0.3fs\n" % overall_benchmark.real)
       outfile.write("#{error_count} errors\n")
+      error_count
     ensure
       outfile.close if outfile && need_close
     end
