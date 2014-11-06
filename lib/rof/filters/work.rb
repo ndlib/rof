@@ -1,3 +1,4 @@
+require 'mime-types'
 
 module ROF
   module Filters
@@ -9,22 +10,28 @@ module ROF
     # and copies the access to each fobject.
     class Work
 
+      WORK_TYPES = {
+        # csv name => af-model
+        "article" => "Article",
+        "dataset" => "Dataset",
+        "document" => "Document",
+        "etd" => "Etd",
+        "image" => "Image"
+      }
+
       def initialize
         @seq = 0
       end
 
       def process(obj_list)
-        obj_list.map! { |x| process_one(x) }
+        obj_list.map! { |x| process_one_work(x) }
         obj_list.flatten!
       end
 
-      def process_one(obj)
-        return obj unless obj["type"].start_with?("Work")
-        model = if obj["type"] =~ /Work(-(.+))?/
-                 $2
-               else
-                 "GenericWork"
-               end
+      def process_one_work(obj)
+        model = decode_work_type(obj)
+        return [obj] if model.nil?
+
         main_obj = {
           "type" => "fobject",
           "af-model" => model,
@@ -38,7 +45,11 @@ module ROF
         }
         result = [main_obj]
         return result if obj["files"].nil?
+        # make the first file be the representative thumbnail
+        thumb_rep = nil
         obj["files"].each do |fname|
+          mimetype = MIME::Types.of(fname)
+          mimetype = mimetype.empty? ? "application/octet-stream" : mimetype.first.content_type
           f_obj = {
             "type" => "fobject",
             "af-model" => "GenericFile",
@@ -52,24 +63,42 @@ module ROF
             },
             "content-file" => fname,
             "content-meta" => {
-              "label" => fname
+              "label" => fname,
+              "mime-type" => mimetype
             }
           }
+          if thumb_rep.nil?
+            thumb_rep = next_label
+            f_obj["pid"] = thumb_rep
+            main_obj["properties"] = properties_ds(obj["owner"], thumb_rep)
+          end
           result << f_obj
         end
         result
       end
 
-      def properties_ds(owner)
-        %Q{<fields>
+      def decode_work_type(obj)
+        t = obj["type"].downcase
+        if obj["type"] =~ /^[Ww]ork(-(.+))?/
+          return "GenericWork" if $2.nil?
+          $2
+        else
+          # this will return nil if key t does not exist
+          WORK_TYPES[t]
+        end
+      end
+
+      def properties_ds(owner, rep=nil)
+        s = %Q{<fields>
 <depositor>batch_ingest</depositor>
 <owner>#{owner}</owner>
-</fields>
 }
+        s += "<representative>#{rep}</representative>\n" if rep
+        s += "</fields>\n"
       end
 
       def next_label
-        "$(#{@seq})".tap { |_| @seq += 1 }
+        "$(pid--#{@seq})".tap { |_| @seq += 1 }
       end
     end
   end
