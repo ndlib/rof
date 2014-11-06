@@ -48,20 +48,39 @@ module ROF
         end
 
         obj_list.each do |obj|
-          next if obj["type"] != "fobject" || obj["rels-ext"].nil?
-          obj["rels-ext"].each do |k,v|
-            v.map! do |id|
-              label = find_label(id)
-              if ! label.nil?
-                pid = labels[label]
-                raise MissingLabel if pid.nil?
-              end
-              label.nil? ? id : pid
-            end
+          next if obj["type"] != "fobject"
+          obj.each do |k,v|
+            force = (k == "rels-ext")
+            obj[k] = replace_labels(v, labels, force)
           end
         end
 
         obj_list
+      end
+
+      # recurse through obj replacing any labels in strings
+      # with the id in labels, which is a hash.
+      # The relacement is done in place.
+      # Hash keys are not touched (only hash values).
+      # if force is true, labels which don't resolve will raise
+      # a MissingLabel error.
+      def replace_labels(obj, labels, force=false)
+        case
+        when obj.is_a?(Array)
+          obj.map! { |x| replace_labels(x, labels, force) }
+        when obj.is_a?(Hash)
+          obj.each do |k,v|
+            obj[k] = replace_labels(v, labels, force)
+          end
+        when obj.is_a?(String)
+          obj.gsub(@label_re) do |match|
+            pid = labels[$1]
+            raise MissingLabel if pid.nil? && force
+            pid.nil? ? match : pid
+          end
+        else
+          obj
+        end
       end
 
       def find_label(s)

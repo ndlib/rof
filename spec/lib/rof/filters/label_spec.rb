@@ -57,6 +57,19 @@ module ROF
                  }}]
         expect { @labeler.process(list) }.to raise_error(Label::MissingLabel)
       end
+
+      it "replaces labels in arrays" do
+        list = ["a", "something $(b) and $(a)", "$(not a label)"]
+        labels = {"a" => "abc", "b" => "qwe"}
+        expect(@labeler.replace_labels(list, labels, false)).to eq(["a", "something qwe and abc", "$(not a label)"])
+
+        hash = {"$(a)" => "this should $(b)", sym: :symbol, b: {b: "$(a) $(z)"}}
+        expect(@labeler.replace_labels(hash, labels, false)).to eq({
+          "$(a)" => "this should qwe",
+          sym: :symbol,
+          b: {b: "abc $(z)"}
+        })
+      end
     end
   end
 end
