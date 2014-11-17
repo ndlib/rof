@@ -10,6 +10,8 @@ module ROF
     # and copies the access to each fobject.
     class Work
 
+      WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/.freeze
+
       WORK_TYPES = {
         # csv name => af-model
         "article" => "Article",
@@ -17,7 +19,7 @@ module ROF
         "document" => "Document",
         "etd" => "Etd",
         "image" => "Image"
-      }
+      }.freeze
 
       def initialize
         @seq = 0
@@ -78,24 +80,26 @@ module ROF
       end
 
       def decode_work_type(obj)
-        t = obj["type"].downcase
-        if obj["type"] =~ /^[Ww]ork(-(.+))?/
+        if obj["type"] =~ WORK_TYPE_WITH_PREFIX_PATTERN
           return "GenericWork" if $2.nil?
           $2
         else
           # this will return nil if key t does not exist
-          WORK_TYPES[t]
+          work_type = obj["type"].downcase
+          WORK_TYPES[work_type]
         end
       end
 
-      def properties_ds(owner, rep=nil)
+      def properties_ds(owner, representative=nil)
         s = %Q{<fields>
 <depositor>batch_ingest</depositor>
 <owner>#{owner}</owner>
 }
-        s += "<representative>#{rep}</representative>\n" if rep
+        s += "<representative>#{representative}</representative>\n" if representative
         s += "</fields>\n"
       end
+
+      private
 
       def next_label
         "$(pid--#{@seq})".tap { |_| @seq += 1 }
