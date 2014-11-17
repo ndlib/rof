@@ -57,5 +57,21 @@ module ROF
       }])
     end
 
+    it "strips space around pipes" do
+      s = %q{type,owner,dc:title,foaf:name
+      Work,user1,"Q, A Letter",Jane Smith | Zander
+      }
+      rof = TranslateCSV.run(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "rights" => {"edit" => ["user1"]},
+        "metadata" => {
+          "@context" => Namespaces,
+          "dc:title" => "Q, A Letter",
+          "foaf:name" => ["Jane Smith", "Zander"]}
+      }])
+    end
+
   end
 end

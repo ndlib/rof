@@ -53,13 +53,14 @@ module ROF
         row.each_with_index do |item, i|
           next if item.nil?
           item.strip!
-          case first_line[i]
+          column_name = first_line[i]
+          case column_name
           when "type", "owner", "access"
-            result[first_line[i]] = item
+            result[column_name] = item
           when "curate_id"
             result["pid"] = item
           else
-            result[first_line[i]] = item.split("|")
+            result[column_name] = item.split("|").map(&:strip)
           end
         end
         if result["type"].nil? or result["owner"].nil?
@@ -77,10 +78,9 @@ module ROF
       # pull any fields of the form XXX:YYY into
       # a metadata section and add a "@context" key
       metadata = {}
-      rof = rof.delete_if do |k,v|
-        if k =~ /([^:]+):.+/
-          xv = v.first if v.length == 1
-          metadata[k] = v.length == 1 ? v.first : v
+      rof = rof.delete_if do |field, v|
+        if field =~ /([^:]+):.+/
+          metadata[field] = v.length == 1 ? v.first : v
           true
         else
           false
