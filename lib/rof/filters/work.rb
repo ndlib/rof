@@ -30,6 +30,8 @@ module ROF
         obj_list.flatten!
       end
 
+      # given a single object, return a list (possibly empty) of new objects
+      # to replace the one given
       def process_one_work(obj)
         model = decode_work_type(obj)
         return [obj] if model.nil?
