@@ -18,7 +18,7 @@ module ROF
         expect(after.first).to eq({
           "type" => "ABC",
           "metadata" => {
-            "@context" => ROF::Namespaces,
+            "@context" => ROF::RdfContext,
             "dc:dateSubmitted" => @today_s
           }
         })

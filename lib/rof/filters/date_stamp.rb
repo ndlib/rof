@@ -18,7 +18,7 @@ module ROF
         obj_list.map! do |obj|
           if obj["metadata"].nil?
             obj["metadata"] = {
-              "@context" => ROF::Namespaces
+              "@context" => ROF::RdfContext
             }
           end
           if obj["metadata"]["dc:dateSubmitted"].nil?

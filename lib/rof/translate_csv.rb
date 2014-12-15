@@ -88,7 +88,7 @@ module ROF
       end
       return rof if metadata.empty?
       # TODO(dbrower): check there are no unknown namespaces
-      metadata["@context"] = ROF::Namespaces
+      metadata["@context"] = ROF::RdfContext
       rof["metadata"] = metadata
       rof
     end

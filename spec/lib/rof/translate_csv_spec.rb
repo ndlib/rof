@@ -38,7 +38,7 @@ module ROF
         "owner" => "user1",
         "rights" => {"edit" => ["user1"]},
         "metadata" => {
-          "@context" => Namespaces,
+          "@context" => RdfContext,
           "dc:title" => "Q, A Letter",
           "foaf:name" => ["Jane Smith", "Zander"]}
       }])
@@ -67,7 +67,7 @@ module ROF
         "owner" => "user1",
         "rights" => {"edit" => ["user1"]},
         "metadata" => {
-          "@context" => Namespaces,
+          "@context" => RdfContext,
           "dc:title" => "Q, A Letter",
           "foaf:name" => ["Jane Smith", "Zander"]}
       }])
