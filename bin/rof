@@ -16,7 +16,7 @@ opt = OptionParser.new do |opts|
 
   Filtering sends transformed objects to stdout.
 
-  Possible filters are: label, work}
+  Possible filters are: datestamp, label, work}
 
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
@@ -45,6 +45,8 @@ when "ingest", "validate"
   exit 1 if error_count > 0
 when "filter"
   filter = case ARGV[1]
+           when "datestamp"
+             ROF::Filters::DateStamp.new
            when "label"
              ROF::Filters::Label.new(prefix, noids)
            when "work"

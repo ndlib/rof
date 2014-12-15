@@ -4,6 +4,7 @@ require "rof/cli"
 require "rof/access"
 require "rof/namespaces"
 require "rof/translate_csv"
+require "rof/filters/date_stamp"
 require "rof/filters/label"
 require "rof/filters/work"
 
