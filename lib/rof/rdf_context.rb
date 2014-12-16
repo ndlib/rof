@@ -6,6 +6,9 @@ module ROF
 
     "dc:dateSubmitted" => {
       "@type" => "http://www.w3.org/2001/XMLSchema#date"
+    },
+    "dc:modified" => {
+      "@type" => "http://www.w3.org/2001/XMLSchema#date"
     }
   }.freeze
 end

@@ -19,7 +19,8 @@ module ROF
           "type" => "ABC",
           "metadata" => {
             "@context" => ROF::RdfContext,
-            "dc:dateSubmitted" => @today_s
+            "dc:dateSubmitted" => @today_s,
+            "dc:modified" => @today_s
           }
         })
       end
@@ -37,7 +38,8 @@ module ROF
           "type" => "BCD",
           "metadata" => {
             "dc:title" => "something",
-            "dc:dateSubmitted" => @today_s
+            "dc:dateSubmitted" => @today_s,
+            "dc:modified" => @today_s
           }
         })
       end
@@ -56,10 +58,33 @@ module ROF
           "type" => "CDE",
           "metadata" => {
             "dc:title" => "anotherthing",
-            "dc:dateSubmitted" => "any date"
+            "dc:dateSubmitted" => "any date",
+            "dc:modified" => @today_s
           }
         })
       end
+
+      it "always update the date modified" do
+        items = [{
+          "type" => "CDE",
+          "metadata" => {
+            "dc:title" => "anotherthing",
+            "dc:dateSubmitted" => "any date",
+            "dc:modified" => "any date"
+          }
+        }]
+        after = @w.process(items)
+        expect(after.length).to eq(1)
+        expect(after.first).to eq({
+          "type" => "CDE",
+          "metadata" => {
+            "dc:title" => "anotherthing",
+            "dc:dateSubmitted" => "any date",
+            "dc:modified" => @today_s
+          }
+        })
+      end
+
     end
   end
 end
