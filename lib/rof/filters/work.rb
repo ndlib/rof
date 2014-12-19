@@ -69,6 +69,10 @@ module ROF
             "content-meta" => {
               "label" => fname,
               "mime-type" => mimetype
+            },
+            "metadata" => {
+              "@context" => ROF::RdfContext,
+              "dc:title" => fname
             }
           }
           if thumb_rep.nil?

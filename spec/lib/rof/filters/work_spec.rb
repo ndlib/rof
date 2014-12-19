@@ -46,6 +46,7 @@ module ROF
                                     "pid" => "$(pid--1)")
         expect(after[2]).to include("type" => "fobject",
                                     "af-model" => "GenericFile")
+        expect(after[2]["metadata"]).to include("dc:title" => "b.jpeg")
       end
     end
   end
