@@ -10,6 +10,9 @@ module ROF
     # and copies the access to each fobject.
     class Work
 
+      class NoFile < RuntimeError
+      end
+
       WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/.freeze
 
       WORK_TYPES = {
@@ -32,33 +35,47 @@ module ROF
 
       # given a single object, return a list (possibly empty) of new objects
       # to replace the one given
-      def process_one_work(obj)
-        model = decode_work_type(obj)
-        return [obj] if model.nil?
+      def process_one_work(input_obj)
+        model = decode_work_type(input_obj)
+        return [input_obj] if model.nil?
 
         main_obj = {
           "type" => "fobject",
           "af-model" => model,
-          "pid" => obj.fetch("pid", next_label),
-          "rights" => obj["rights"],
-          "properties" => properties_ds(obj["owner"]),
+          "pid" => input_obj.fetch("pid", next_label),
+          "rights" => input_obj["rights"],
+          "properties" => properties_ds(input_obj["owner"]),
           "properties-meta" => {
             "mime-type" => "text/xml"
           },
-          "metadata" => obj["metadata"]
+          "metadata" => input_obj["metadata"]
         }
         result = [main_obj]
-        return result if obj["files"].nil?
+        return result if input_obj["files"].nil?
         # make the first file be the representative thumbnail
         thumb_rep = nil
-        obj["files"].each do |fname|
+        input_obj["files"].each do |finfo|
+          if finfo.is_a?(String)
+            fname = finfo
+            finfo = {"files" => [fname]}
+          else
+            fname = finfo["files"].first
+            raise NoFile if fname.nil?
+          end
+          finfo["rights"] ||= input_obj["rights"]
+          finfo["owner"] ||= input_obj["owner"]
+          finfo["metadata"] ||= {
+            "@context" => ROF::RdfContext
+          }
+          finfo["metadata"]["dc:title"] ||= fname
           mimetype = MIME::Types.of(fname)
           mimetype = mimetype.empty? ? "application/octet-stream" : mimetype.first.content_type
           f_obj = {
             "type" => "fobject",
             "af-model" => "GenericFile",
-            "rights" => obj["rights"],
-            "properties" => properties_ds(obj["owner"]),
+            "pid" => finfo["pid"],
+            "rights" => finfo["rights"],
+            "properties" => properties_ds(finfo["owner"]),
             "properties-meta" => {
               "mime-type" => "text/xml"
             },
@@ -70,15 +87,16 @@ module ROF
               "label" => fname,
               "mime-type" => mimetype
             },
-            "metadata" => {
-              "@context" => ROF::RdfContext,
-              "dc:title" => fname
-            }
+            "metadata" => finfo["metadata"]
           }
+          f_obj.delete_if { |k,v| v.nil? }
           if thumb_rep.nil?
-            thumb_rep = next_label
-            f_obj["pid"] = thumb_rep
-            main_obj["properties"] = properties_ds(obj["owner"], thumb_rep)
+            thumb_rep = f_obj["pid"]
+            if thumb_rep.nil?
+              thumb_rep = next_label
+              f_obj["pid"] = thumb_rep
+            end
+            main_obj["properties"] = properties_ds(input_obj["owner"], thumb_rep)
           end
           result << f_obj
         end

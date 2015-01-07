@@ -26,6 +26,10 @@ module ROF
   #
   # fields with a name of the form XXX:YYY will be treated as descriptive metadata.
   #
+  # As a special case, a type of "+" will insert a generic file associated
+  # with the previous work translated into ROF. This will allow a work to have
+  # attached files with different access permissions, owners, etc...
+  # Any extra files are appended to the file list for the work.
   class TranslateCSV
     class ParseError < RuntimeError
     end
@@ -37,9 +41,13 @@ module ROF
       end
     end
 
+    class NoPriorWork < RuntimeError
+    end
+
     def self.run(csv_contents)
       first_line = nil
       rof_contents = []
+      previous_work = nil
       CSV.parse(csv_contents) do |row|
         if first_line.nil?
           first_line = row
@@ -52,13 +60,12 @@ module ROF
         result = {}
         row.each_with_index do |item, i|
           next if item.nil?
-          item.strip!
           column_name = first_line[i]
           case column_name
           when "type", "owner", "access"
-            result[column_name] = item
+            result[column_name] = item.strip
           when "curate_id"
-            result["pid"] = item
+            result["pid"] = item.strip
           else
             result[column_name] = item.split("|").map(&:strip)
           end
@@ -69,7 +76,14 @@ module ROF
         result["rights"] = ROF::Access.decode(result.fetch("access", "private"), result["owner"])
         result.delete("access")
         result = self.collect_metadata(result)
-        rof_contents << result
+        # is this a generic file which should be attached to the previous work?
+        if result["type"] == "+"
+          raise NoPriorWork if previous_work.nil?
+          previous_work["files"] = previous_work.fetch("files", []) + [result]
+        else
+          previous_work = result
+          rof_contents << result
+        end
       end
       rof_contents
     end

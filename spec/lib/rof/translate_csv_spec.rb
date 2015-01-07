@@ -73,5 +73,29 @@ module ROF
       }])
     end
 
+    it "handles follow-on generic files" do
+      s = %q{type,owner,dc:title,files
+      Work,user1,"Q, A Letter",thumb
+      +,user1,,extra file.txt
+      }
+      rof = TranslateCSV.run(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "rights" => {"edit" => ["user1"]},
+        "metadata" => {
+          "@context" => RdfContext,
+          "dc:title" => "Q, A Letter"},
+        "files" => [
+          "thumb",
+          {
+            "type"  => "+",
+            "owner" => "user1",
+            "files" => ["extra file.txt"],
+            "rights" => {"edit" => ["user1"]}
+          }]
+      }])
+    end
+
   end
 end
