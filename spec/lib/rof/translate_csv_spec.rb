@@ -22,7 +22,7 @@ module ROF
 
     it "deocdes the access field into rights" do
       s = %q{type,owner,access
-      Work,user1,"private,edit:user2|user3"
+      Work,user1,"private;edit=user2,user3"
       }
       rof = TranslateCSV.run(s)
       expect(rof).to eq([{"type" => "Work", "owner" => "user1", "rights" => {"edit" => ["user1", "user2", "user3"]}}])
