@@ -52,11 +52,12 @@ when "filter"
            when "work"
              ROF::Filters::Work.new
            else
-             puts "Unknown filter #{ARGV[1]}"
-             exit
+             STDERR.puts "Unknown filter #{ARGV[1]}"
+             exit 3
            end
   ROF::CLI.filter_file(filter, ARGV[2], STDOUT)
 else
-  puts "Unknown command #{ARGV[0]}"
-  puts opt.help
+  STDERR.puts "Unknown command #{ARGV[0]}"
+  STDERR.puts opt.help
+  exit 3
 end
