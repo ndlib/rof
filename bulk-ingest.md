@@ -106,6 +106,16 @@ Example:
 }
 ````
 
+More complicated relationships can be defined by using a JSON-LD `@context` element:
+
+````json
+{
+ "@context" : {
+    "hydra" : "http://project-hydra.org"
+ },
+ "hydra:hasEditor" : ["user:12345"]
+}
+````
 
 # Meta
 The Metadata field is not for an object's descriptive metadata, rather it is
