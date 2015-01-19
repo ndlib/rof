@@ -66,8 +66,8 @@ module ROF
 
     def self.filter_array(filter, items, outfile=STDOUT)
       # filter will transform the items array in place
-      filter.process(items)
-      outfile.write(JSON.pretty_generate(items))
+      result = filter.process(items)
+      outfile.write(JSON.pretty_generate(result))
     end
 
     protected
