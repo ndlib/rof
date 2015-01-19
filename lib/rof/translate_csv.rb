@@ -64,7 +64,7 @@ module ROF
           case column_name
           when "type", "owner", "access"
             result[column_name] = item.strip
-          when "curate_id"
+          when "curate_id", "pid"
             result["pid"] = item.strip
           else
             result[column_name] = item.split("|").map(&:strip)
