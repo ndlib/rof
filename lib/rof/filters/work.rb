@@ -48,6 +48,7 @@ module ROF
           "properties-meta" => {
             "mime-type" => "text/xml"
           },
+          "collections" => input_obj["collections"],
           "metadata" => input_obj["metadata"]
         }
         result = [main_obj]
@@ -87,6 +88,7 @@ module ROF
               "label" => fname,
               "mime-type" => mimetype
             },
+            "collections" => finfo["collections"],
             "metadata" => finfo["metadata"]
           }
           f_obj.delete_if { |k,v| v.nil? }

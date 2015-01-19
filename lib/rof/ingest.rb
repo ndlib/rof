@@ -59,7 +59,7 @@ module ROF
         ds_touched << "descMetadata"
 
       # ignore these fields
-      when "type", "pid", "model", "id", "af-model", "rels-ext"
+      when "type", "pid", "model", "id", "af-model", "rels-ext", "collections"
 
       # datastream fields
       when /\A(.+)-file\Z/, /\A(.+)-meta\Z/, /\A(.+)\Z/
@@ -79,6 +79,9 @@ module ROF
     ds_filename = item["#{dsname}-file"]
     if ds_filename && ds_content
       raise SourceError.new("Both #{dsname} and #{dsname}-file are present.")
+    end
+    if ds_content && !ds_content.is_a?(String)
+      raise SourceError.new("Content for #{dsname} is not a string.")
     end
 
     md = {"mime-type" => "text/plain",

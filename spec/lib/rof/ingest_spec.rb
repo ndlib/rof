@@ -45,6 +45,25 @@ module ROF
       }
       expect(ROF.Ingest(item)).to eq(["content", "other"])
     end
+
+    it "raises an error if content is not a string" do
+      item = {"type" => "fobject",
+              "id" => "test:1",
+              "af-model" => "GenericFile",
+              "content" => ["list", "of", "items"]
+      }
+      expect {ROF.Ingest(item)}.to raise_error
+    end
+
+    it "ignores null data streams" do
+      item = {"type" => "fobject",
+              "id" => "test:1",
+              "af-model" => "GenericFile",
+              "content" => nil
+      }
+      expect(ROF.Ingest(item)).to eq(["content"])
+    end
+
     describe "RDF Metadata" do
       it "loads JSON-LD" do
         item = {"pid" => "test:1",
