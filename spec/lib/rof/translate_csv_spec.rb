@@ -97,5 +97,13 @@ module ROF
       }])
     end
 
+    it "raises an error if a follow-on file has no preceeding work" do
+      s = %q{type,owner,dc:title,files
+      +,user1,,extra file.txt
+      }
+      expect {TranslateCSV.run(s)}.to raise_error
+    end
+
+
   end
 end
