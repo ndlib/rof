@@ -106,7 +106,7 @@ module ROF
     end
     need_close = false
     if ds_filename
-      ds_content = self.find_file_and_open(ds_filename, search_paths, "r")
+      ds_content = self.find_file_and_open(ds_filename, search_paths, "rb")
       need_close = true
     end
     if ds

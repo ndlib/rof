@@ -73,14 +73,14 @@ module ROF
     protected
     def self.load_items_from_file(fname, outfile)
       items = nil
-      File.open(fname, 'r') do |f|
+      File.open(fname, 'r:UTF-8') do |f|
         items = JSON.parse(f.read)
       end
       items = [items] unless items.is_a? Array
       items
     rescue JSON::ParserError => e
       outfile.puts("Error reading #{fname}:#{e.to_s}")
-      exit!(-1)
+      exit!(1)
     end
   end
 end
