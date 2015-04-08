@@ -146,6 +146,9 @@ module ROF
     input["@id"] = "info:fedora/#{item['pid']}" unless input["@id"]
     graph = RDF::Graph.new << JSON::LD::API.toRdf(input)
     content = graph.dump(:ntriples)
+    # we read the rof file as utf-8. the RDF gem seems to convert it back to
+    # the default encoding. so fix it.
+    content.force_encoding('UTF-8')
     if fdoc
       ds = fdoc['descMetadata']
       ds.mimeType = "text/plain"
