@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rdf", "~> 1.1.2"
   spec.add_dependency "rdf-rdfxml"
   spec.add_dependency "json-ld", "~> 1.1.1"
-  spec.add_dependency "mime-types", "~> 2.4.3"
+  spec.add_dependency "mime-types"
   spec.add_dependency "rubydora", "~> 1.7.4"
   spec.add_dependency "noids_client"
 
