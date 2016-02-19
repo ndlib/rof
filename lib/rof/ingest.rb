@@ -77,6 +77,7 @@ module ROF
     # What kind of content is there?
     ds_content = item[dsname]
     ds_filename = item["#{dsname}-file"]
+    ds_meta = item["#{dsname}-meta"]
     if ds_filename && ds_content
       raise SourceError.new("Both #{dsname} and #{dsname}-file are present.")
     end
@@ -87,9 +88,24 @@ module ROF
     md = {"mime-type" => "text/plain",
           "label" => "",
           "versionable" => true,
-          "control-group" => "M",
     }
-    if item["#{dsname}-meta"]
+
+    #  A meta containing an URL, without content or file, is and r datastream
+    #  A meta containing an URL, with content or file, raises an error
+    if ds_meta
+      ds_url = dsname["URL"]
+      if ds_url
+         if ds_url && ds_content
+	      raise SourceError.new("Both #{ds_url} and #{dsname} are present.")
+         end
+         if ds_url && ds_filename
+	      raise SourceError.new("Both #{dsname}-file and #{ds_url} are present.")
+         end
+         md["URL"] = ds_url
+         md["control-group"] = "R"
+      else
+         md["control-group"] = "M"
+      end
       md.merge!(item["#{dsname}-meta"])
     end
 
@@ -103,6 +119,9 @@ module ROF
       ds.dsLabel = md["label"]
       ds.versionable = md["versionable"]
       ds.mimeType = md["mime-type"]
+      if md["URL"]
+	      ds.dsLocation = md["URL"]
+      end
     end
     need_close = false
     if ds_filename
