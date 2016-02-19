@@ -31,7 +31,7 @@ module ROF
   # attached files with different access permissions, owners, etc...
   # Any extra files are appended to the file list for the work.
   class TranslateCSV
-    class ParseError < RuntimeError
+    class MissingOwnerOrType < RuntimeError
     end
 
     class UnknownNamespace < RuntimeError
@@ -52,7 +52,7 @@ module ROF
         if first_line.nil?
           first_line = row
           if ! (first_line.include?("type") && first_line.include?("owner"))
-            raise ParseError
+            raise MissingOwnerOrType
           end
           next
         end
@@ -71,7 +71,7 @@ module ROF
           end
         end
         if result["type"].nil? or result["owner"].nil?
-          raise ParseError
+          raise MissingOwnerOrType
         end
         result["rights"] = ROF::Access.decode(result.fetch("access", "private"), result["owner"])
         result.delete("access")
