@@ -93,7 +93,7 @@ module ROF
     #  A meta containing an URL, without content or file, is and r datastream
     #  A meta containing an URL, with content or file, raises an error
     if ds_meta
-      ds_url = dsname["URL"]
+      ds_url = ds_meta["URL"]
       if ds_url
          if ds_url && ds_content
 	      raise SourceError.new("Both #{ds_url} and #{dsname} are present.")

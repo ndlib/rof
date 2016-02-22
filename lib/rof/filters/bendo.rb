@@ -20,7 +20,7 @@ module ROF
 	      obj.map do |name, value|
 		      if name =~ ends_meta
 			      if obj[name]["URL"] && @bendo
-				      obj[name]["URL"] = obj[name]["URL"].sub("bendo",@bendo)
+				      obj[name]["URL"] = obj[name]["URL"].sub("bendo:",@bendo)
 			      end
 		      end
 	      end
