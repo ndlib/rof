@@ -45,7 +45,7 @@ fedora_info = nil if fedora_info.empty?
 
 case ARGV[0]
 when "ingest", "validate"
-  error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info)
+  error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info, bendo_info)
   exit 1 if error_count > 0
 when "filter"
   filter = case ARGV[1]
