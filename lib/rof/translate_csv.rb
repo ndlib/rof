@@ -21,6 +21,7 @@ module ROF
   # curate_id -- optional. single valued, the pid or noid of the parent object (e.g. "ab12cd34j" or "und:ab12cd34j")
   # owner -- mandatory. The owner of this object and any children objects. Must be a Curate User name
   # access -- optional. The access policy of this object. defaults to "public". See below
+  # bendo-item -- optional. The bendo item name to save this object into.
   #
   # access is described by an "access string".
   #
@@ -62,7 +63,7 @@ module ROF
           next if item.nil?
           column_name = first_line[i]
           case column_name
-          when "type", "owner", "access"
+          when "type", "owner", "access", "bendo-item"
             result[column_name] = item.strip
           when "curate_id", "pid"
             result["pid"] = item.strip
