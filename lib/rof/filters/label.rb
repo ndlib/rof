@@ -54,7 +54,7 @@ module ROF
             force = (k == "rels-ext")
             obj[k] = replace_labels(v, labels, force)
           end
-	  master_pid  = obj["pid"] if master_pid .nil?
+	  master_pid  = obj["pid"].gsub(/^.*:/,"") if master_pid.nil?
 	  obj = add_bendo_id(obj, master_pid )
         end
 
@@ -86,13 +86,11 @@ module ROF
         end
       end
 
-      # If object contains empty bendo-item key, assign it id of master pid stripped of prefix
-      def add_bendo_id(obj, master_pid)
-	if obj["bendo-item"]
-	  if  obj["bendo-item"] == ""
-	    obj["bendo-item"]= master_pid.gsub(/^.*:/,"")
-          end
-	end
+      # If object contains empty bendo-item key, assign it id of provided  pid stripped of prefix
+      def add_bendo_id(obj, bid)
+	if ! obj["bendo-item"] || obj["bendo-item"] == ""
+	    obj["bendo-item"]= bid
+        end
 
       	obj
       end
