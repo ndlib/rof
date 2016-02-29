@@ -6,6 +6,7 @@ require 'optparse'
 fedora_info = {}
 noids = {}
 prefix = nil
+bendo_info = nil
 search_path = ["."]
 opt = OptionParser.new do |opts|
   opts.banner = %q{Usage: rof [options] <command> <input files>
@@ -16,10 +17,13 @@ opt = OptionParser.new do |opts|
 
   Filtering sends transformed objects to stdout.
 
-  Possible filters are: collections, datestamp, label, work}
+  Possible filters are: bendo collections, datestamp, label, work}
 
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
+  end
+  opts.on("", "--bendo URL", "Base Bendo URL") do |url|
+    bendo_info = url
   end
   opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
     fedora_info[:user], fedora_info[:password] = u.split(':')
@@ -41,7 +45,7 @@ fedora_info = nil if fedora_info.empty?
 
 case ARGV[0]
 when "ingest", "validate"
-  error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info)
+  error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info, bendo_info)
   exit 1 if error_count > 0
 when "filter"
   filter = case ARGV[1]
@@ -53,6 +57,8 @@ when "filter"
              ROF::Filters::Label.new(prefix, noids)
            when "work"
              ROF::Filters::Work.new
+	   when "bendo"
+	     ROF::Filters::Bendo.new(bendo_info)
            else
              STDERR.puts "Unknown filter #{ARGV[1]}"
              exit 3

@@ -8,6 +8,7 @@ require "rof/filters/collections"
 require "rof/filters/date_stamp"
 require "rof/filters/label"
 require "rof/filters/work"
+require "rof/filters/bendo"
 
 module ROF
 end

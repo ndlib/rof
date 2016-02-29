@@ -20,7 +20,7 @@ module ROF
   # Otherwise fedora is a Rubydora::Reporitory object (for now...)
   # Returns a list of ingested datastreams, if everything is okay.
   # Otherwise raises an exception depending on the error.
-  def self.Ingest(item, fedora=nil, search_paths=[])
+  def self.Ingest(item, fedora=nil, search_paths=[], bendo=nil)
     raise NotFobjectError if item["type"] != "fobject"
     raise TooManyIdentitiesError if item.key?("id") && item.key?("pid")
     item["pid"] = item["id"] unless item.key?("pid")
@@ -66,17 +66,18 @@ module ROF
         # ingest a datastream
         dsname = $1
         next if ds_touched.include?(dsname)
-        self.ingest_datastream(dsname, item, doc, search_paths)
+        self.ingest_datastream(dsname, item, doc, search_paths, bendo)
         ds_touched << dsname
       end
     end
     return ds_touched
   end
 
-  def self.ingest_datastream(dsname, item, fdoc, search_paths)
+  def self.ingest_datastream(dsname, item, fdoc, search_paths, bendo)
     # What kind of content is there?
     ds_content = item[dsname]
     ds_filename = item["#{dsname}-file"]
+    ds_meta = item["#{dsname}-meta"]
     if ds_filename && ds_content
       raise SourceError.new("Both #{dsname} and #{dsname}-file are present.")
     end
@@ -87,9 +88,22 @@ module ROF
     md = {"mime-type" => "text/plain",
           "label" => "",
           "versionable" => true,
-          "control-group" => "M",
     }
-    if item["#{dsname}-meta"]
+
+    #  A meta containing an URL, without content or file, is and r datastream
+    #  A meta containing an URL, with content or file, raises an error
+    if ds_meta
+      md["control-group"] = "M"
+      ds_url = ds_meta["URL"]
+      if ds_url
+         if ds_url && ds_content
+	      raise SourceError.new("Both #{ds_url} and #{dsname} are present.")
+         end
+         if ds_url && ds_filename
+	      raise SourceError.new("Both #{dsname}-file and #{ds_url} are present.")
+         end
+         md["control-group"] = "R"
+      end
       md.merge!(item["#{dsname}-meta"])
     end
 
@@ -103,6 +117,15 @@ module ROF
       ds.dsLabel = md["label"]
       ds.versionable = md["versionable"]
       ds.mimeType = md["mime-type"]
+      if md["URL"]
+	      # If the bendo server was passed in the command line, assume that the URL is in
+	      # the form "bendo:/item/<item#>/<item name> and substitute bendo: w/ the server name
+	      # if no bendo provided, use whatever's there.
+	      if bendo
+	         md["URL"] = md["URL"].sub("bendo:",bendo)
+	      end
+	      ds.dsLocation = md["URL"]
+      end
     end
     need_close = false
     if ds_filename

@@ -15,12 +15,12 @@ module ROF
     # All output is sent to `outfile`.
     #
     # Returns the number of errors.
-    def self.ingest_file(fname, search_paths=[], outfile=STDOUT, fedora=nil)
+    def self.ingest_file(fname, search_paths=[], outfile=STDOUT, fedora=nil, bendo=nil)
       items = self.load_items_from_file(fname, outfile)
-      self.ingest_array(items, search_paths, outfile, fedora)
+      self.ingest_array(items, search_paths, outfile, fedora, bendo)
     end
 
-    def self.ingest_array(items, search_paths=[], outfile=STDOUT, fedora=nil)
+    def self.ingest_array(items, search_paths=[], outfile=STDOUT, fedora=nil, bendo=nil)
       need_close = false
       if outfile == nil
         outfile = File.open("/dev/null", "w")
@@ -38,7 +38,7 @@ module ROF
             outfile.write("#{item_count}. #{verb} #{item["pid"]} ...")
             item_count += 1
             individual_benchmark = Benchmark.measure do
-              ROF.Ingest(item, fedora, search_paths)
+              ROF.Ingest(item, fedora, search_paths, bendo)
             end
             outfile.write("ok. %0.3fs\n" % individual_benchmark.real)
           rescue Exception => e
