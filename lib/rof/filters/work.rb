@@ -43,6 +43,7 @@ module ROF
           "type" => "fobject",
           "af-model" => model,
           "pid" => input_obj.fetch("pid", next_label),
+          "bendo-item" => input_obj["bendo-item"],
           "rights" => input_obj["rights"],
           "properties" => properties_ds(input_obj["owner"]),
           "properties-meta" => {
@@ -65,6 +66,7 @@ module ROF
           end
           finfo["rights"] ||= input_obj["rights"]
           finfo["owner"] ||= input_obj["owner"]
+          finfo["bendo-item"] ||= input_obj["bendo-item"]
           finfo["metadata"] ||= {
             "@context" => ROF::RdfContext
           }
@@ -75,6 +77,7 @@ module ROF
             "type" => "fobject",
             "af-model" => "GenericFile",
             "pid" => finfo["pid"],
+            "bendo-item" => finfo["bendo-item"],
             "rights" => finfo["rights"],
             "properties" => properties_ds(finfo["owner"]),
             "properties-meta" => {

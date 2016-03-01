@@ -17,7 +17,8 @@ opt = OptionParser.new do |opts|
 
   Filtering sends transformed objects to stdout.
 
-  Possible filters are: bendo collections, datestamp, label, work}
+  Possible filters are:
+    bendo, collections, datestamp, file-to-url, label, work}
 
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
@@ -49,16 +50,18 @@ when "ingest", "validate"
   exit 1 if error_count > 0
 when "filter"
   filter = case ARGV[1]
+           when "bendo"
+             ROF::Filters::Bendo.new(bendo_info)
            when "collections"
              ROF::Filters::Collections.new
            when "datestamp"
              ROF::Filters::DateStamp.new
+           when "file-to-url"
+             ROF::Filters::FileToUrl.new
            when "label"
              ROF::Filters::Label.new(prefix, noids)
            when "work"
              ROF::Filters::Work.new
-	   when "bendo"
-	     ROF::Filters::Bendo.new(bendo_info)
            else
              STDERR.puts "Unknown filter #{ARGV[1]}"
              exit 3
