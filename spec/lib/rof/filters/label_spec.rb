@@ -13,15 +13,15 @@ module ROF
       end
       it "skips already assigned ids" do
         list = [{"type" => "fobject", "pid" => "123"}]
-        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "123"}])
+        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "123", "bendo-item" => "123"}])
       end
       it "assignes missing pids" do
         list = [{"type" => "fobject"}]
-        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "101"}])
+        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "101", "bendo-item" => "101"}])
       end
       it "assignes pids which are labels" do
         list = [{"type" => "fobject", "pid" => "$(zzz)"}]
-        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "101"}])
+        expect(@labeler.process(list)).to eq([{"type" => "fobject", "pid" => "101", "bendo-item" => "101"}])
       end
       it "resolves loops" do
         list = [{"type" => "fobject",
@@ -31,6 +31,7 @@ module ROF
                  }}]
         expect(@labeler.process(list)).to eq([{"type" => "fobject",
                                                "pid" => "101",
+		 				"bendo-item"=>"101",
                                                "rels-ext" => {
                                                   "partOf" => ["123", "101"]}}])
       end
@@ -44,10 +45,12 @@ module ROF
                  "rels-ext" => { "memberOf" => ["$(zzz)"]}}]
         expect(@labeler.process(list)).to eq([{"type" => "fobject",
                                                "pid" => "101",
+		 			       "bendo-item" =>"101",
                                                "rels-ext" => {
                                                   "partOf" => ["123", "101"]}},
         {"type" => "fobject",
          "pid" => "102",
+	 "bendo-item" =>"101",
          "rels-ext" => { "memberOf" => ["101"]}}])
       end
       it "errors on undefined labels" do

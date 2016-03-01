@@ -32,6 +32,7 @@ module ROF
       # mutate obj_list by assigning labels and resolving labels where needed
       def process(obj_list)
         labels = {}
+	master_pid = nil
 
         # Use two passes. First assign ids, and then resolve labels
         # Do this since labels can be referenced before being defined
@@ -53,6 +54,8 @@ module ROF
             force = (k == "rels-ext")
             obj[k] = replace_labels(v, labels, force)
           end
+	  master_pid  = obj["pid"].gsub(/^.*:/,"") if master_pid.nil?
+	  obj = add_bendo_id(obj, master_pid )
         end
 
         obj_list
@@ -81,6 +84,15 @@ module ROF
         else
           obj
         end
+      end
+
+      # If object contains empty bendo-item key, assign it id of provided  pid stripped of prefix
+      def add_bendo_id(obj, bid)
+	if ! obj["bendo-item"] || obj["bendo-item"] == ""
+	    obj["bendo-item"]= bid
+        end
+
+      	obj
       end
 
       def find_label(s)
