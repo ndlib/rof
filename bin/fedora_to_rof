@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'rof'
+require 'optparse'
+
+fedora_info = {}
+download_content = false
+opt = OptionParser.new do |opts|
+  opts.banner = %q{Usage: fedora_to_rof --pid --fedora URL --user STRING --output_path STRING [ --download_content]}
+
+  opts.on("", "--fedora URL", "Base Fedora URL (including port number)") do |url|
+    fedora_info[:url] = url
+  end
+  opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
+    fedora_info[:user], fedora_info[:password] = u.split(':')
+  end
+  opts.on("", "--download-content", "Download files <1K in size inline (defaults to false)") do
+   	download_content = true 
+  end
+  opts.on("", "--output_file PATH", "Desired file output path") do |output|
+	file_path = output
+  end
+  opts.on("", "--pid pid", "Desired pid from fedora") do |pid|
+	thisPid = pid
+  end
+end
+
+opt.parse!
+
+fedora_info = nil if fedora_info.empty?
+
+if fedora_info == nil || !file_path.exists || !thisPid.exists then
+	STDERR.puts opt.help
+	exit 1
+end
+
+#ROF::CLI.filter_file(filter, ARGV[2], STDOUT)
