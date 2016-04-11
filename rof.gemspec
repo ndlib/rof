@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mime-types", "~> 2.4.3"
   spec.add_dependency "rubydora", "~> 1.7.4"
   spec.add_dependency "noids_client"
+  spec.add_dependency 'deprecation', '~> 0.1'
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
