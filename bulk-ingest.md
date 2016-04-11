@@ -219,12 +219,12 @@ likely wrong.
      },
      "characterization-meta" : {
           "mime-type" : "text/xml"
-     }
+     },
      "thumbnail-meta" : {
           "mime-type" : "image/png",
           "label" : "File Datastream",
           "checksum" : ""
-     }
+     },
      "thumbnail-file" : "/opt/citations/thumb/5772.png"
 }]
 ````
