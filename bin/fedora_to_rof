@@ -3,10 +3,18 @@
 require 'rof'
 require 'optparse'
 
+# assign default parameter values
 fedora_info = {}
-download_content = false
+config = {}
+thisPid = nil
+file_path = STDOUT
+config['download_content'] = false
+config['show_all'] = false
+
+# parse the command line
+#
 opt = OptionParser.new do |opts|
-  opts.banner = %q{Usage: fedora_to_rof --pid --fedora URL --user STRING --output_path STRING [ --download_content]}
+  opts.banner = %q{Usage: fedora_to_rof --pid --fedora URL --user STRING --output_path STRING [ --download_content] [ --show_all ]}
 
   opts.on("", "--fedora URL", "Base Fedora URL (including port number)") do |url|
     fedora_info[:url] = url
@@ -14,8 +22,11 @@ opt = OptionParser.new do |opts|
   opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
     fedora_info[:user], fedora_info[:password] = u.split(':')
   end
-  opts.on("", "--download-content", "Download files <1K in size inline (defaults to false)") do
-   	download_content = true 
+  opts.on("", "--download_content", "Download files <1K in size inline (defaults to false)") do
+   	config['download_content'] = true 
+  end
+  opts.on("", "--show_all", "Include Unhandled Datastreams in ROF output  (defaults to false)") do
+   	config['show_all'] = true 
   end
   opts.on("", "--output_file PATH", "Desired file output path") do |output|
 	file_path = output
@@ -29,9 +40,13 @@ opt.parse!
 
 fedora_info = nil if fedora_info.empty?
 
-if fedora_info == nil || !file_path.exists || !thisPid.exists then
+# without a fedora and a pid, there is no reaso to proceed
+
+if fedora_info == nil || thisPid == nil then
 	STDERR.puts opt.help
 	exit 1
 end
 
-#ROF::CLI.filter_file(filter, ARGV[2], STDOUT)
+#perform conversion
+
+ROF::CLI.convert_to_rof(thisPid, fedora_info, file_path, config)

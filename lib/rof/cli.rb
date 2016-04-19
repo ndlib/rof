@@ -2,6 +2,7 @@ require 'benchmark'
 require 'json'
 require 'rubydora'
 require 'rof/ingest'
+require 'rof/get_from_fedora'
 module ROF
   module CLI
 
@@ -70,7 +71,25 @@ module ROF
       outfile.write(JSON.pretty_generate(result))
     end
 
+    # retrieve fedora object and convert to ROF
+    def self.convert_to_rof( pid, fedora=nil, outfile=STDOUT , config)
+	
+	# open output file if needed
+  	need_close = false
+	outfile="/dev/null" if outfile == nil
+        if outfile != STDOUT
+	    outfile = File.open(outfile , "w")
+	    need_close = true
+        end
+
+	fedora_data =  ROF.GetFromFedora(pid, fedora, config )
+	outfile.write(JSON.pretty_generate(fedora_data))
+    ensure
+      outfile.close if outfile && need_close
+    end
+
     protected
+
     def self.load_items_from_file(fname, outfile)
       items = nil
       File.open(fname, 'r:UTF-8') do |f|
@@ -79,7 +98,7 @@ module ROF
       items = [items] unless items.is_a? Array
       items
     rescue JSON::ParserError => e
-      outfile.puts("Error reading #{fname}:#{e.to_s}")
+      outfile.puts("Error reading #{fname}:#{e}")
       exit!(1)
     end
   end
