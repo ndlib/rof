@@ -72,17 +72,17 @@ module ROF
     end
 
     # retrieve fedora object and convert to ROF
-    def self.convert_to_rof( pid, fedora=nil, outfile=STDOUT , config)
+    def self.convert_to_rof(pid, fedora=nil, outfile=STDOUT , config)
 	
 	# open output file if needed
   	need_close = false
-	outfile="/dev/null" if outfile == nil
+	outfile="/dev/null" unless outfile
         if outfile != STDOUT
 	    outfile = File.open(outfile , "w")
 	    need_close = true
         end
 
-	fedora_data =  ROF.GetFromFedora(pid, fedora, config )
+	fedora_data =  ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
 	outfile.write(JSON.pretty_generate(fedora_data))
     ensure
       outfile.close if outfile && need_close

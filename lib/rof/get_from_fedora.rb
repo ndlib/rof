@@ -5,6 +5,7 @@ require 'rdf/rdfxml'
 require 'rubydora'
 
 module ROF
+ class FedoraToRof
   # connect to fedora and fetch object
   # returns array of fedora attributes or nil
 
@@ -12,13 +13,13 @@ module ROF
     @fedora_info = {}
 
     # Try to connect to fedora, and search for the desired item
-    # If either of these actions fail, handle it.
+    # If either of these actions fail, handle it, and exit.
     begin
       fedora = Rubydora.connect(fedora)
       doc = fedora.find(pid)
     rescue StandardError => e
       puts "Error: #{e}"
-      return @fedora_info
+      exit 1
     end
 
     # set pid, type
@@ -41,8 +42,7 @@ module ROF
     rdora_obj.datastreams.each do |key, value|
       method_key = key.sub('-', '')
       if self.respond_to?(method_key)
-        this_method = method(method_key)
-        this_method.call(value, config)
+	      send(method_key, value, config)
       else
         @fedora_info[key] = ds.profile if config['show_all'] == true
       end
@@ -76,18 +76,12 @@ module ROF
   def self.descMetadata(ds, _config)
     # desMetadata is encoded in ntriples
     meta_array = {}
-    meta_array['@context'] = {}
-    meta_array['@context']['dc'] = 'http://purl.org/dc/terms/'
-    meta_array['@context']['foaf'] = 'http://xmlns.com/foaf/0.1/'
-    meta_array['@context']['rdfs'] = 'http://www.w3.org/2000/01/rdf-schema#'
-    meta_array['@context']['dc:dateSubmitted'] = {}
-    meta_array['@context']['dc:modified'] = {}
-    meta_array['@context']['dc:dateSubmitted']['@type'] = 'http://www.w3.org/2001/XMLSchema#date'
-    meta_array['@context']['dc:modified']['@type'] = 'http://www.w3.org/2001/XMLSchema#date'
+    meta_array['@context'] = RdfContext
     RDF::Reader.for(:ntriples).new(ds.datastream_content) do |reader|
       reader.each_statement do |statement|
         key = statement.predicate.to_s
-        meta_array[key.sub('http://purl.org/dc/terms/', 'dc:')] = statement.object
+	normalized_key = key.sub('http://purl.org/dc/terms/', 'dc:')
+	meta_array[normalized_key] = statement.object
       end
     end
 
@@ -158,4 +152,5 @@ module ROF
 
     @fedora_info['rels-ext'] = relsext_array
   end
+ end
 end
