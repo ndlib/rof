@@ -1,0 +1,45 @@
+{
+  "pid": "und:dev0012829m",
+  "type": "fobject",
+  "af-model": "GenericFile",
+  "rels-ext": {
+    "hasModel": [
+      "GenericFile"
+    ],
+    "isPartOf": [
+      "dev00128288"
+    ]
+  },
+  "rights": {
+    "read-groups": [
+      "registered"
+    ],
+    "edit": [
+      "dbrower"
+    ]
+  },
+  "properties": "<fields>\n<depositor>batch_ingest</depositor>\n<owner>dbrower</owner>\n</fields>\n",
+  "properties-meta": "text/xml",
+  "content-meta": {
+    "label": "bonnie+chauncey",
+    "mime_type": "application/octet-stream",
+    "URL": "bendo:14000/item/dev0012826k/bonnie+chauncey"
+  },
+  "metadata": {
+    "@context": {
+      "dc": "http://purl.org/dc/terms/",
+      "foaf": "http://xmlns.com/foaf/0.1/",
+      "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+      "dc:dateSubmitted": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:modified": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      }
+    },
+    "dc:dateSubmitted": "2016-04-12Z",
+    "dc:modified": "2016-04-12Z",
+    "dc:title": "bonnie+chauncey"
+  },
+  "bendo-item": "dev0012826k"
+}
