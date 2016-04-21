@@ -1,0 +1,337 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/describe?xml=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=D51C73CCB72718698C57C00D8C3B6A5A; Path=/fedora
+      Content-Type:
+      - text/xml;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+    body:
+      encoding: UTF-8
+      string: <?xml version="1.0" encoding="UTF-8"?><fedoraRepository xmlns="http://www.fedora.info/definitions/1/0/access/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.fedora.info/definitions/1/0/access/ http://www.fedora.info/definitions/1/0/fedoraRepository.xsd"><repositoryName>Fedora
+        Repository</repositoryName><repositoryBaseURL>http://localhost:8080/fedora</repositoryBaseURL><repositoryVersion>3.6.1</repositoryVersion><repositoryPID>    <PID-namespaceIdentifier>UND</PID-namespaceIdentifier>    <PID-delimiter>:</PID-delimiter>    <PID-sample>UND:100</PID-sample>    <retainPID>*</retainPID></repositoryPID><repositoryOAI-identifier>    <OAI-namespaceIdentifier>library.nd.edu</OAI-namespaceIdentifier>    <OAI-delimiter>:</OAI-delimiter>    <OAI-sample>oai:library.nd.edu:UND:100</OAI-sample></repositoryOAI-identifier><sampleSearch-URL>http://localhost:8080/fedora/objects</sampleSearch-URL><sampleAccess-URL>http://localhost:8080/fedora/objects/demo:5</sampleAccess-URL><sampleOAI-URL>http://localhost:8080/fedora/oai?verb=Identify</sampleOAI-URL><adminEmail>suhovecky@nd.edu</adminEmail></fedoraRepository>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m?format=xml
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=A1E0FF7C753546DDB48322710AEC4B1E; Path=/fedora
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/xml
+      Content-Length:
+      - '966'
+    body:
+      encoding: UTF-8
+      string: <?xml version="1.0" encoding="UTF-8"?><objectProfile  xmlns="http://www.fedora.info/definitions/1/0/access/"  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fedora.info/definitions/1/0/access/
+        http://www.fedora.info/definitions/1/0/objectProfile.xsd" pid="und:dev0012829m"
+        ><objLabel></objLabel><objOwnerId>fedoraAdmin</objOwnerId><objModels><model>info:fedora/afmodel:GenericFile</model><model>info:fedora/fedora-system:FedoraObject-3.0</model></objModels><objCreateDate>2016-04-12T17:40:55.481Z</objCreateDate><objLastModDate>2016-04-12T21:01:17.871Z</objLastModDate><objDissIndexViewURL>http://localhost:8080/fedora/objects/und%3Adev0012829m/methods/fedora-system%3A3/viewMethodIndex</objDissIndexViewURL><objItemIndexViewURL>http://localhost:8080/fedora/objects/und%3Adev0012829m/methods/fedora-system%3A3/viewItemIndex</objItemIndexViewURL><objState>A</objState></objectProfile>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams?format=xml&profiles=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=6486DC4781E92B5838E4DC939D3A26BD; Path=/fedora
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/xml
+      Content-Length:
+      - '7094'
+    body:
+      encoding: UTF-8
+      string: <?xml version="1.0" encoding="UTF-8"?><objectDatastreams xmlns="http://www.fedora.info/definitions/1/0/access/"
+        xmlns:apim="http://www.fedora.info/definitions/1/0/management/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.fedora.info/definitions/1/0/access/
+        http://localhost:8080/fedora/schema/listDatastreams.xsd" pid="und:dev0012829m"  baseURL="http://localhost:8080/fedora/"
+        ><datastreamProfile pid="und:dev0012829m" dsID="DC" ><apim:dsLabel>Dublin
+        Core Record for this object</apim:dsLabel><apim:dsVersionID>DC1.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T17:40:55.481Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/xml</apim:dsMIME><apim:dsFormatURI>http://www.openarchives.org/OAI/2.0/oai_dc/</apim:dsFormatURI><apim:dsControlGroup>X</apim:dsControlGroup><apim:dsSize>344</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+DC+DC1.0</apim:dsLocation><apim:dsLocationType></apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>fbc10257804fa1d75f5865301b33eb8c</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="RELS-EXT" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>RELS-EXT.2</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:58.994Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>application/rdf+xml</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>441</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+RELS-EXT+RELS-EXT.2</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>363cb425320c077d4b97784a5a23926b</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="rightsMetadata" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>rightsMetadata.2</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:59.034Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/xml</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>566</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+rightsMetadata+rightsMetadata.2</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>ba4c7c955a27b8a73ce73baaf73d2db4</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="properties" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>properties.2</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:59.084Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/xml</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>78</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+properties+properties.2</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>f2e758145da8484717ccb8d703bb4fde</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="content" ><apim:dsLabel>bonnie+chauncey</apim:dsLabel><apim:dsVersionID>content.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:59.166Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>application/octet-stream</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>R</apim:dsControlGroup><apim:dsSize>0</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>http://libvirt9.library.nd.edu:14000/item/dev0012826k/bonnie+chauncey</apim:dsLocation><apim:dsLocationType>URL</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>bb389b3d9ea0aa218b48250aed539fbe</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="descMetadata" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>descMetadata.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:59.248Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/plain</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>334</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+descMetadata+descMetadata.0</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>8729e15eca62614d8459bccbd9fcb468</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="bendo-item" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>bendo-item.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:00:59.313Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/plain</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>11</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+bendo-item+bendo-item.0</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>9a89c557b7131c9c7642015398e6d389</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="characterization" ><apim:dsLabel></apim:dsLabel><apim:dsVersionID>characterization.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:01:16.719Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>text/xml</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>3092</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+characterization+characterization.0</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>3a60e4fac7949932e91a46d613d03eff</apim:dsChecksum></datastreamProfile><datastreamProfile
+        pid="und:dev0012829m" dsID="thumbnail" ><apim:dsLabel>File Datastream</apim:dsLabel><apim:dsVersionID>thumbnail.0</apim:dsVersionID><apim:dsCreateDate>2016-04-12T21:01:17.871Z</apim:dsCreateDate><apim:dsState>A</apim:dsState><apim:dsMIME>image/png</apim:dsMIME><apim:dsFormatURI></apim:dsFormatURI><apim:dsControlGroup>M</apim:dsControlGroup><apim:dsSize>45918</apim:dsSize><apim:dsVersionable>true</apim:dsVersionable><apim:dsInfoType></apim:dsInfoType><apim:dsLocation>und:dev0012829m+thumbnail+thumbnail.0</apim:dsLocation><apim:dsLocationType>INTERNAL_ID</apim:dsLocationType><apim:dsChecksumType>MD5</apim:dsChecksumType><apim:dsChecksum>31914238ed48f0104a26da4e32bc5c38</apim:dsChecksum></datastreamProfile></objectDatastreams>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams/RELS-EXT/content
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=3C71C0631C6B4D91E18F9EADFD43732B; Path=/fedora
+      Content-Disposition:
+      - inline; filename="RELS-EXT.rdf"
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - application/rdf+xml
+      Content-Length:
+      - '441'
+    body:
+      encoding: UTF-8
+      string: |
+        <?xml version='1.0' encoding='utf-8' ?>
+        <rdf:RDF xmlns:ns0='info:fedora/fedora-system:def/model#' xmlns:ns1='info:fedora/fedora-system:def/relations-external#' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+          <rdf:Description rdf:about='info:fedora/und:dev0012829m'>
+            <ns0:hasModel rdf:resource='info:fedora/afmodel:GenericFile' />
+            <ns1:isPartOf rdf:resource='info:fedora/und:dev00128288' />
+          </rdf:Description>
+        </rdf:RDF>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams/rightsMetadata/content
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=E3C08F0DF8406BEF4D1A16003FE7A064; Path=/fedora
+      Content-Disposition:
+      - inline; filename="rightsMetadata.xml"
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/xml
+      Content-Length:
+      - '566'
+    body:
+      encoding: UTF-8
+      string: |
+        <rightsMetadata xmlns="http://hydra-collab.stanford.edu/schemas/rightsMetadata/v1" version="0.1">
+          <copyright>
+            <human type="title"/>
+            <human type="description"/>
+            <machine type="uri"/>
+          </copyright>
+          <access type="discover">
+            <human/>
+            <machine/>
+          </access>
+          <access type="read">
+            <human/>
+            <machine>
+              <group>registered</group>
+            </machine>
+          </access>
+          <access type="edit">
+            <human/>
+            <machine>
+              <person>dbrower</person>
+            </machine>
+          </access>
+          <embargo>
+            <human/>
+            <machine/>
+          </embargo>
+        </rightsMetadata>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams/properties/content
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=E15CA7D2868EA1328D161F023DAF65A6; Path=/fedora
+      Content-Disposition:
+      - inline; filename="properties.xml"
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/xml
+      Content-Length:
+      - '78'
+    body:
+      encoding: UTF-8
+      string: |
+        <fields>
+        <depositor>batch_ingest</depositor>
+        <owner>dbrower</owner>
+        </fields>
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams/descMetadata/content
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=B07BFC242D757E94A9E224049CCE83BC; Path=/fedora
+      Content-Disposition:
+      - inline; filename="descMetadata.txt"
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/plain
+      Content-Length:
+      - '334'
+    body:
+      encoding: UTF-8
+      string: |
+        <info:fedora/und:dev0012829m> <http://purl.org/dc/terms/dateSubmitted> "2016-04-12Z"^^<http://www.w3.org/2001/XMLSchema#date> .
+        <info:fedora/und:dev0012829m> <http://purl.org/dc/terms/modified> "2016-04-12Z"^^<http://www.w3.org/2001/XMLSchema#date> .
+        <info:fedora/und:dev0012829m> <http://purl.org/dc/terms/title> "bonnie+chauncey" .
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+- request:
+    method: get
+    uri: http://fedoraAdmin:webmock@localhost:8080/fedora/objects/und:dev0012829m/datastreams/bendo-item/content
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - '*/*; q=0.5, application/xml'
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Apache-Coyote/1.1
+      Set-Cookie:
+      - JSESSIONID=8292275A1C42F4246C8F2A595F7E1F6E; Path=/fedora
+      Content-Disposition:
+      - inline; filename="bendo-item.txt"
+      Date:
+      - Wed, 20 Apr 2016 18:55:49 GMT
+      Content-Type:
+      - text/plain
+      Content-Length:
+      - '11'
+    body:
+      encoding: UTF-8
+      string: dev0012826k
+    http_version: 
+  recorded_at: Wed, 20 Apr 2016 18:55:49 GMT
+recorded_with: VCR 3.0.1
