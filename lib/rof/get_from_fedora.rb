@@ -38,54 +38,66 @@ module ROF
     @fedora_info['af-model'] = setModel(rdora_obj)
     # iterate through the data streams that are present.
     # use reflection to call appropriate method for each
-    #
-    rdora_obj.datastreams.each do |key, value|
-      method_key = key.sub('-', '')
+    rdora_obj.datastreams.each do |dsname, ds|
+      next if dsname == "DC"
+      method_key = dsname.sub('-', '')
       if self.respond_to?(method_key)
-	      send(method_key, value, config)
+        send(method_key, ds, config)
       else
-        @fedora_info[key] = ds.profile if config['show_all'] == true
+        # dump generic datastream
+        meta = create_meta(ds, config)
+        @fedora_info["#{dsname}-meta"] = meta unless meta.empty?
+
+        # TODO(dbrower): change dump algorithm:
+        # if content is short < X bytes, save as string
+        # if content is > X bytes, save as file only if config option is given
+        content = ds.datastream_content.to_s
+        if content.length <= 1024
+          @fedora_info[dsname] = content
+        end
+        #@fedora_info[key] = ds.profile if config['show_all'] == true
       end
     end
+  end
+
+  def self.create_meta(ds, _config)
+    result = {}
+
+    label = ds.profile['dsLabel']
+    result["label"] = label unless label.nil? || label == ''
+    result["mime-type"] = ds.profile['dsMIME'] if ds.profile['dsMIME'] != "text/plain"
+    # TODO(dbrower): make sure this is working as intended
+    if ["R", "E"].include?(ds.profile['TYPE'])
+      content_array['URL'] = 'bendo:' + ds.profile['dsLocation'].split(':')[2]
+    end
+    result
   end
 
   # set fedora_indo['af-model']
   #
   def self.setModel(rdora_obj)
-    model_string = rdora_obj.profile['objModels'][0].split(':')
-    model_string[2]
-  end
-
-  # set bendo-item
-  #
-  def self.bendoitem(ds, _config)
-    @fedora_info['bendo-item'] = ds.datastream_content
+    # only keep info:fedora/afmodel:XXXXX
+    models = rdora_obj.profile['objModels'].map do |model|
+      if model =~ /^info:fedora\/afmodel:(.*)/
+         $1
+      end
+    end.compact
+    models[0]
   end
 
   # The methods below are called if the like-named datastream exists in fedora
 
-  # set properties
-  #
-  def self.properties(ds, _config)
-    @fedora_info['properties'] = ds.datastream_content
-    @fedora_info['properties-meta'] = ds.profile['dsMIME']
-  end
-
   # set metadata
   #
   def self.descMetadata(ds, _config)
-    # desMetadata is encoded in ntriples
-    meta_array = {}
-    meta_array['@context'] = RdfContext
-    RDF::Reader.for(:ntriples).new(ds.datastream_content) do |reader|
-      reader.each_statement do |statement|
-        key = statement.predicate.to_s
-	normalized_key = key.sub('http://purl.org/dc/terms/', 'dc:')
-	meta_array[normalized_key] = statement.object
-      end
+    # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
+    graph = RDF::Graph.new
+    graph.from_ntriples(ds.datastream_content, format: :ntriples)
+    result = nil
+    JSON::LD::API::fromRdf(graph) do |expanded|
+      result = JSON::LD::API.compact(expanded, RdfContext)
     end
-
-    @fedora_info['metadata'] = meta_array
+    @fedora_info['metadata'] = result
   end
 
   # set rights
@@ -127,30 +139,45 @@ module ROF
     @fedora_info['rights'] = rights_array
   end
 
-  # set content
-  #
-  def self.content(ds, _config)
-    content_array = {}
-
-    content_array['label'] = ds.profile['dsLabel']
-    content_array['mime_type'] = ds.profile['dsMIME']
-    content_array['URL'] = 'bendo:' + ds.profile['dsLocation'].split(':')[2]
-    @fedora_info['content-meta'] = content_array
-  end
-
   def self.RELSEXT(ds, _config)
     # RELS-EXT is RDF-XML - parse it
-    relsext_array = {}
-
-    RDF::RDFXML::Reader.new(ds.datastream_content).each do |relsext|
-      key = relsext.predicate.to_s.split('#')
-      value = relsext.object.to_s.split(':')
-      value_array = []
-      value_array << value[2]
-      relsext_array[key[1]] = value_array
+    graph = RDF::Graph.new
+    graph.from_rdfxml(ds.datastream_content)
+    ctx = {
+      "@vocab" => "info:fedora/fedora-system:def/relations-external#",
+      "fedora-model" => "info:fedora/fedora-system:def/model#",
+      "hydra" => "http://projecthydra.org/ns/relations#",
+      "hasModel" => {"@id" => "fedora-model:hasModel", "@type" => "@id"},
+      "hasEditor" => {"@id" => "hydra:hasEditor", "@type" => "@id"},
+      "hasEditorGroup" => {"@id" => "hydra:hasEditorGroup", "@type" => "@id"},
+      "isPartOf" => {"@type" => "@id"}
+    }
+    result = nil
+    JSON::LD::API::fromRdf(graph) do |expanded|
+      result = JSON::LD::API.compact(expanded, ctx)
     end
-
-    @fedora_info['rels-ext'] = relsext_array
+    # now strip the info:fedora/ prefix from the URIs
+    strip_info_fedora(result)
+    # remove extra items
+    result.delete("@id")
+    result.delete("hasModel")
+    @fedora_info['rels-ext'] = result
   end
+
+  private
+  def self.strip_info_fedora(rels_ext)
+    rels_ext.each do |relation, targets| 
+      next if relation == "@context"
+      if targets.is_a?(Hash)
+        strip_info_fedora(targets)
+      else
+        targets = [targets] if targets.is_a?(String)
+        rels_ext[relation] = targets.map do |target|
+          target.sub("info:fedora/", '')
+        end
+      end
+    end
+  end
+
  end
 end
