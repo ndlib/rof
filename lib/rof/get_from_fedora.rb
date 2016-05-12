@@ -97,6 +97,7 @@ module ROF
     JSON::LD::API::fromRdf(graph) do |expanded|
       result = JSON::LD::API.compact(expanded, RdfContext)
     end
+    result.delete("@id")
     @fedora_info['metadata'] = result
   end
 
