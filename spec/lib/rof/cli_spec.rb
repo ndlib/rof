@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'stringio'
-require 'vcr'
 
 describe ROF::CLI do
   it "ingests an array of items" do
@@ -66,7 +65,7 @@ describe ROF::CLI do
     fedora[:password] = 'fedoraAdmin'
     VCR.use_cassette("fedora_to_rof1") do
       fedora_data =  ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
-      expect(fedora_data).to match(expected_output)
+      expect(fedora_data).to eq(expected_output)
     end
   end
 end

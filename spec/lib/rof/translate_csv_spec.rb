@@ -4,10 +4,10 @@ module ROF
   describe "translate CSV" do
     it "requires the columns type and owner" do
       s = "dc:title,access,owner"
-      expect{TranslateCSV.run(s)}.to raise_error
+      expect{TranslateCSV.run(s)}.to raise_error(ROF::TranslateCSV::MissingOwnerOrType)
 
       s = "dc:title,access,type"
-      expect{TranslateCSV.run(s)}.to raise_error
+      expect{TranslateCSV.run(s)}.to raise_error(ROF::TranslateCSV::MissingOwnerOrType)
 
       s = "dc:title,type,owner,access"
       expect(TranslateCSV.run(s)).to eq([])
@@ -17,7 +17,7 @@ module ROF
       s = %q{type,owner
       Work,
       }
-      expect{TranslateCSV.run(s)}.to raise_error
+      expect{TranslateCSV.run(s)}.to raise_error(ROF::TranslateCSV::MissingOwnerOrType)
     end
 
     it "deocdes the access field into rights" do
@@ -101,7 +101,7 @@ module ROF
       s = %q{type,owner,dc:title,files
       +,user1,,extra file.txt
       }
-      expect {TranslateCSV.run(s)}.to raise_error
+      expect {TranslateCSV.run(s)}.to raise_error(ROF::TranslateCSV::NoPriorWork)
     end
 
 
