@@ -20,11 +20,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "rdf", "~> 1.1.2"
+  spec.add_dependency "rdf", "~> 2.0.1"
   spec.add_dependency "rdf-rdfxml"
-  spec.add_dependency "json-ld", "~> 1.1.1"
+  spec.add_dependency "json-ld", "~> 2.0.0"
   spec.add_dependency "mime-types", "~> 2.4.3"
-  spec.add_dependency "rubydora", "~> 1.7.4"
+  spec.add_dependency "rubydora", "~> 1.8.1"
   spec.add_dependency "noids_client"
   spec.add_dependency 'deprecation', '~> 0.1'
 
@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec-its'
   spec.add_development_dependency 'vcr'
   spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'equivalent-xml'
 end

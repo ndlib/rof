@@ -52,7 +52,7 @@ module ROF
               "af-model" => "GenericFile",
               "content" => ["list", "of", "items"]
       }
-      expect {ROF.Ingest(item)}.to raise_error
+      expect {ROF.Ingest(item)}.to raise_error(ROF::SourceError)
     end
 
     it "ignores null data streams" do

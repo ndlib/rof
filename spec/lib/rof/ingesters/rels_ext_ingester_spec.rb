@@ -13,7 +13,7 @@ module ROF
       subject { described_class.new(models: models, item: item, fedora_document: fedora_document) }
 
       context 'without a fedora document' do
-        its(:call) { should eq expected_content }
+        its(:call) { should be_equivalent_to(expected_content) }
       end
 
       context 'with a fedora document' do
@@ -21,7 +21,7 @@ module ROF
         let(:rels_ext) { double }
         it 'should save the document' do
           expect(fedora_document).to receive(:[]).with('RELS-EXT').and_return(rels_ext)
-          expect(rels_ext).to receive(:content=).with(expected_content)
+          expect(rels_ext).to receive(:content=).with(be_equivalent_to(expected_content))
           expect(rels_ext).to receive(:mimeType=).with("application/rdf+xml")
           expect(rels_ext).to receive(:save)
           subject.call
@@ -51,7 +51,7 @@ module ROF
         let(:rels_ext) { double }
         it 'should save the document' do
           expect(fedora_document).to receive(:[]).with('RELS-EXT').and_return(rels_ext)
-          expect(rels_ext).to receive(:content=).with(expected_content)
+          expect(rels_ext).to receive(:content=).with(be_equivalent_to(expected_content))
           expect(rels_ext).to receive(:mimeType=).with("application/rdf+xml")
           expect(rels_ext).to receive(:save)
           subject.call
