@@ -72,19 +72,24 @@ module ROF
     end
 
     # retrieve fedora object and convert to ROF
-    def self.convert_to_rof(pid, fedora=nil, outfile=STDOUT, config)
-      # open output file if needed
+    def self.convert_to_rof(pids, fedora=nil, outfile=STDOUT, config={})
       need_close = false
-      # what is the use case for the /dev/null option???
-      outfile = "/dev/null" unless outfile
       # use outfile is_a String
-      if outfile != STDOUT
+      if outfile.is_a?(String)
         outfile = File.open(outfile , "w")
         need_close = true
       end
 
-      fedora_data =  ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
-      outfile.write(JSON.pretty_generate(fedora_data))
+      # wrap the objects inside a JSON list
+      outfile.write("[\n")
+      first = true
+      pids.each do |pid|
+        outfile.write(",") unless first
+        fedora_data =  ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
+        outfile.write(JSON.pretty_generate(fedora_data))
+        first = false
+      end
+      outfile.write("]\n")
     ensure
       outfile.close if outfile && need_close
     end

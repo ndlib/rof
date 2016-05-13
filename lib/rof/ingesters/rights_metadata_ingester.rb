@@ -44,7 +44,6 @@ module ROF
         content
       end
 
-      private
       def format_rights_section(section_name, people, groups)
         people = [people] if people.is_a? String
         groups = [groups] if groups.is_a? String

@@ -18,15 +18,7 @@ describe ROF::CLI do
       "type" => "fobject",
       "af-model" => "GenericFile",
       "rels-ext" => {
-        "@context"=>{
-          "@vocab"=>"info:fedora/fedora-system:def/relations-external#",
-          "fedora-model"=>"info:fedora/fedora-system:def/model#",
-          "hydra"=>"http://projecthydra.org/ns/relations#",
-          "hasModel"=>{"@id"=>"fedora-model:hasModel", "@type"=>"@id"},
-          "hasEditor"=>{"@id"=>"hydra:hasEditor", "@type"=>"@id"},
-          "hasEditorGroup"=>{"@id"=>"hydra:hasEditorGroup", "@type"=>"@id"},
-          "isPartOf"=>{"@type"=>"@id"}
-        },
+        "@context"=> ROF::RelsExtRefContext,
         "isPartOf"=>["und:dev00128288"]
       },
       "rights" => {

@@ -11,4 +11,16 @@ module ROF
       "@type" => "http://www.w3.org/2001/XMLSchema#date"
     }
   }.freeze
+
+  RelsExtRefContext = {
+      "@vocab" => "info:fedora/fedora-system:def/relations-external#",
+      "fedora-model" => "info:fedora/fedora-system:def/model#",
+      "hydra" => "http://projecthydra.org/ns/relations#",
+      "hasModel" => {"@id" => "fedora-model:hasModel", "@type" => "@id"},
+      "hasEditor" => {"@id" => "hydra:hasEditor", "@type" => "@id"},
+      "hasEditorGroup" => {"@id" => "hydra:hasEditorGroup", "@type" => "@id"},
+      "isPartOf" => {"@type" => "@id"},
+      "isEditorOf" => {"@id" => "hydra:isEditorOf", "@type" => "@id"},
+      "hasMember" => {"@type" => "@id"},
+  }.freeze
 end

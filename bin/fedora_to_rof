@@ -6,15 +6,23 @@ require 'optparse'
 # assign default parameter values
 fedora_info = {}
 config = {}
-thisPid = nil
 file_path = STDOUT
-config['download_content'] = false
-config['show_all'] = false
+config['download'] = false
+config['inline'] = false
+config['download_path'] = '.'
 
 # parse the command line
 #
 opt = OptionParser.new do |opts|
-  opts.banner = %q{Usage: fedora_to_rof --pid --fedora URL --user STRING --output_path STRING [ --download_content] [ --show_all ]}
+  opts.banner = %q{Usage: fedora_to_rof --fedora URL --user STRING --output DIR [--download | --inline]  PID [PID2 ...]
+
+Read the given PIDs from the given Fedora 3 instance, and then output them as
+ROF objects. By default output will be STDOUT, pass a directory in `--output`
+to save them as files. Datastreams smaller than 1024 bytes are added to the ROF
+file. Larger ones may either be included inline or saved as auxillary files.
+Use `--inline` to include them inline and use `--download` to save them as
+files. The files will have a name in the form `<pid>-<dsname>`.
+}
 
   opts.on("", "--fedora URL", "Base Fedora URL (including port number)") do |url|
     fedora_info[:url] = url
@@ -22,31 +30,28 @@ opt = OptionParser.new do |opts|
   opts.on("", "--user STRING", "Username and password (colon separated) for fedora") do |u|
     fedora_info[:user], fedora_info[:password] = u.split(':')
   end
-  opts.on("", "--download_content", "Download files <1K in size inline (defaults to false)") do
-   	config['download_content'] = true 
+  opts.on("", "--download DIRECTORY", "Save datastreams >1K in size to files (defaults to false)") do |directory|
+    config['download'] = true
+    config['download_path'] = directory
   end
-  opts.on("", "--show_all", "Include Unhandled Datastreams in ROF output  (defaults to false)") do
-   	config['show_all'] = true 
+  opts.on("", "--inline", "Include datastreams >1K in size in ROF output (defaults to false)") do
+    config['inline'] = true
   end
-  opts.on("", "--output_file PATH", "Desired file output path") do |output|
-	file_path = output
-  end
-  opts.on("", "--pid pid", "Desired pid from fedora") do |pid|
-	thisPid = pid
+  opts.on("", "--outfile FILENAME", "File to save ROF to") do |output|
+    file_path = output
   end
 end
 
 opt.parse!
 
+pids = ARGV
 fedora_info = nil if fedora_info.empty?
 
-# without a fedora and a pid, there is no reaso to proceed
-
-if fedora_info == nil || thisPid == nil then
-	STDERR.puts opt.help
-	exit 1
+# without a fedora and a pid, there is no reason to proceed
+if fedora_info == nil || pids.empty? then
+  STDERR.puts opt.help
+  exit 1
 end
 
-#perform conversion
-
-ROF::CLI.convert_to_rof(thisPid, fedora_info, file_path, config)
+# perform conversion
+ROF::CLI.convert_to_rof(pids, fedora_info, file_path, config)
