@@ -31,13 +31,24 @@ module ROF
                                  "mime-type" => "application/jello"},
               "other-meta" => {"label" => "test stream 2"},
       }
-      expect(ROF.Ingest(item)).to eq(["content", "other"])
+      expect(ROF.Ingest(item)).to eq(["rels-ext", "content", "other"])
     end
 
     it "treats id as a surrogate for pid when pid is missing" do
       item = {"type" => "fobject",
               "id" => "test:1",
               "af-model" => "GenericFile",
+              "content" => "jello",
+              "content-meta" => {"label" => "test stream 1",
+                                 "mime-type" => "application/jello"},
+              "other-meta" => {"label" => "test stream 2"},
+      }
+      expect(ROF.Ingest(item)).to eq(["rels-ext", "content", "other"])
+    end
+
+    it "doesn't touch the rels ext if the model and rels-ext key are missing" do
+      item = {"type" => "fobject",
+              "id" => "test:1",
               "content" => "jello",
               "content-meta" => {"label" => "test stream 1",
                                  "mime-type" => "application/jello"},
@@ -61,7 +72,7 @@ module ROF
               "af-model" => "GenericFile",
               "content" => nil
       }
-      expect(ROF.Ingest(item)).to eq(["content"])
+      expect(ROF.Ingest(item)).to eq(["rels-ext", "content"])
     end
 
     describe "RDF Metadata" do
@@ -77,68 +88,23 @@ module ROF
         s = ROF.ingest_ld_metadata(item, nil)
         expect(s).to eq %(<info:fedora/test:1> <http://purl.org/dc/terms/title> "Hello Z" .\n)
       end
-    end
-    describe "decoding rights metadata" do
-      it "formats people and groups" do
-        s = ROF.format_rights_section("qwerty", "alice", ["bob", "carol"])
-        expect(s).to eq <<-EOS
-  <access type="qwerty">
-    <human/>
-    <machine>
-      <person>alice</person>
-      <group>bob</group>
-      <group>carol</group>
-    </machine>
-  </access>
-EOS
-      end
-      it "handles no people or groups" do
-        s = ROF.format_rights_section("qwerty", nil, nil)
-        expect(s).to eq <<-EOS
-  <access type="qwerty">
-    <human/>
-    <machine/>
-  </access>
-EOS
-      end
 
-      it "formats rights metadata correctly" do
-        item = {
-          "rights" => {
-            "read-groups" => ["public"],
-            "edit" => ["batch_user"],
-          }
-        }
-        s = ROF.ingest_rights_metadata(item, nil)
-        expect(s).to eq <<-EOS
-<rightsMetadata xmlns="http://hydra-collab.stanford.edu/schemas/rightsMetadata/v1" version="0.1">
-  <copyright>
-    <human type="title"/>
-    <human type="description"/>
-    <machine type="uri"/>
-  </copyright>
-  <access type="discover">
-    <human/>
-    <machine/>
-  </access>
-  <access type="read">
-    <human/>
-    <machine>
-      <group>public</group>
-    </machine>
-  </access>
-  <access type="edit">
-    <human/>
-    <machine>
-      <person>batch_user</person>
-    </machine>
-  </access>
-  <embargo>
-    <human/>
-    <machine/>
-  </embargo>
-</rightsMetadata>
-EOS
+      it "handles @graph objects" do
+        item = {"pid" => "test:1",
+                "metadata" => {
+                  "@context" => {
+                    "dc" => "http://purl.org/dc/terms/",
+                    "dc:creator" => {"@type" => "@id"},
+                  },
+                  "@graph" => [
+                    {"@id" => "_:b0",
+                     "dc:title" => "Hello"},
+                    {"@id" => "info:fedora/test:1",
+                     "dc:creator" => "_:b0"},
+                  ]}}
+        s = ROF.ingest_ld_metadata(item, nil)
+        s = s.split("\n").sort.join("\n") # canonicalize the line ordering
+        expect(s).to eq %(<info:fedora/test:1> <http://purl.org/dc/terms/creator> _:b0 .\n_:b0 <http://purl.org/dc/terms/title> "Hello" .)
       end
     end
   end

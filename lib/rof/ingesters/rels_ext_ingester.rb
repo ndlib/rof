@@ -39,12 +39,7 @@ module ROF
 
         # build up a json-ld object, and then persist that (into XML!)
         input = rels_ext
-        context = input.fetch("@context", {}).merge(
-          "@vocab" => "info:fedora/fedora-system:def/relations-external#",
-          "hasModel" => {"@id" => "info:fedora/fedora-system:def/model#hasModel",
-                      "@type" => "@id"},
-          "@base" => "info:fedora/"
-        )
+        context = input.fetch("@context", {}).merge(ROF::RelsExtRefContext)
         input["@context"] = context
         input["@id"] = "info:fedora/#{pid}"
 
@@ -54,17 +49,19 @@ module ROF
         # objects. Rewrite them to have prefix "info:fedora/".
         # Also need to make sure json-ld interprets each of these object
         # references as an IRI instead of a string.
+        # This is kinda hacky. Is there a better way?
         input.each do |relation, targets|
-          next if relation[0] == "@" || relation == "hasModel"
+          next if relation == "@context" || relation == "@id" || relation == "hasModel"
           targets = [targets] if targets.is_a? String
           input[relation] = targets.map do |target|
-            {"@id" => "info:fedora/#{target}"}
+            target.is_a?(String) ? {"@id" => "info:fedora/#{target}"} : target
           end
         end
 
         graph = RDF::Graph.new << JSON::LD::API.toRdf(input)
         graph.dump(:rdfxml)
       end
+
       def persist(content)
         if fdoc
           ds = fdoc['RELS-EXT']
@@ -75,6 +72,7 @@ module ROF
           true
         end
       end
+
     end
   end
 end

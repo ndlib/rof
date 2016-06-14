@@ -6,9 +6,9 @@ require 'rubydora'
 
 module ROF
  class FedoraToRof
+
   # connect to fedora and fetch object
   # returns array of fedora attributes or nil
-
   def self.GetFromFedora(pid, fedora, config)
     @fedora_info = {}
 
@@ -51,16 +51,22 @@ module ROF
         # TODO(dbrower): change dump algorithm:
         # if content is short < X bytes, save as string
         # if content is > X bytes, save as file only if config option is given
-        content = ds.datastream_content.to_s
-        if content.length <= 1024
-          @fedora_info[dsname] = content
+        content = ds.datastream_content
+        if content.length <= 1024 || config['inline']
+          @fedora_info[dsname] = content.to_s
+        elsif config['download']
+          fname = "#{@fedora_info['pid']}-#{dsname}"
+          abspath = File.join(config['download_path'], fname)
+          @fedora_info["#{dsname}-file"] = fname
+          File.open(fname, "w") do |f|
+            f.write(content)
+          end
         end
-        #@fedora_info[key] = ds.profile if config['show_all'] == true
       end
     end
   end
 
-  def self.create_meta(ds, _config)
+  def self.create_meta(ds, config)
     result = {}
 
     label = ds.profile['dsLabel']
@@ -68,7 +74,11 @@ module ROF
     result["mime-type"] = ds.profile['dsMIME'] if ds.profile['dsMIME'] != "text/plain"
     # TODO(dbrower): make sure this is working as intended
     if ["R", "E"].include?(ds.profile['TYPE'])
-      content_array['URL'] = 'bendo:' + ds.profile['dsLocation'].split(':')[2]
+      s = result['URL'] = ds.profile['dsLocation']
+      if config['bendo']
+        s = s.sub(config['bendo'], 'bendo:')
+      end
+      result['URL'] = s
     end
     result
   end
@@ -89,7 +99,7 @@ module ROF
 
   # set metadata
   #
-  def self.descMetadata(ds, _config)
+  def self.descMetadata(ds, config)
     # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
     graph = RDF::Graph.new
     graph.from_ntriples(ds.datastream_content, format: :ntriples)
@@ -103,7 +113,7 @@ module ROF
 
   # set rights
   #
-  def self.rightsMetadata(ds, _config)
+  def self.rightsMetadata(ds, config)
     # rights is an XML document
     # the access array may have read or edit elements
     # each of these elements may contain group or person elements
@@ -140,19 +150,12 @@ module ROF
     @fedora_info['rights'] = rights_array
   end
 
-  def self.RELSEXT(ds, _config)
+  def self.RELSEXT(ds, config)
     # RELS-EXT is RDF-XML - parse it
+    ctx = ROF::RelsExtRefContext.dup
+    ctx.delete("@base") # @base causes problems when converting TO json-ld (it is = "info:/fedora") but info is not a namespace
     graph = RDF::Graph.new
     graph.from_rdfxml(ds.datastream_content)
-    ctx = {
-      "@vocab" => "info:fedora/fedora-system:def/relations-external#",
-      "fedora-model" => "info:fedora/fedora-system:def/model#",
-      "hydra" => "http://projecthydra.org/ns/relations#",
-      "hasModel" => {"@id" => "fedora-model:hasModel", "@type" => "@id"},
-      "hasEditor" => {"@id" => "hydra:hasEditor", "@type" => "@id"},
-      "hasEditorGroup" => {"@id" => "hydra:hasEditorGroup", "@type" => "@id"},
-      "isPartOf" => {"@type" => "@id"}
-    }
     result = nil
     JSON::LD::API::fromRdf(graph) do |expanded|
       result = JSON::LD::API.compact(expanded, ctx)
@@ -167,13 +170,17 @@ module ROF
 
   private
   def self.strip_info_fedora(rels_ext)
-    rels_ext.each do |relation, targets| 
+    rels_ext.each do |relation, targets|
       next if relation == "@context"
       if targets.is_a?(Hash)
         strip_info_fedora(targets)
-      else
-        targets = [targets] if targets.is_a?(String)
-        rels_ext[relation] = targets.map do |target|
+        next
+      end
+      targets = [targets] if targets.is_a?(String)
+      rels_ext[relation] = targets.map do |target|
+        if target.is_a?(Hash)
+          strip_info_fedora(target)
+        else
           target.sub("info:fedora/", '')
         end
       end

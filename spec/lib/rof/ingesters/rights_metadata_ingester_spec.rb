@@ -2,7 +2,36 @@ require 'spec_helper'
 
 module ROF
   module Ingesters
+
     describe RightsMetadataIngester do
+      before(:all) do
+        @rights_ingestor = RightsMetadataIngester.new(item:{})
+      end
+
+      it "formats people and groups" do
+        s = @rights_ingestor.format_rights_section("qwerty", "alice", ["bob", "carol"])
+        expect(s).to eq <<-EOS
+  <access type="qwerty">
+    <human/>
+    <machine>
+      <person>alice</person>
+      <group>bob</group>
+      <group>carol</group>
+    </machine>
+  </access>
+EOS
+      end
+
+      it "handles no people or groups" do
+        s = @rights_ingestor.format_rights_section("qwerty", nil, nil)
+        expect(s).to eq <<-EOS
+  <access type="qwerty">
+    <human/>
+    <machine/>
+  </access>
+EOS
+      end
+
       it "works with simple cases" do
         item = {"rights" => {"read-groups" => ["restricted", "abc"],
                              "read" => ["joe"],

@@ -44,10 +44,13 @@ module ROF
     end
 
     ds_touched = []
-    if doc
+    # update rels-ext if there is either a rels-ext present or if there
+    # is a model to set. Otherwise, don't touch it!
+    if (item.has_key?("rels-ext") || !models.empty?)
       update_rels_ext(models, item, doc)
       ds_touched << "rels-ext"
     end
+    # now handle all the other datastreams
     item.each do |key,value|
       case key
       # fields having special treatement
@@ -84,27 +87,35 @@ module ROF
     if ds_content && !ds_content.is_a?(String)
       raise SourceError.new("Content for #{dsname} is not a string.")
     end
+    # A URL, without content or file, is an R datastream
+    # A URL, with content or file, raises an error
+    ds_url = ds_meta["URL"] if ds_meta && ds_meta.is_a?(Hash)
+    if ds_url && ds_content
+      raise SourceError.new("Both #{ds_url} and #{dsname} are present.")
+    end
+    if ds_url && ds_filename
+      raise SourceError.new("Both #{ds_url} and #{dsname}-file are present.")
+    end
 
     md = {"mime-type" => "text/plain",
           "label" => "",
           "versionable" => true,
+          "control-group" => "M",
     }
 
-    #  A meta containing an URL, without content or file, is and r datastream
-    #  A meta containing an URL, with content or file, raises an error
     if ds_meta
-      md["control-group"] = "M"
-      ds_url = ds_meta["URL"]
-      if ds_url
-         if ds_url && ds_content
-	      raise SourceError.new("Both #{ds_url} and #{dsname} are present.")
-         end
-         if ds_url && ds_filename
-	      raise SourceError.new("Both #{dsname}-file and #{ds_url} are present.")
-         end
-         md["control-group"] = "R"
-      end
       md.merge!(item["#{dsname}-meta"])
+    end
+
+    if ds_url
+       md["control-group"] = "R"
+
+       # If the bendo server was passed in the command line, assume that the URL is in
+       # the form "bendo:/item/<item#>/<item name> and substitute bendo: w/ the server name
+       # if no bendo provided, use whatever's there.
+       if bendo
+         md["URL"] = md["URL"].sub("bendo:", bendo)
+       end
     end
 
     # NOTE(dbrower): this could be refactored a bit. I was trying to keep the
@@ -117,15 +128,7 @@ module ROF
       ds.dsLabel = md["label"]
       ds.versionable = md["versionable"]
       ds.mimeType = md["mime-type"]
-      if md["URL"]
-	      # If the bendo server was passed in the command line, assume that the URL is in
-	      # the form "bendo:/item/<item#>/<item name> and substitute bendo: w/ the server name
-	      # if no bendo provided, use whatever's there.
-	      if bendo
-	         md["URL"] = md["URL"].sub("bendo:",bendo)
-	      end
-	      ds.dsLocation = md["URL"]
-      end
+      ds.dsLocation = md["URL"] if md["URL"]
     end
     need_close = false
     if ds_filename
@@ -144,29 +147,13 @@ module ROF
     Ingesters::RightsMetadataIngester.call(item: item, fedora_document: fdoc)
   end
 
-  def self.format_rights_section(section_name, people, groups)
-    people = [people] if people.is_a? String
-    groups = [groups] if groups.is_a? String
-    result = %Q{  <access type="#{section_name}">\n    <human/>\n}
-    if people || groups
-      result += "    <machine>\n"
-      (people || []).each do |person|
-        result += %Q{      <person>#{person}</person>\n}
-      end
-      (groups || []).each do |group|
-        result += %Q{      <group>#{group}</group>\n}
-      end
-      result += "    </machine>\n"
-    else
-      result += "    <machine/>\n"
-    end
-    result += "  </access>\n"
-    result
-  end
-
   def self.ingest_ld_metadata(item, fdoc)
     input = item['metadata']
-    input["@id"] = "info:fedora/#{item['pid']}" unless input["@id"]
+    # sometimes json-ld generates @graph structures when converting from fedora to ROF.
+    # in that case, don't provide an id key
+    if !input.has_key?("@graph")
+      input["@id"] = "info:fedora/#{item['pid']}" unless input["@id"]
+    end
     graph = RDF::Graph.new << JSON::LD::API.toRdf(input)
     content = graph.dump(:ntriples)
     # we read the rof file as utf-8. the RDF gem seems to convert it back to
