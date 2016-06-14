@@ -9,19 +9,19 @@ module ROF
     # turns original object into an fobject/$1
     # and copies the access to each fobject.
     class Work
-
       class NoFile < RuntimeError
       end
 
-      WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/.freeze
+      WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/
 
       WORK_TYPES = {
         # csv name => af-model
-        "article" => "Article",
-        "dataset" => "Dataset",
-        "document" => "Document",
-        "etd" => "Etd",
-        "image" => "Image"
+        'article' => 'Article',
+        'dataset' => 'Dataset',
+        'document' => 'Document',
+        'collection' => 'Collection',
+        'etd' => 'Etd',
+        'image' => 'Image'
       }.freeze
 
       def initialize
@@ -40,68 +40,68 @@ module ROF
         return [input_obj] if model.nil?
 
         main_obj = {
-          "type" => "fobject",
-          "af-model" => model,
-          "pid" => input_obj.fetch("pid", next_label),
-          "bendo-item" => input_obj["bendo-item"],
-          "rights" => input_obj["rights"],
-          "properties" => properties_ds(input_obj["owner"]),
-          "properties-meta" => {
-            "mime-type" => "text/xml"
+          'type' => 'fobject',
+          'af-model' => model,
+          'pid' => input_obj.fetch('pid', next_label),
+          'bendo-item' => input_obj['bendo-item'],
+          'rights' => input_obj['rights'],
+          'properties' => properties_ds(input_obj['owner']),
+          'properties-meta' => {
+            'mime-type' => 'text/xml'
           },
-          "collections" => input_obj["collections"],
-          "metadata" => input_obj["metadata"]
+          'rels-ext' => input_obj['rels-ext'],
+          'metadata' => input_obj['metadata']
         }
         result = [main_obj]
-        return result if input_obj["files"].nil?
+        return result if input_obj['files'].nil?
         # make the first file be the representative thumbnail
         thumb_rep = nil
-        input_obj["files"].each do |finfo|
+        input_obj['files'].each do |finfo|
           if finfo.is_a?(String)
             fname = finfo
-            finfo = {"files" => [fname]}
+            finfo = { 'files' => [fname] }
           else
-            fname = finfo["files"].first
+            fname = finfo['files'].first
             raise NoFile if fname.nil?
           end
-          finfo["rights"] ||= input_obj["rights"]
-          finfo["owner"] ||= input_obj["owner"]
-          finfo["bendo-item"] ||= input_obj["bendo-item"]
-          finfo["metadata"] ||= {
-            "@context" => ROF::RdfContext
+          finfo['rights'] ||= input_obj['rights']
+          finfo['owner'] ||= input_obj['owner']
+          finfo['bendo-item'] ||= input_obj['bendo-item']
+          finfo['metadata'] ||= {
+            '@context' => ROF::RdfContext
           }
-          finfo["metadata"]["dc:title"] ||= fname
+          finfo['metadata']['dc:title'] ||= fname
           mimetype = MIME::Types.of(fname)
-          mimetype = mimetype.empty? ? "application/octet-stream" : mimetype.first.content_type
+          mimetype = mimetype.empty? ? 'application/octet-stream' : mimetype.first.content_type
           f_obj = {
-            "type" => "fobject",
-            "af-model" => "GenericFile",
-            "pid" => finfo["pid"],
-            "bendo-item" => finfo["bendo-item"],
-            "rights" => finfo["rights"],
-            "properties" => properties_ds(finfo["owner"]),
-            "properties-meta" => {
-              "mime-type" => "text/xml"
+            'type' => 'fobject',
+            'af-model' => 'GenericFile',
+            'pid' => finfo['pid'],
+            'bendo-item' => finfo['bendo-item'],
+            'rights' => finfo['rights'],
+            'properties' => properties_ds(finfo['owner']),
+            'properties-meta' => {
+              'mime-type' => 'text/xml'
             },
-            "rels-ext" => {
-              "isPartOf" => [main_obj["pid"]]
+            'rels-ext' => {
+              'isPartOf' => [main_obj['pid']]
             },
-            "content-file" => fname,
-            "content-meta" => {
-              "label" => fname,
-              "mime-type" => mimetype
+            'content-file' => fname,
+            'content-meta' => {
+              'label' => fname,
+              'mime-type' => mimetype
             },
-            "collections" => finfo["collections"],
-            "metadata" => finfo["metadata"]
+            'collections' => finfo['collections'],
+            'metadata' => finfo['metadata']
           }
-          f_obj.delete_if { |k,v| v.nil? }
+          f_obj.delete_if { |_k, v| v.nil? }
           if thumb_rep.nil?
-            thumb_rep = f_obj["pid"]
+            thumb_rep = f_obj['pid']
             if thumb_rep.nil?
               thumb_rep = next_label
-              f_obj["pid"] = thumb_rep
+              f_obj['pid'] = thumb_rep
             end
-            main_obj["properties"] = properties_ds(input_obj["owner"], thumb_rep)
+            main_obj['properties'] = properties_ds(input_obj['owner'], thumb_rep)
           end
           result << f_obj
         end
@@ -109,21 +109,21 @@ module ROF
       end
 
       def decode_work_type(obj)
-        if obj["type"] =~ WORK_TYPE_WITH_PREFIX_PATTERN
-          return "GenericWork" if $2.nil?
-          $2
+        if obj['type'] =~ WORK_TYPE_WITH_PREFIX_PATTERN
+          return 'GenericWork' if Regexp.last_match(2).nil?
+          Regexp.last_match(2)
         else
           # this will return nil if key t does not exist
-          work_type = obj["type"].downcase
+          work_type = obj['type'].downcase
           WORK_TYPES[work_type]
         end
       end
 
-      def properties_ds(owner, representative=nil)
-        s = %Q{<fields>
+      def properties_ds(owner, representative = nil)
+        s = %(<fields>
 <depositor>batch_ingest</depositor>
 <owner>#{owner}</owner>
-}
+)
         s += "<representative>#{representative}</representative>\n" if representative
         s += "</fields>\n"
       end
