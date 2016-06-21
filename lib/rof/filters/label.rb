@@ -20,13 +20,14 @@ module ROF
       # or pass in :id_list, a list of identifiers
       # to use (responds to :shift method)
       def initialize(prefix, options)
-        @id_list = if options[:id_list]
-                     options[:id_list]
-                   elsif options[:noid_server]
-                     NoidsPool.new(options[:noid_server], options[:pool_name])
-                   else
-                     raise NoPool
-                   end
+        @id_list =  case
+		    when options[:id_list]
+	              options[:id_list]
+		    when options[:noid_server]
+                      NoidsPool.new(options[:noid_server], options[:pool_name])
+                    else
+                      raise NoPool
+                    end
         @prefix = "#{prefix}:" if prefix
         # The first match group in the RE provides the label name
         @label_re = /\$\(([^)]+)\)/
@@ -35,7 +36,7 @@ module ROF
       # mutate obj_list by assigning labels and resolving labels where needed
       def process(obj_list)
         labels = {}
-        master_pid = nil
+        @master_pid = nil
 
         # Use two passes. First assign ids, and then resolve labels
         # Do this since labels can be referenced before being defined
@@ -48,7 +49,7 @@ module ROF
 
         # replace labels with pids we've assigned them
         obj_list.each do |obj|
-          replace_labels_in_obj(obj, labels, master_pid)
+          replace_labels_in_obj(obj, labels)
         end
 
         obj_list
@@ -89,7 +90,7 @@ module ROF
       end
 
       # replace labels, and add bendo id if needed
-      def replace_labels_in_obj(obj, labels, master_pid)
+      def replace_labels_in_obj(obj, labels)
         return if obj['type'] != 'fobject'
         obj.each do |k, v|
           obj[k] = if k == 'rels-ext'
@@ -98,8 +99,8 @@ module ROF
                      replace_labels(v, labels, false)
                    end
         end
-        master_pid = obj['pid'].gsub(/^.*:/, '') if master_pid.nil?
-        obj = add_bendo_id(obj, master_pid)
+        @master_pid = obj['pid'].gsub(/^.*:/, '') if @master_pid.nil?
+        obj = add_bendo_id(obj, @master_pid)
       end
 
       # recurse through obj replacing any labels in strings

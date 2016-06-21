@@ -32,12 +32,12 @@ module ROF
         main_obj = set_main_obj(input_obj, model)
 
         result = [main_obj]
-        result = make_thumbnail(result, input_obj) unless input_obj['files'].nil?
+        result = make_thumbnail(result, main_obj, input_obj) unless input_obj['files'].nil?
         result
       end
 
       # make the first file be the representative thumbnail
-      def make_thumbnail(result, input_obj)
+      def make_thumbnail(result, main_obj, input_obj)
         thumb_rep = nil
         input_obj['files'].each do |finfo|
           if finfo.is_a?(String)
@@ -62,7 +62,7 @@ module ROF
             'pid' => finfo['pid'],
             'bendo-item' => finfo['bendo-item'],
             'rights' => finfo['rights'],
-            'properties' => @utility.prop_ds(finfo['owner']),
+            'properties' => ROF::Utility.prop_ds(finfo['owner']),
             'properties-meta' => {
               'mime-type' => 'text/xml'
             },
@@ -84,7 +84,7 @@ module ROF
               thumb_rep = @utility.next_label
               f_obj['pid'] = thumb_rep
             end
-            main_obj['properties'] = @utility.prop_ds(input_obj['owner'], thumb_rep)
+            main_obj['properties'] = ROF::Utility.prop_ds(input_obj['owner'], thumb_rep)
           end
           result << f_obj
         end
@@ -99,25 +99,12 @@ module ROF
         result['pid'] = input_obj.fetch('pid', @utility.next_label)
         result['bendo-item'] = input_obj['bendo-item']
         result['rights'] = input_obj['rights']
-        result['properties'] = @utility.prop_ds(input_obj['owner'])
+        result['properties'] = ROF::Utility.prop_ds(input_obj['owner'])
         result['properties-meta'] = { 'mime-type' => 'text/xml' }
         result['rels-ext'] = input_obj['rels-ext']
         result['metadata'] = input_obj['metadata']
         result
       end
-
-#      def prop_ds(owner, representative = nil)
-#        s = %(<fields>
-#<depositor>batch_ingest</depositor>
-#<owner>#{owner}</owner>
-#)
-#        if representative
-#          s += "<representative>#{representative}</representative>\n</fields>\n"
-#        else
-#          s += "</fields>\n"
-#        end
-#        s
-#      end
     end
   end
 end

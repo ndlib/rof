@@ -40,7 +40,7 @@ module ROF
         expect(after[0]).to include("type" => "fobject",
                                     "af-model" => "GenericWork",
                                     "pid" => "$(pid--0)",
-                                    "properties" => w.properties_ds("user1", "$(pid--1)"))
+                                    "properties" => ROF::Utility.prop_ds("user1", "$(pid--1)"))
         expect(after[1]).to include("type" => "fobject",
                                     "af-model" => "GenericFile",
                                     "pid" => "$(pid--1)")

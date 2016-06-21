@@ -41,7 +41,7 @@ module ROF
     end
 
     # set 'properties'
-    def prop_ds(owner, representative = nil)
+    def self.prop_ds(owner, representative = nil)
       s = %(<fields><depositor>batch_ingest</depositor>
 				<owner>#{owner}</owner>)
       if representative
