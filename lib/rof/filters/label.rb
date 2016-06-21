@@ -39,45 +39,67 @@ module ROF
 
         # Use two passes. First assign ids, and then resolve labels
         # Do this since labels can be referenced before being defined
+
+        # find labels in pids and in rels-ext
         obj_list.each do |obj|
-          next if obj['type'] != 'fobject'
-          label = nil
-          unless obj['pid'].nil?
-            label = find_label(obj['pid'])
-            next if label.nil?
-          end
-          pid = "#{@prefix}#{next_id}"
-          obj['pid'] = pid
-          labels[label] = pid unless label.nil?
+          find_pid_labels(obj, labels)
+          find_relsext_labels(obj, labels)
         end
 
-        # Handle rels-ext
+        # replace labels with pids we've assigned them
         obj_list.each do |obj|
-          next if obj['type'] != 'fobject'
-          next if obj['rels-ext'].nil?
-          next if obj['rels-ext']['isMemberOf'].nil?
-          obj['rels-ext']['isMemberOf'].each_with_index do |parent_pid, _index|
+          replace_labels_in_obj(obj, labels, master_pid)
+        end
+
+        obj_list
+      end
+
+      # find labels in pids
+      def find_pid_labels(obj, labels)
+        return if obj['type'] != 'fobject'
+        label = nil
+        unless obj['pid'].nil?
+          label = find_label(obj['pid'])
+          return if label.nil?
+        end
+        pid = "#{@prefix}#{next_id}"
+        obj['pid'] = pid
+        labels[label] = pid unless label.nil?
+      end
+
+      # find labels in rels-ext
+      def find_relsext_labels(obj, labels)
+        if ismemberof?(obj)
+          obj['rels-ext']['isMemberOfCollection'].each do |parent|
             label = nil
-            label = find_label(parent_pid) unless parent_pid.nil?
+            label = find_label(parent) unless parent.nil?
             pid = "#{@prefix}#{next_id}"
             labels[label] = pid unless label.nil?
           end
         end
+      end
 
-        obj_list.each do |obj|
-          next if obj['type'] != 'fobject'
-          obj.each do |k, v|
-            obj[k] = if k == 'rels-ext'
-                       replace_labels(v, labels, true)
-                     else
-                       replace_labels(v, labels, false)
-                     end
-          end
-          master_pid = obj['pid'].gsub(/^.*:/, '') if master_pid.nil?
-          obj = add_bendo_id(obj, master_pid)
+      # true if object is a fedora object with a rels-ext hash containing
+      # an isMemberOfCollection array
+      def ismemberof?(obj)
+        return false if obj['type'] != 'fobject'
+        return false if obj['rels-ext'].nil?
+        return false if obj['rels-ext']['isMemberOfCollection'].nil?
+        true
+      end
+
+      # replace labels, and add bendo id if needed
+      def replace_labels_in_obj(obj, labels, master_pid)
+        return if obj['type'] != 'fobject'
+        obj.each do |k, v|
+          obj[k] = if k == 'rels-ext'
+                     replace_labels(v, labels, true)
+                   else
+                     replace_labels(v, labels, false)
+                   end
         end
-
-        obj_list
+        master_pid = obj['pid'].gsub(/^.*:/, '') if master_pid.nil?
+        obj = add_bendo_id(obj, master_pid)
       end
 
       # recurse through obj replacing any labels in strings
@@ -90,13 +112,19 @@ module ROF
         if obj.is_a?(Array)
           obj.map! { |x| replace_labels(x, labels, force) }
         elsif obj.is_a?(Hash)
-          obj.each do |k, v|
-            obj[k] = replace_labels(v, labels, force)
-          end
+          replace_labels_in_hash(obj, labels, force)
         elsif obj.is_a?(String)
           replace_match(obj, labels, force)
         else
           obj
+        end
+      end
+
+      # small util function to iterate through hash and
+      # replace labels on elements
+      def replace_labels_in_hash(obj, labels, force)
+        obj.each do |k, v|
+          obj[k] = replace_labels(v, labels, force)
         end
       end
 
