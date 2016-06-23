@@ -20,7 +20,7 @@ module ROF
       result['metadata'] = obj['metadata']
       result['pid'] = obj.fetch('pid', utility.next_label)
       result['rels-ext'] = obj['rels-ext']
-      result['properties'] = utility.prop_ds(obj['owner'])
+      result['properties'] = ROF::Utility.prop_ds(obj['owner'])
       result['properties-meta'] = { 'mime-type' => 'text/xml' }
       result
     end
