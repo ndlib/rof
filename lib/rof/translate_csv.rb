@@ -69,7 +69,7 @@ module ROF
             result['pid'] = item.strip
           when 'collections'
             result['rels-ext'] = {}
-            result['rels-ext']['isMemberOfCollection'] = item.split('|')
+            result['rels-ext']['isMemberOfCollection'] = item.split('|').map(&:strip)
           else
             result[column_name] = item.split('|').map(&:strip)
           end

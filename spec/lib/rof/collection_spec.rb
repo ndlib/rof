@@ -6,6 +6,7 @@ module ROF
     let!(:testobject1) { { 'owner' => 'rtillman', 'pid' => '$(first)'} } 
     let!(:testobject2) { { 'owner' => 'rtillman', 'rights' => { 'read-groups' => [ 'public' ], 'edit' => [ 'edit']}} } 
     let!(:testobject3) { { 'owner' => 'rtillman', "metadata" => { "dc:title" => "Extensive Reading in Japanese"} } }
+    let!(:testobject4) { { 'owner' => 'rtillman', "files" => [ '/it_is_not_there'] } }
 
     describe 'set_required_fields' do
     let(:obj) { ROF::Collection.set_required_fields( testobject1, util) }
@@ -48,6 +49,12 @@ module ROF
       context 'without file extension' do
 	subject { ROF::Collection.mk_dest_img_name('/opt/data/und:12345/flashcrowd', '-launch') }
 	it { is_expected.to eq("/opt/data/und:12345/flashcrowd-launch") }
+      end
+    end
+    describe 'make_images' do
+      context 'with non-existent file' do
+	subject { ROF::Collection.make_images({}, testobject4)}
+        it { is_expected.to raise_error(SystemExit) }
       end
     end
     describe 'find_file_mime' do

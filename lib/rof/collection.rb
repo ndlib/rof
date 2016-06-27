@@ -34,7 +34,10 @@ module ROF
 
       # attempt to create a launch page image and thumbnail
       # exit if either fails
-      exit 1 unless File.exist?(image_source)
+      unless File.exist?(image_source)
+        STDERR.print("ROF:Collection.make_images: file  ", image_source, " does not exist.\n")
+        exit 1
+      end
       create_images(subtotal, image_source)
     end
 
@@ -54,7 +57,10 @@ module ROF
       options = ' -resize 350x350 '
 
       dest_image = mk_dest_img_name(src_image, '-launch')
-      return nil unless run_convert(src_image, dest_image, options)
+      unless run_convert(src_image, dest_image, options)
+        STDERR.print("ROF:Collection.mk_launch: failed on file  ", src_image, ".\n")
+        return nil
+      end
       dest_image
     end
 
@@ -63,7 +69,10 @@ module ROF
       options = ' -resize 256x256 '
 
       dest_image = mk_dest_img_name(src_image, '-thumb')
-      return nil unless run_convert(src_image, dest_image, options)
+      unless run_convert(src_image, dest_image, options)
+        STDERR.print("ROF:Collection.mk_thumb: failed on file  ", src_image, ".\n")
+        return nil
+      end
       dest_image
     end
 
