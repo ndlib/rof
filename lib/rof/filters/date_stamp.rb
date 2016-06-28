@@ -15,7 +15,7 @@ module ROF
                    end
       end
 
-      def process(obj_list)
+      def process(obj_list, _fname)
         obj_list.map! do |obj|
           if obj["metadata"].nil?
             obj["metadata"] = {

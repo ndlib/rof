@@ -63,12 +63,12 @@ module ROF
 
     def self.filter_file(filter, fname, outfile=STDOUT)
       items = self.load_items_from_file(fname, STDERR)
-      self.filter_array(filter, items, outfile)
+      self.filter_array(filter, items, fname, outfile)
     end
 
-    def self.filter_array(filter, items, outfile=STDOUT)
+    def self.filter_array(filter, items, fname,  outfile=STDOUT)
       # filter will transform the items array in place
-      result = filter.process(items)
+      result = filter.process(items, fname)
       outfile.write(JSON.pretty_generate(result))
     end
 
