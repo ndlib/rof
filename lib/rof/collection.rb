@@ -4,6 +4,8 @@ module ROF
   # Called from ROF::Work.process_one_work
   # Can assume type fobject, af-model Collection
   class Collection
+    class NoFile < RuntimeError
+    end
     def self.process_one_collection(input_obj, utility)
       # set the required fields
       result = set_required_fields(input_obj, utility)
@@ -36,7 +38,7 @@ module ROF
       # exit if either fails
       unless File.exist?(image_source)
         STDERR.print("ROF:Collection.make_images: file  ", image_source, " does not exist.\n")
-        exit 1
+        raise NoFile
       end
       create_images(subtotal, image_source)
     end
@@ -44,7 +46,7 @@ module ROF
     def self.create_images(obj, image_source)
       launch_img = make_launch(image_source)
       thumb_img = make_thumb(image_source)
-      exit 1 if launch_img.nil? || thumb_img.nil?
+      raise NoFile if launch_img.nil? || thumb_img.nil?
       obj['content-file'] = File.basename(launch_img)
       obj['content-meta'] = { 'mime-type' => find_file_mime(launch_img) }
       obj['thumbnail-file'] = File.basename(thumb_img)
