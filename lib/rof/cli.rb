@@ -2,6 +2,7 @@ require 'benchmark'
 require 'json'
 require 'rubydora'
 require 'rof/ingest'
+require 'rof/collection'
 require 'rof/get_from_fedora'
 module ROF
   module CLI

@@ -52,7 +52,7 @@ module ROF
       CSV.parse(csv_contents) do |row|
         if first_line.nil?
           first_line = row
-          if ! (first_line.include?("type") && first_line.include?("owner"))
+          unless first_line.include?('type') && first_line.include?('owner')
             raise MissingOwnerOrType
           end
           next
@@ -63,24 +63,25 @@ module ROF
           next if item.nil?
           column_name = first_line[i]
           case column_name
-          when "type", "owner", "access", "bendo-item"
+          when 'type', 'owner', 'access', 'bendo-item'
             result[column_name] = item.strip
-          when "curate_id", "pid"
-            result["pid"] = item.strip
+          when 'curate_id', 'pid'
+            result['pid'] = item.strip
+          when 'collections'
+            result['rels-ext'] = {}
+            result['rels-ext']['isMemberOfCollection'] = item.split('|').map(&:strip)
           else
-            result[column_name] = item.split("|").map(&:strip)
+            result[column_name] = item.split('|').map(&:strip)
           end
         end
-        if result["type"].nil? or result["owner"].nil?
-          raise MissingOwnerOrType
-        end
-        result["rights"] = ROF::Access.decode(result.fetch("access", "private"), result["owner"])
-        result.delete("access")
-        result = self.collect_metadata(result)
+        raise MissingOwnerOrType if result['type'].nil? || result['owner'].nil?
+        result['rights'] = ROF::Access.decode(result.fetch('access', 'private'), result['owner'])
+        result.delete('access')
+        result = collect_metadata(result)
         # is this a generic file which should be attached to the previous work?
-        if result["type"] == "+"
+        if result['type'] == '+'
           raise NoPriorWork if previous_work.nil?
-          previous_work["files"] = previous_work.fetch("files", []) + [result]
+          previous_work['files'] = previous_work.fetch('files', []) + [result]
         else
           previous_work = result
           rof_contents << result
@@ -103,8 +104,8 @@ module ROF
       end
       return rof if metadata.empty?
       # TODO(dbrower): check there are no unknown namespaces
-      metadata["@context"] = ROF::RdfContext
-      rof["metadata"] = metadata
+      metadata['@context'] = ROF::RdfContext
+      rof['metadata'] = metadata
       rof
     end
   end

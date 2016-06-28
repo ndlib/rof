@@ -2,6 +2,9 @@ require 'noids_client'
 
 module ROF
   module Filters
+    # Class Label locates in-place labels of the form
+    # "$(label)_name)" in the ROF file, assigns each
+    # label a pid, then replaces the label with that pid.
     class Label
       class MissingLabel < RuntimeError
       end
@@ -14,16 +17,17 @@ module ROF
 
       # if not nil, "#{prefix}:" is prepended to every identifier
       # either pass in options for :noid_server, :pool_name
-      # or pass in :id_list, a list of identifiers to use (responds to :shift method)
+      # or pass in :id_list, a list of identifiers
+      # to use (responds to :shift method)
       def initialize(prefix, options)
-        @id_list = case
-        when options[:id_list]
-          options[:id_list]
-        when options[:noid_server]
-          NoidsPool.new(options[:noid_server], options[:pool_name])
-        else
-          raise NoPool
-        end
+        @id_list =  case
+		    when options[:id_list]
+	              options[:id_list]
+		    when options[:noid_server]
+                      NoidsPool.new(options[:noid_server], options[:pool_name])
+                    else
+                      raise NoPool
+                    end
         @prefix = "#{prefix}:" if prefix
         # The first match group in the RE provides the label name
         @label_re = /\$\(([^)]+)\)/
@@ -32,33 +36,71 @@ module ROF
       # mutate obj_list by assigning labels and resolving labels where needed
       def process(obj_list)
         labels = {}
-	master_pid = nil
+        @master_pid = nil
 
         # Use two passes. First assign ids, and then resolve labels
         # Do this since labels can be referenced before being defined
+
+        # find labels in pids and in rels-ext
         obj_list.each do |obj|
-          next if obj["type"] != "fobject"
-          label = nil
-          if ! obj["pid"].nil?
-            label = find_label(obj["pid"])
-            next if label.nil?
-          end
-          pid = "#{@prefix}#{next_id}"
-          obj["pid"] = pid
-          labels[label] = pid if ! label.nil?
+          find_pid_labels(obj, labels)
+          find_relsext_labels(obj, labels)
         end
 
+        # replace labels with pids we've assigned them
         obj_list.each do |obj|
-          next if obj["type"] != "fobject"
-          obj.each do |k,v|
-            force = (k == "rels-ext")
-            obj[k] = replace_labels(v, labels, force)
-          end
-	  master_pid  = obj["pid"].gsub(/^.*:/,"") if master_pid.nil?
-	  obj = add_bendo_id(obj, master_pid )
+          replace_labels_in_obj(obj, labels)
         end
 
         obj_list
+      end
+
+      # find labels in pids
+      def find_pid_labels(obj, labels)
+        return if obj['type'] != 'fobject'
+        label = nil
+        unless obj['pid'].nil?
+          label = find_label(obj['pid'])
+          return if label.nil?
+        end
+        pid = "#{@prefix}#{next_id}"
+        obj['pid'] = pid
+        labels[label] = pid unless label.nil?
+      end
+
+      # find labels in rels-ext
+      def find_relsext_labels(obj, labels)
+        if ismemberof?(obj)
+          obj['rels-ext']['isMemberOfCollection'].each do |parent|
+            label = nil
+            label = find_label(parent) unless parent.nil?
+            pid = "#{@prefix}#{next_id}"
+            labels[label] = pid unless label.nil?
+          end
+        end
+      end
+
+      # true if object is a fedora object with a rels-ext hash containing
+      # an isMemberOfCollection array
+      def ismemberof?(obj)
+        return false if obj['type'] != 'fobject'
+        return false if obj['rels-ext'].nil?
+        return false if obj['rels-ext']['isMemberOfCollection'].nil?
+        true
+      end
+
+      # replace labels, and add bendo id if needed
+      def replace_labels_in_obj(obj, labels)
+        return if obj['type'] != 'fobject'
+        obj.each do |k, v|
+          obj[k] = if k == 'rels-ext'
+                     replace_labels(v, labels, true)
+                   else
+                     replace_labels(v, labels, false)
+                   end
+        end
+        @master_pid = obj['pid'].gsub(/^.*:/, '') if @master_pid.nil?
+        obj = add_bendo_id(obj, @master_pid)
       end
 
       # recurse through obj replacing any labels in strings
@@ -67,32 +109,41 @@ module ROF
       # Hash keys are not touched (only hash values).
       # if force is true, labels which don't resolve will raise
       # a MissingLabel error.
-      def replace_labels(obj, labels, force=false)
-        case
-        when obj.is_a?(Array)
+      def replace_labels(obj, labels, force = false)
+        if obj.is_a?(Array)
           obj.map! { |x| replace_labels(x, labels, force) }
-        when obj.is_a?(Hash)
-          obj.each do |k,v|
-            obj[k] = replace_labels(v, labels, force)
-          end
-        when obj.is_a?(String)
-          obj.gsub(@label_re) do |match|
-            pid = labels[$1]
-            raise MissingLabel if pid.nil? && force
-            pid.nil? ? match : pid
-          end
+        elsif obj.is_a?(Hash)
+          replace_labels_in_hash(obj, labels, force)
+        elsif obj.is_a?(String)
+          replace_match(obj, labels, force)
         else
           obj
         end
       end
 
-      # If object contains empty bendo-item key, assign it id of provided  pid stripped of prefix
-      def add_bendo_id(obj, bid)
-	if ! obj["bendo-item"] || obj["bendo-item"] == ""
-	    obj["bendo-item"]= bid
+      # small util function to iterate through hash and
+      # replace labels on elements
+      def replace_labels_in_hash(obj, labels, force)
+        obj.each do |k, v|
+          obj[k] = replace_labels(v, labels, force)
         end
+      end
 
-      	obj
+      # small matching function- uses regular expression
+      def replace_match(obj, labels, force)
+        obj.gsub(@label_re) do |match|
+          pid = labels[Regexp.last_match(1)]
+          raise MissingLabel if pid.nil? && force
+          pid.nil? ? match : pid
+        end
+      end
+
+      # If object contains empty bendo-item key, assign
+      # it id of provided  pid stripped of prefix
+      def add_bendo_id(obj, bid)
+        obj['bendo-item'] = bid if !obj['bendo-item'] || obj['bendo-item'] == ''
+
+        obj
       end
 
       def find_label(s)
@@ -104,13 +155,16 @@ module ROF
         @id_list.shift
       end
 
+      # Encapsulates connection to Noids Server
       class NoidsPool
         def initialize(noids_server, pool_name)
           @pool = NoidsClient::Connection.new(noids_server).get_pool(pool_name)
         end
+
         def shift
           @pool.mint.first
         end
+
         def empty?
           @pool.closed?
         end
