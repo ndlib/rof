@@ -11,7 +11,7 @@ module ROF
         items = [{
           "type" => "ABC"
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "ABC"
@@ -27,7 +27,7 @@ module ROF
           "bendo-item" => "12345",
           "thumbnail-content" => "a_file.png"
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(2)
         expect(after.first).to eq({
           "type" => "ABC",
@@ -49,7 +49,7 @@ module ROF
         "content-meta" => {
           "mime-type" => "image/png"
         }}]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(2)
         expect(after.first).to eq({
           "bendo-item" => "12345",

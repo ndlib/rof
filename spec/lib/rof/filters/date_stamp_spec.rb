@@ -13,7 +13,7 @@ module ROF
         items = [{
           "type" => "ABC"
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "ABC",
@@ -32,7 +32,7 @@ module ROF
             "dc:title" => "something"
           }
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "BCD",
@@ -52,7 +52,7 @@ module ROF
             "dc:dateSubmitted" => "any date"
           }
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "CDE",
@@ -73,7 +73,7 @@ module ROF
             "dc:modified" => "any date"
           }
         }]
-        after = @w.process(items)
+        after = @w.process(items, '')
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "CDE",

@@ -30,7 +30,7 @@ module ROF
     end
 
     #give base directory of given file for workdir
-    def get_workdir
+    def workdir
       @workdir
     end
 

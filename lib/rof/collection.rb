@@ -32,7 +32,7 @@ module ROF
       return subtotal if obj['files'].nil?
 
       # verify source image is present in job dir
-      image_source = File.join(utility.get_workdir, obj['files'][0])
+      image_source = File.join(utility.workdir, obj['files'][0])
 
       # attempt to create a launch page image and thumbnail
       # exit if either fails

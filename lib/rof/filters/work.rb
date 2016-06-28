@@ -18,7 +18,7 @@ module ROF
 
       # wade through object list
       def process(obj_list, filename)
-	@utility.set_workdir(filename)
+        @utility.set_workdir(filename)
         obj_list.map! { |x| process_one_work(x) }
         obj_list.flatten!
       end
