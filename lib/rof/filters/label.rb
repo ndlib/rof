@@ -34,7 +34,7 @@ module ROF
       end
 
       # mutate obj_list by assigning labels and resolving labels where needed
-      def process(obj_list)
+      def process(obj_list, _fname)
         labels = {}
         @master_pid = nil
 

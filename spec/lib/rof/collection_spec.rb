@@ -53,7 +53,7 @@ module ROF
     end
     describe 'make_images' do
       it 'raises error with non-existent file' do
-	expect { ROF::Collection.make_images({}, testobject4)}.to raise_error(ROF::Collection::NoFile) 
+	expect { ROF::Collection.make_images({}, testobject4, util)}.to raise_error(ROF::Collection::NoFile) 
       end
     end
     describe 'find_file_mime' do

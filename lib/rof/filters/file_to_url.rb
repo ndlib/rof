@@ -9,7 +9,7 @@ module ROF
       def initialize()
       end
 
-      def process(obj_list)
+      def process(obj_list, _fname)
         obj_list.map! do |obj|
           bendo_item = obj['bendo-item']
           content_file = obj['content-file']

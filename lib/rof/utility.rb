@@ -5,6 +5,7 @@ module ROF
   class Utility
     def initialize
       @seq = 0
+      @workdir = '.'
     end
 
     WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/
@@ -22,6 +23,16 @@ module ROF
       'etd' => 'Etd',
       'image' => 'Image'
     }.freeze
+
+    #use base directory of given file for workdir
+    def set_workdir(filename)
+      @workdir = File.dirname(filename)
+    end
+
+    #give base directory of given file for workdir
+    def workdir
+      @workdir
+    end
 
     # Given an object's type, detrmine and return its af-model
     def decode_work_type(obj)

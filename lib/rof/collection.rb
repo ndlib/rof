@@ -9,7 +9,7 @@ module ROF
     def self.process_one_collection(input_obj, utility)
       # set the required fields
       result = set_required_fields(input_obj, utility)
-      result = make_images(result, input_obj)
+      result = make_images(result, input_obj, utility)
       result
     end
 
@@ -28,11 +28,11 @@ module ROF
     end
 
     # If collection included a file, create launch image and thumbnaile
-    def self.make_images(subtotal, obj)
+    def self.make_images(subtotal, obj, utility)
       return subtotal if obj['files'].nil?
 
       # verify source image is present in job dir
-      image_source = File.join(Dir.pwd, obj['files'][0])
+      image_source = File.join(utility.workdir, obj['files'][0])
 
       # attempt to create a launch page image and thumbnail
       # exit if either fails

@@ -10,7 +10,7 @@ module ROF
         @bendo = bendo
       end
 
-      def process(obj_list)
+      def process(obj_list, _fname)
 
         ends_meta = Regexp.new('(.+)-meta')
 
