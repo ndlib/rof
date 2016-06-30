@@ -102,7 +102,7 @@ module ROF
         result['rights'] = input_obj['rights']
         result['properties'] = ROF::Utility.prop_ds(input_obj['owner'])
         result['properties-meta'] = { 'mime-type' => 'text/xml' }
-        result['rels-ext'] = input_obj['rels-ext']
+        result['rels-ext'] = input_obj.fetch('rels-ext', {})
         result['metadata'] = input_obj['metadata']
         result
       end
