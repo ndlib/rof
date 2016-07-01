@@ -10,10 +10,13 @@ matrix:
     - rvm: "2.3.0"
     - rvm: "2.2.4"
 
-script: "rspec"
+script: "bundle exec rspec"
 
 notifications:
   irc: "irc.freenode.org#ndlib"
 
 before_install:
   - gem install bundler
+
+sudo: false
+cache: bundler

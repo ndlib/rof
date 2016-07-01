@@ -72,6 +72,7 @@ module ROF
         expect(after.length).to eq(3)
         expect(after[0]).to include("type" => "fobject",
                                     "af-model" => "GenericWork",
+				    "rels-ext" => {}, 
                                     "pid" => "$(pid--0)")
         expect(after[1]).to include("type" => "fobject",
                                     "af-model" => "GenericFile",

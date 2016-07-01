@@ -40,6 +40,10 @@ module ROF
 	subject { obj['properties-meta'] }
 	it { is_expected.to eq({ 'mime-type' => 'text/xml' }) }
       end
+      context 'rels-ext' do
+	subject { obj['rels-ext'] }
+	it { is_expected.to eq({}) }
+      end
     end
     describe 'mk_dest_img_name' do
       context 'with file extension' do

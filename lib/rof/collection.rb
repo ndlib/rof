@@ -21,7 +21,7 @@ module ROF
       result['rights'] = obj['rights']
       result['metadata'] = obj['metadata']
       result['pid'] = obj.fetch('pid', utility.next_label)
-      result['rels-ext'] = obj['rels-ext']
+      result['rels-ext'] = obj.fetch('rels-ext', {})
       result['properties'] = ROF::Utility.prop_ds(obj['owner'])
       result['properties-meta'] = { 'mime-type' => 'text/xml' }
       result
