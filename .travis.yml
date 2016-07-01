@@ -17,3 +17,6 @@ notifications:
 
 before_install:
   - gem install bundler
+
+sudo: false
+cache: bundler
