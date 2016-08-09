@@ -20,6 +20,7 @@ module ROF
       "hasEditor" => {"@id" => "hydra:hasEditor", "@type" => "@id"},
       "hasEditorGroup" => {"@id" => "hydra:hasEditorGroup", "@type" => "@id"},
       "isPartOf" => {"@type" => "@id"},
+      "isMemberOfCollection" => {"@type" => "@id"},
       "isEditorOf" => {"@id" => "hydra:isEditorOf", "@type" => "@id"},
       "hasMember" => {"@type" => "@id"},
   }.freeze

@@ -46,7 +46,7 @@ describe ROF::CLI do
       },
       "bendo-item" => "dev0012826k",
       "characterization-meta" => {"mime-type"=>"text/xml"},
-      "content-meta" => {"label"=>"bonnie+chauncey", "mime-type"=>"application/octet-stream"},
+      "content-meta" => {"label"=>"bonnie+chauncey", "mime-type"=>"application/octet-stream", "URL"=>"http://libvirt9.library.nd.edu:14000/item/dev0012826k/bonnie+chauncey"},
       "thumbnail-meta" => {"label"=>"File Datastream", "mime-type"=>"image/png"},
     }
     pid = 'und:dev0012829m'

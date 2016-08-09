@@ -73,7 +73,7 @@ module ROF
     result["label"] = label unless label.nil? || label == ''
     result["mime-type"] = ds.profile['dsMIME'] if ds.profile['dsMIME'] != "text/plain"
     # TODO(dbrower): make sure this is working as intended
-    if ["R", "E"].include?(ds.profile['TYPE'])
+    if ["R", "E"].include?(ds.profile['dsControlGroup'])
       s = result['URL'] = ds.profile['dsLocation']
       if config['bendo']
         s = s.sub(config['bendo'], 'bendo:')
