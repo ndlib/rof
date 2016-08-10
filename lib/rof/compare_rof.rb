@@ -12,6 +12,7 @@ module ROF
    def self.fedora_vs_bendo( fedora_rof, bendo_rof, output)
 
      error_count = 0
+     # dereferencing an array of one element with [0]. Oh, the horror of it.
      error_count += compare_rights( fedora_rof[0], bendo_rof[0], output)
      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0], output)
      error_count += compare_metadata(fedora_rof[0], bendo_rof[0], output)
@@ -83,6 +84,7 @@ module ROF
       error_count =0
       fedora = remove_others(fedora)
       bendo = remove_others(bendo)
+      # comparsion using builtin equivalency operation
       error_count = 1 if bendo != fedora
       error_count
     end
