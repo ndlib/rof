@@ -11,6 +11,7 @@ search_path = ["."]
 opt = OptionParser.new do |opts|
   opts.banner = %q{Usage: rof [options] <command> <input files>
   command is one of:
+    compare
     ingest
     validate
     filter <filter name>
@@ -45,6 +46,9 @@ opt.parse!
 fedora_info = nil if fedora_info.empty?
 
 case ARGV[0]
+when "compare"
+  error_count = ROF::CLI.compare_files(ARGV[1], ARGV[2], STDOUT, fedora_info, bendo_info)
+  exit 1 if error_count > 0
 when "ingest", "validate"
   error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info, bendo_info)
   exit 1 if error_count > 0

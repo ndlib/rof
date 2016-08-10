@@ -1,4 +1,5 @@
 require 'benchmark'
+require 'rof/compare_rof'
 require 'json'
 require 'rubydora'
 require 'rof/ingest'
@@ -94,6 +95,15 @@ module ROF
     ensure
       outfile.close if outfile && need_close
     end
+
+    #compare two rofs
+    def self.compare_files( file1, file2, outfile=STDOUT, fedora, bendo )
+
+      fedora_rof = load_items_from_file(file1, outfile)
+      bendo_rof =  load_items_from_file(file2, outfile)
+
+      ROF::CompareRof.fedora_vs_bendo( fedora_rof, bendo_rof, outfile)
+    end	    
 
     protected
 
