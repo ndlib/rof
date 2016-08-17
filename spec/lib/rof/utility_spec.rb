@@ -19,7 +19,7 @@ module ROF
        let(:id) { util.next_label}
 
        it 'assigns initial label' do
-         id.should == '$(pid--0)'
+         expect(id).to eq '$(pid--0)'
        end
     end
 
