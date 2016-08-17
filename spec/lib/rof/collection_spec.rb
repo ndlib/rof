@@ -33,8 +33,8 @@ module ROF
 	it { is_expected.to eq("$(first)") }
       end
       context 'properties' do
-	subject { obj['properties'] }
-	it { is_expected.to match /<fields><depositor>batch_ingest<\/depositor>\n\t\t\t\t<owner>rtillman<\/owner><\/fields>\n/ }
+        subject { obj['properties'] }
+        it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>rtillman</owner>\n</fields>\n" }
       end
       context 'properties--meta' do
 	subject { obj['properties-meta'] }

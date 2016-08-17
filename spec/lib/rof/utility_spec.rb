@@ -5,14 +5,14 @@ module ROF
     let(:util) { described_class.new }
 
     describe 'prop_ds' do
-      context 'set properties, representative is true' do
-        subject { described_class.prop_ds(owner: 'msuhovec', representative: true) }
-	it { is_expected.to match /<fields><depositor>batch_ingest<\/depositor>\n\t\t\t\t<owner>{:owner=>\"msuhovec\", :representative=>true}<\/owner><\/fields>\n/ }
+      context 'set properties with representative' do
+        subject { described_class.prop_ds('msuhovec', 'temp:1234') }
+        it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n<representative>temp:1234</representative>\n</fields>\n" }
       end
 
-      context 'set properties, representative is false' do
-        subject { described_class.prop_ds(owner: 'msuhovec', representative: false) }
-	it { is_expected.to match /<fields><depositor>batch_ingest<\/depositor>\n\t\t\t\t<owner>{:owner=>\"msuhovec\", :representative=>false}<\/owner><\/fields>\n/ }
+      context 'set properties without representative' do
+        subject { described_class.prop_ds('msuhovec') }
+        it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n" }
       end
     end
     describe 'next_label' do
