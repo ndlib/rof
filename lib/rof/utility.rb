@@ -52,14 +52,12 @@ module ROF
     end
 
     # set 'properties'
-    def self.prop_ds(owner, representative = nil)
-      s = %(<fields><depositor>batch_ingest</depositor>
-				<owner>#{owner}</owner>)
+    def self.prop_ds(owner, representative=nil)
+      s = "<fields><depositor>batch_ingest</depositor>\n<owner>#{owner}</owner>\n"
       if representative
-        s += "<representative>#{representative}</representative>\n</fields>\n"
-      else
-        s += "</fields>\n"
+        s += "<representative>#{representative}</representative>\n"
       end
+      s += "</fields>\n"
       s
     end
   end

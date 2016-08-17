@@ -31,7 +31,7 @@ module ROF
                  }}]
         expect(@labeler.process(list, '')).to eq([{"type" => "fobject",
                                                "pid" => "101",
-		 				"bendo-item"=>"101",
+                                               "bendo-item"=>"101",
                                                "rels-ext" => {
                                                   "partOf" => ["123", "101"]}}])
       end
@@ -43,15 +43,20 @@ module ROF
                  }},
                 {"type" => "fobject",
                  "rels-ext" => { "memberOf" => ["$(zzz)"]}}]
-        expect(@labeler.process(list, '')).to eq([{"type" => "fobject",
-                                               "pid" => "101",
-		 			       "bendo-item" =>"101",
-                                               "rels-ext" => {
-                                                  "partOf" => ["123", "101"]}},
-        {"type" => "fobject",
-         "pid" => "102",
-	 "bendo-item" =>"101",
-         "rels-ext" => { "memberOf" => ["101"]}}])
+        expect(@labeler.process(list, '')).to eq([
+              {"type" => "fobject",
+               "pid" => "101",
+               "bendo-item" => "101",
+               "rels-ext" => {
+                 "partOf" => ["123", "101"]
+               }},
+              {"type" => "fobject",
+               "pid" => "102",
+               "bendo-item" => "101",
+               "rels-ext" => {
+                 "memberOf" => ["101"]
+               }}
+              ])
       end
       it "errors on undefined labels" do
         list = [{"type" => "fobject",
@@ -72,6 +77,17 @@ module ROF
           sym: :symbol,
           b: {b: "abc $(z)"}
         })
+      end
+
+      it "handles pids in isMemberOf" do
+        list = [
+          {"type" => "fobject", "pid" => "$(zzz)"},
+          {"type" => "fobject", "rels-ext" => { "isMemberOfCollection" => ["$(zzz)"]}}
+        ]
+        expect(@labeler.process(list, '')).to eq([
+          {"type" => "fobject", "pid" => "101", "bendo-item" =>"101"},
+          {"type" => "fobject", "pid" => "102", "bendo-item" =>"101", "rels-ext" => { "isMemberOfCollection" => ["101"]}}
+        ])
       end
     end
   end
