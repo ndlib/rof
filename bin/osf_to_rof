@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby -Ilib
+#Command Line Tool to convert and Open Science Farmework Archive Package to an ROF file
+
+require 'rof'
+require 'optparse'
+
+# assign default parameter values
+config = {}
+file_path = STDOUT
+config['project_file'] = './osf_projects'
+config['package_dir'] = './FROM_OSF'
+config['output_dir'] = '.'
+
+# parse the command line
+#
+opt = OptionParser.new do |opts|
+  opts.banner = %q{Usage: osf_to_rof --projectfile file --packagedir DIR  --outputdir DIR 
+}
+
+  opts.on("", "--project_file project_file", "osf_projects file provided by requestor (required)") do |project_file|
+    config['project_file'] = project_file
+  end
+  opts.on("", "--package_dir package_dir", "directory OSF packages were  downloaded (defaults to ./FROM_OSF)") do |package_dir|
+    config['package_dir'] = package_dir
+  end
+  opts.on("", "--output_dir output_dir", "Directory to save ROF to (defaults to .)") do |output_dir|
+    config['output_dir'] = output_dir
+  end
+end
+
+opt.parse!
+
+# without a project file there is no reason to proceed
+if  !FileTest.exists?(config['project_file']) then
+  STDERR.puts opt.help
+  exit 1
+end
+
+# perform conversion
+ROF::CLI.osf_to_rof(config)
