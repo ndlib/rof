@@ -55,7 +55,7 @@ module ROF
       metadata = {}
       metadata['@context'] = ROF::RdfContext.dup
       # metdata derived from project ttl file
-      metadata['dc:created'] = ttl_data[0][@osf_map['dc:created']][0]['@value']
+      metadata['dc:created'] = Time.iso8601(ttl_data[0][@osf_map['dc:created']][0]['@value']).to_date.iso8601 + "Z"
       metadata['dc:title'] = ttl_data[0][@osf_map['dc:title']][0]['@value']
       metadata['dc:description'] =
         ttl_data[0][@osf_map['dc:description']][0]['@value']

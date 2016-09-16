@@ -41,7 +41,7 @@ RSpec.describe ROF::OsfToRof do
                                                  "dc:dateSubmitted"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
                                                  "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
                                                  "dc:modified"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"}},
-                                                 "dc:created"=>"2016-09-06T13:43:55.705Z",
+                                                 "dc:created"=>"2016-09-06Z",
                                                  "dc:title"=>"OSFNonInstProj1",
                                                  "dc:description"=>"",
                                                  "dc:subject"=>"",
