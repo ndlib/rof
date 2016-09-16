@@ -102,13 +102,16 @@ module ROF
   def self.descMetadata(ds, config)
     # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
     graph = RDF::Graph.new
-    graph.from_ntriples(ds.datastream_content, format: :ntriples)
-    result = nil
+    data = ds.datastream_content
+    # force utf-8 encoding. fedora does not store the encoding, so it defaults to ASCII-8BIT
+    # see https://github.com/ruby-rdf/rdf/issues/142
+    data.force_encoding('utf-8')
+    graph.from_ntriples(data, format: :ntriples)
     JSON::LD::API::fromRdf(graph) do |expanded|
       result = JSON::LD::API.compact(expanded, RdfContext)
+      result.delete("@id")
+      @fedora_info['metadata'] = result
     end
-    result.delete("@id")
-    @fedora_info['metadata'] = result
   end
 
   # set rights
