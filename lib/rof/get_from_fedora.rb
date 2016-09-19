@@ -180,13 +180,17 @@ module ROF
         next
       end
       targets = [targets] if targets.is_a?(String)
-      rels_ext[relation] = targets.map do |target|
+      targets.map! do |target|
         if target.is_a?(Hash)
           strip_info_fedora(target)
         else
           target.sub("info:fedora/", '')
         end
       end
+      # some single strings cannot be arrays in json-ld, so convert back
+      # this shouldn't cause any problems with items that began as arrays
+      targets = targets[0] if targets.length == 1
+      rels_ext[relation] = targets
     end
   end
 

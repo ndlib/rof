@@ -19,7 +19,7 @@ describe ROF::CLI do
       "af-model" => "GenericFile",
       "rels-ext" => {
         "@context"=> ROF::RelsExtRefContext,
-        "isPartOf"=>["und:dev00128288"]
+        "isPartOf"=> "und:dev00128288"
       },
       "rights" => {
         "read-groups" => ["registered"],
