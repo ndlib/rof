@@ -1,0 +1,50 @@
+{
+    "title": "Preservation ROF",
+    "description": "Describes the JSON part of the Preservation ROF profile. The embedded JSON-LD in the metadata and rels-ext sections are validated separately as RDF graphs.",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "https://library.nd.edu/ns/schema/preservation-rof.json",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": ["pid", "type", "af-model"],
+        "properties": {
+            "pid" : { "type": "string" },
+            "type" : { "type": "string", "pattern": "^fobject$" },
+            "af-model": { "type": "string" },
+            "bendo-item": {"type": "string"},
+            "rights": {
+                "type" : "object",
+                "properties": {
+                    "read":        {"type": "array", "items": {"type": "string"}},
+                    "read-groups": {"type": "array", "items": {"type": "string"}},
+                    "edit":        {"type": "array", "items": {"type": "string"}},
+                    "edit-groups": {"type": "array", "items": {"type": "string"}},
+                    "embargo":     {"type": "string"}
+                }
+            },
+            "metadata": {
+                "type":"object",
+                "properties": {
+                    "@context" : {"type": "object"},
+                    "@id": {"type": "string"}
+                }
+            },
+            "rels-ext" : {"type": "object"}
+        },
+        "patternProperties": {
+            "-meta$": {
+                "type": "object",
+                "properties": {
+                    "control-group": {"type": "string"},
+                    "label":         {"type": "string"},
+                    "mime-type":     {"type": "string"},
+                    "URL":           {"type": "string"},
+                    "versionable":   {"type": "boolean"}
+                },
+                "additionalProperties": false
+            },
+            "-file$": {"type": "string"}
+        },
+        "additionalProperties": { "type": "string" }
+    }
+}

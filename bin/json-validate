@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby -Ilib
+
+# validate a list of rof files against the preservation rof profile
+# output validation errors to stdout
+# exits with 0 if there are no errors
+# with a 1 if there was some non-validation error
+# with a 2 if there are validate errors
+
+require 'json'
+require 'json-schema'
+
+schema_file = File.join(File.dirname(__FILE__), "../data/preservation-rof.json")
+schema = nil
+File.open(schema_file) do |f|
+  schema = JSON.load(f)
+end
+
+is_valid = true
+
+ARGV.each do |target_file| 
+  File.open(target_file) do |f|
+    jdata = JSON.load(f)
+    err = JSON::Validator.fully_validate(schema_file, jdata)
+    if err.length > 0
+      is_valid = false
+      err.each do |msg|
+        puts "#{target_file}: #{msg}"
+      end
+    end
+  end
+end
+
+exit(2) unless is_valid
