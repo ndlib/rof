@@ -44,7 +44,7 @@ module ROF
           "dc:modified"=> "2016-07-22Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo, {})
+      test_return = CompareRof.compare_metadata(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -69,7 +69,36 @@ module ROF
           "dc:modified"=> "2016-07-23Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo, {})
+      test_return = CompareRof.compare_metadata(fedora, bendo)
+      expect(test_return).to eq(1)
+    end
+
+    it "compares metadata (different types) " do
+      # dateSubmitted is a string literal in one and a date type in the other
+      fedora = { "metadata"=> { "@context"=> {
+                                  "dc"=> "http://purl.org/dc/terms/",
+                                  "foaf"=> "http://xmlns.com/foaf/0.1/",
+                                  "rdfs"=> "http://www.w3.org/2000/01/rdf-schema#",
+                                  "dc:dateSubmitted"=> {
+                                    "@type"=> "http://www.w3.org/2001/XMLSchema#date"
+                                  },
+                                  "dc:modified"=> {
+	                                "@type"=> "http://www.w3.org/2001/XMLSchema#date"
+	                              }
+                                },
+                                "dc:dateSubmitted"=> "2016-07-22Z",
+                                "dc:modified"=> "2016-07-22Z",
+                                "dc:title"=> "carmella.jpeg"
+                              }}
+      bendo = { "metadata"=> {
+                  "@context" => {
+                    "dc"=> "http://purl.org/dc/terms/",
+                  },
+                  "dc:dateSubmitted"=> "2016-07-22Z",
+                  "dc:modified"=> "2016-07-22Z",
+                  "dc:title"=> "carmella.jpeg"
+                }}
+      test_return = CompareRof.compare_metadata(fedora, bendo)
       expect(test_return).to eq(1)
     end
 
@@ -111,7 +140,7 @@ module ROF
 		      "und:dev00149x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo, {})
+      test_return = CompareRof.compare_rels_ext(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -153,7 +182,7 @@ module ROF
 		      "und:dev00148x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo, {})
+      test_return = CompareRof.compare_rels_ext(fedora, bendo)
       expect(test_return).to eq(1)
     end
 
