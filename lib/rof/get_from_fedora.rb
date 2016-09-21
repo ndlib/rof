@@ -109,7 +109,6 @@ module ROF
     graph.from_ntriples(data, format: :ntriples)
     JSON::LD::API::fromRdf(graph) do |expanded|
       result = JSON::LD::API.compact(expanded, RdfContext)
-      result.delete("@id")
       @fedora_info['metadata'] = result
     end
   end
@@ -166,7 +165,6 @@ module ROF
     # now strip the info:fedora/ prefix from the URIs
     strip_info_fedora(result)
     # remove extra items
-    result.delete("@id")
     result.delete("hasModel")
     @fedora_info['rels-ext'] = result
   end

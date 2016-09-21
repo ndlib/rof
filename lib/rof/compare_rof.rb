@@ -21,41 +21,30 @@ module ROF
    end
 
     # do rights comparison
+    # return 0 if the same, >0 if different
     def self.compare_rights( fedora_rof, bendo_rof, output )
 
       error_count =0
-     
+
       # Use same comparison scheme on all rights
-      [ 'read' , 'read-groups', 'edit', 'edit-groups', 'edit-users', 'embargo-date'].each { |attribute|
-        exist_count = rights_exist(attribute, fedora_rof, bendo_rof)
-	return 1 if exist_count == 1
-	error_count += rights_equal(attribute, fedora_rof, bendo_rof) if exist_count == 2
-	break if error_count != 0
-      }
+      [ 'read' , 'read-groups', 'edit', 'edit-groups', 'edit-users', 'embargo-date'].each do |attribute|
+        error_count += rights_equal(attribute, fedora_rof, bendo_rof)
+        break if error_count != 0
+      end
 
       error_count
-    end
-
-    # returns 2 is rights attribute exists in both fedora and bendo, 0 if in neither, 1 otherwise 
-    def self.rights_exist(rights_attr, fedora, bendo)
-      exist_count = 0
-      exist_count += 1 if fedora['rights'].has_key?(rights_attr)
-      exist_count += 1 if bendo['rights'].has_key?(rights_attr)
-      exist_count
     end
 
     # compare array or element for equivalence
     def self.rights_equal(rights_attr, fedora, bendo)
-      error_count = 0
+      f_rights = fedora.fetch('rights', {}).fetch(rights_attr, [])
+      b_rights = bendo.fetch('rights', {}).fetch(rights_attr, [])
 
-      # this should always be an array, except for embargo-date
-      if bendo['rights'][rights_attr].respond_to?('sort')
-        error_count +=1 if bendo['rights'][rights_attr].sort.to_s != fedora['rights'][rights_attr].sort.to_s 
-      else
-        error_count +=1 if bendo['rights'][rights_attr].to_s != fedora['rights'][rights_attr].to_s 
-      end
+      f_rights = f_rights.sort if f_rights.respond_to?(:"sort")
+      b_rights = b_rights.sort if b_rights.respond_to?(:"sort")
 
-      error_count
+      return 0 if f_rights == b_rights
+      1
     end
 
     # convert RELS-EXT sections to RDF::graph and compater w/ rdf-isomorphic

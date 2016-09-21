@@ -16,6 +16,13 @@ module ROF
       expect(test_return).to eq(0)
     end
 
+    it "compares rights metadata with different groups" do
+      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+      bendo = { "rights"=> {"edit"=> ["rtillman"]}}
+      test_return = CompareRof.compare_rights(fedora, bendo, {})
+      expect(test_return).to eq(1)
+    end
+
     it "compares metadata (same) " do
       fedora = { "metadata"=> { "@context"=> {
             "dc"=> "http://purl.org/dc/terms/",

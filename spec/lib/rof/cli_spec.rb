@@ -19,6 +19,7 @@ describe ROF::CLI do
       "af-model" => "GenericFile",
       "rels-ext" => {
         "@context"=> ROF::RelsExtRefContext,
+        "@id" => "und:dev0012829m",
         "isPartOf"=> "und:dev00128288"
       },
       "rights" => {
@@ -41,6 +42,7 @@ describe ROF::CLI do
           "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
           "dc:modified" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"}
         },
+        "@id" => "info:fedora/und:dev0012829m",
         "dc:dateSubmitted" => "2016-04-12Z",
         "dc:modified" => "2016-04-12Z",
         "dc:title" => "bonnie+chauncey"
