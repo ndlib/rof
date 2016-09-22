@@ -37,7 +37,7 @@ module ROF
           "dc:modified"=> "2016-07-22Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo, {})
+      test_return = CompareRof.compare_metadata(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -62,7 +62,7 @@ module ROF
           "dc:modified"=> "2016-07-23Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo, {})
+      test_return = CompareRof.compare_metadata(fedora, bendo)
       expect(test_return).to eq(1)
     end
 
@@ -104,7 +104,7 @@ module ROF
 		      "und:dev00149x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo, {})
+      test_return = CompareRof.compare_rels_ext(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -146,7 +146,7 @@ module ROF
 		      "und:dev00148x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo, {})
+      test_return = CompareRof.compare_rels_ext(fedora, bendo)
       expect(test_return).to eq(1)
     end
 
@@ -183,7 +183,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = CompareRof.compare_everything_else(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -220,7 +220,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = CompareRof.compare_everything_else(fedora, bendo)
       expect(test_return).to eq(1)
     end
   end

@@ -19,7 +19,7 @@ module ROF
       puts "@@ #{error_count}"
       error_count += compare_metadata(fedora_rof[0], bendo_rof[0])
       puts "@@@ #{error_count}"
-      error_count += compare_everything_else(fedora_rof[0], bendo_rof[0], output)
+      error_count += compare_everything_else(fedora_rof[0], bendo_rof[0])
       puts "@@@@ #{error_count}"
       error_count
     end
@@ -98,7 +98,7 @@ module ROF
     end
 
     # compare what remains
-    def self.compare_everything_else( fedora, bendo, output)
+    def self.compare_everything_else( fedora, bendo)
       error_count =0
       fedora = remove_others(fedora)
       bendo = remove_others(bendo)
