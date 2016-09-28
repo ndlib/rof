@@ -61,7 +61,7 @@ module ROF
         ttl_data[0][@osf_map['dc:description']][0]['@value']
       metadata['dc:subject'] = map_subject(ttl_data[0])
       # metadata derived from osf_projects data, passed from UI
-      metadata['dc:source'] = project['project_url']
+      metadata['dc:source'] = "https://osf.io/" +project['project_identifier']
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator(config, project, ttl_data)
