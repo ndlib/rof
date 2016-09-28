@@ -18,7 +18,6 @@ RSpec.describe ROF::OsfToRof do
       "owner" => "msuhovec",
       "affiliation" => "OddFellows Local 151",
       "status" => "submitted",
-      "project_url"  => "https://osf.io/b6psa"
     }
 
     expected_rof = [{"owner"=>"msuhovec",
