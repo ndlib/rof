@@ -22,7 +22,7 @@
   "properties-meta": "text/xml",
   "content-meta": {
     "label": "bonnie+chauncey",
-    "mime_type": "application/octet-stream",
+    "mime-type": "application/octet-stream",
     "URL": "bendo:14000/item/dev0012826k/bonnie+chauncey"
   },
   "metadata": {
