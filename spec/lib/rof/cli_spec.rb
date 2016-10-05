@@ -28,19 +28,19 @@ describe ROF::CLI do
       },
       "properties" => "<fields>\n<depositor>batch_ingest</depositor>\n<owner>dbrower</owner>\n</fields>\n",
       "properties-meta" => {"mime-type" => "text/xml"},
-      "content-meta" => {
-        "label" => "bonnie+chauncey",
-        "mime_type" => "application/octet-stream",
-        "URL" => "bendo:14000/item/dev0012826k/bonnie+chauncey"
-      },
       "metadata" => {
-        "@context" => {
-          "dc" => "http://purl.org/dc/terms/",
-          "foaf" => "http://xmlns.com/foaf/0.1/",
-          "rdfs" => "http://www.w3.org/2000/01/rdf-schema#",
-          "dc:dateSubmitted" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"},
-          "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
-          "dc:modified" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"}
+	 "@context"=> {
+           "bibo"=>"http://purl.org/ontology/bibo/",
+           "dc"=>"http://purl.org/dc/terms/",
+           "ebucore"=>"http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+           "foaf"=>"http://xmlns.com/foaf/0.1/",
+           "mrel"=>"http://id.loc.gov/vocabulary/relators/",
+	   "nd"=>"https://library.nd.edu/ns/terms/",
+           "rdfs"=>"http://www.w3.org/2000/01/rdf-schema#",
+           "vracore"=>"http://purl.org/vra/",
+           "dc:dateSubmitted" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"},
+           "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
+           "dc:modified" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"}
         },
         "@id" => "info:fedora/und:dev0012829m",
         "dc:dateSubmitted" => "2016-04-12Z",

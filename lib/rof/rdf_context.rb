@@ -1,8 +1,13 @@
 module ROF
   RdfContext = {
+    'bibo' => 'http://purl.org/ontology/bibo/',
     'dc' => 'http://purl.org/dc/terms/',
+    'ebucore' => 'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#',
     'foaf' => 'http://xmlns.com/foaf/0.1/',
+    'mrel' => 'http://id.loc.gov/vocabulary/relators/',
+    'nd' => 'https://library.nd.edu/ns/terms/',
     'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+    'vracore' => 'http://purl.org/vra/',
 
     'dc:dateSubmitted' => {
       '@type' => 'http://www.w3.org/2001/XMLSchema#date'
