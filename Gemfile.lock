@@ -1,0 +1,161 @@
+PATH
+  remote: .
+  specs:
+    rof (1.0.3)
+      activesupport (< 5.0)
+      deprecation (~> 0.1)
+      json-ld (~> 2.0.0)
+      mime-types (~> 2.4.3)
+      noids_client
+      rdf (~> 2.0.1)
+      rdf-isomorphic
+      rdf-rdfxml
+      rdf-turtle
+      rubydora (~> 1.8.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activemodel (4.2.7.1)
+      activesupport (= 4.2.7.1)
+      builder (~> 3.1)
+    activesupport (4.2.7.1)
+      i18n (~> 0.7)
+      json (~> 1.7, >= 1.7.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.3, >= 0.3.4)
+      tzinfo (~> 1.1)
+    addressable (2.4.0)
+    builder (3.2.2)
+    byebug (9.0.5)
+    concurrent-ruby (1.0.2)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
+    deprecation (0.2.2)
+      activesupport
+    diff-lcs (1.2.5)
+    domain_name (0.5.20160826)
+      unf (>= 0.0.5, < 1.0.0)
+    ebnf (1.0.1)
+      rdf (~> 2.0)
+      sxp (~> 1.0)
+    equivalent-xml (0.6.0)
+      nokogiri (>= 1.4.3)
+    fastercsv (1.5.5)
+    haml (4.0.7)
+      tilt
+    hamster (3.0.0)
+      concurrent-ruby (~> 1.0)
+    hashdiff (0.3.0)
+    hooks (0.3.6)
+      uber (~> 0.0.4)
+    htmlentities (4.3.4)
+    http-cookie (1.0.3)
+      domain_name (~> 0.5)
+    i18n (0.7.0)
+    json (1.8.3)
+    json-ld (2.0.0.1)
+      multi_json (~> 1.11)
+      rdf (~> 2.0)
+    link_header (0.0.8)
+    mime-types (2.4.3)
+    mini_portile2 (2.1.0)
+    minitest (5.9.1)
+    multi_json (1.12.1)
+    netrc (0.11.0)
+    noids_client (0.0.1)
+      json (~> 1.8)
+      rest-client (~> 1.6)
+    nokogiri (1.6.8.1)
+      mini_portile2 (~> 2.1.0)
+    rake (11.2.2)
+    rdf (2.0.2)
+      hamster (~> 3.0)
+      link_header (~> 0.0, >= 0.0.8)
+    rdf-aggregate-repo (2.0.0)
+      rdf (~> 2.0)
+    rdf-isomorphic (2.0.0)
+      rdf (~> 2.0)
+    rdf-rdfa (2.0.1)
+      haml (~> 4.0)
+      htmlentities (~> 4.3)
+      rdf (~> 2.0)
+      rdf-aggregate-repo (~> 2.0)
+      rdf-xsd (~> 2.0)
+    rdf-rdfxml (2.0.0)
+      htmlentities (~> 4.3)
+      rdf (~> 2.0)
+      rdf-rdfa (~> 2.0)
+      rdf-xsd (~> 2.0)
+    rdf-turtle (2.0.0)
+      ebnf (~> 1.0, >= 1.0.1)
+      rdf (~> 2.0)
+    rdf-xsd (2.0.0)
+      rdf (~> 2.0)
+    redcarpet (3.3.4)
+    rest-client (1.8.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
+    rspec (3.5.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+    rspec-core (3.5.2)
+      rspec-support (~> 3.5.0)
+    rspec-expectations (3.5.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-its (1.2.0)
+      rspec-core (>= 3.0.0)
+      rspec-expectations (>= 3.0.0)
+    rspec-mocks (3.5.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-support (3.5.0)
+    rubydora (1.8.1)
+      activemodel
+      activesupport
+      deprecation
+      equivalent-xml
+      fastercsv
+      hooks (~> 0.3.0)
+      mime-types
+      nokogiri
+      rest-client
+    safe_yaml (1.0.4)
+    sxp (1.0.0)
+      rdf (~> 2.0)
+    thread_safe (0.3.5)
+    tilt (2.0.5)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+    uber (0.0.15)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.2)
+    vcr (3.0.3)
+    webmock (2.1.0)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
+    yard (0.9.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.3)
+  byebug
+  equivalent-xml
+  rake
+  redcarpet
+  rof!
+  rspec
+  rspec-its
+  vcr
+  webmock
+  yard
+
+BUNDLED WITH
+   1.12.5
