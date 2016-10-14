@@ -51,6 +51,7 @@ module ROF
           # if content is short < X bytes, save as string
           # if content is > X bytes, save as file only if config option is given
           content = ds.datastream_content
+          # NOTE- Entire datastream being downloaded every time.
           content_string = content.to_s.force_encoding('UTF-8')
           if (content.length <= 1024 || config['inline']) && content_string.valid_encoding?
             @fedora_info[dsname] = content_string
