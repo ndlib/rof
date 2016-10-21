@@ -81,15 +81,11 @@ module ROF
       end
 
       # wrap the objects inside a JSON list
-      outfile.write("[\n")
-      first = true
+      result = []
       pids.each do |pid|
-        outfile.write(',') unless first
-        fedora_data = ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
-        outfile.write(JSON.pretty_generate(fedora_data))
-        first = false
+        result << ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
       end
-      outfile.write("]\n")
+      outfile.write(JSON.pretty_generate(result))
     ensure
       outfile.close if outfile && need_close
     end
