@@ -52,7 +52,7 @@ RSpec.describe ROF::OsfToRof do
                                                  "dc:source"=>"https://osf.io/b6psa",
                                                  "dc:creator#adminstrative_unit"=>"Library",
                                                  "dc:creator#affiliation"=>"OddFellows Local 151",
-                                                 "dc:creator"=>"Mark Suhovecky"},
+                                                 "dc:creator"=>["Mark Suhovecky"]},
                      "files"=>["b6psa.tar.gz"]}]
 
     FileUtils.cp('spec/fixtures/osf/b6psa.tar.gz', tar_file)

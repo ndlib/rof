@@ -101,15 +101,16 @@ module ROF
     # sets the creator- needs to read another ttl for the User data
     # only contrubutors with isBibliographic true are considered
     def self.map_creator(config, project, ttl_data)
-      creator = ''
-      contributor = ttl_data[0][@osf_map['hasContributor']][0]['@id']
+      creator = []
+      ttl_data[0][@osf_map['hasContributor']].each do |contributor|
       ttl_data.each do |item|
-        next unless item['@id'] == contributor
+        next unless item['@id'] == contributor['@id']
         if item[@osf_map['isBibliographic']][0]['@value'] == 'true'
-          creator = map_user_from_ttl(config, project,
-                                      item[@osf_map['hasUser']][0]['@id'])
+          creator.push ( map_user_from_ttl(config, project,
+                                      item[@osf_map['hasUser']][0]['@id']))
         end
       end
+    end
       creator
     end
 
