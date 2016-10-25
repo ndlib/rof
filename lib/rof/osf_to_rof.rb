@@ -34,8 +34,8 @@ module ROF
     def self.ttl_from_targz(config, this_project, ttl_filename)
       id =  this_project['project_identifier']
       ttl_path = File.join(id,
-                      'data/obj/root',
-                      ttl_filename)
+                           'data/obj/root',
+                           ttl_filename)
       ROF::Utility.file_from_targz(File.join(config['package_dir'], id + '.tar.gz'),
                                    ttl_path)
       ttl_data = fetch_from_ttl(File.join(config['package_dir'], ttl_path))
@@ -55,13 +55,13 @@ module ROF
       metadata = {}
       metadata['@context'] = ROF::RdfContext.dup
       # metdata derived from project ttl file
-      metadata['dc:created'] = Time.iso8601(ttl_data[0][@osf_map['dc:created']][0]['@value']).to_date.iso8601 + "Z"
+      metadata['dc:created'] = Time.iso8601(ttl_data[0][@osf_map['dc:created']][0]['@value']).to_date.iso8601 + 'Z'
       metadata['dc:title'] = ttl_data[0][@osf_map['dc:title']][0]['@value']
       metadata['dc:description'] =
         ttl_data[0][@osf_map['dc:description']][0]['@value']
       metadata['dc:subject'] = map_subject(ttl_data[0])
       # metadata derived from osf_projects data, passed from UI
-      metadata['dc:source'] = "https://osf.io/" +project['project_identifier']
+      metadata['dc:source'] = 'https://osf.io/' + project['project_identifier']
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator(config, project, ttl_data)
@@ -101,13 +101,14 @@ module ROF
     # sets the creator- needs to read another ttl for the User data
     # only contrubutors with isBibliographic true are considered
     def self.map_creator(config, project, ttl_data)
-      creator = ''
-      contributor = ttl_data[0][@osf_map['hasContributor']][0]['@id']
-      ttl_data.each do |item|
-        next unless item['@id'] == contributor
-        if item[@osf_map['isBibliographic']][0]['@value'] == 'true'
-          creator = map_user_from_ttl(config, project,
-                                      item[@osf_map['hasUser']][0]['@id'])
+      creator = []
+      ttl_data[0][@osf_map['hasContributor']].each do |contributor|
+        ttl_data.each do |item|
+          next unless item['@id'] == contributor['@id']
+          if item[@osf_map['isBibliographic']][0]['@value'] == 'true'
+            creator.push map_user_from_ttl(config, project,
+                                           item[@osf_map['hasUser']][0]['@id'])
+          end
         end
       end
       creator
