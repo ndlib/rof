@@ -14,7 +14,7 @@ RSpec.describe ROF::FedoraToRof do
       rights_tests.each do |this_test|
         xml_doc = REXML::Document.new(this_test[0])
         root = xml_doc.root
-        rights = ROF::FedoraToRof.testEmbargoDate(root)
+        rights = ROF::FedoraToRof.has_embargo_date(root)
         expect(rights).to eq(this_test[1])
       end
     end
