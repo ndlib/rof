@@ -131,6 +131,10 @@ module ROF
 
       root = xml_doc.root
 
+      # check for optional embargo date - set if present
+      this_embargo = root.elements['embargo']
+      rights_array['embargo-date'] = this_embargo.elements['machine'].elements['date'][0] if has_embargo_date(this_embargo)
+
       %w(read edit).each do |access|
         this_access = root.elements["//access[@type=\'#{access}\']"]
 
@@ -154,6 +158,13 @@ module ROF
       end
 
       @fedora_info['rights'] = rights_array
+    end
+
+    # test for embargo xml cases
+    def self.has_embargo_date(embargo_xml)
+      return false if embargo_xml == '' || embargo_xml.nil?
+      return false unless embargo_xml.elements['machine'].has_elements? && embargo_xml.elements['machine'].elements['date'].has_text?
+      true
     end
 
     def self.RELSEXT(ds, _config)
