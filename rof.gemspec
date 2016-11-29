@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   # only needed because we use ruby < 2.2.2 in production and that doesn't play
   # nice with rails 5
   spec.add_dependency 'activesupport', '< 5.0'
+  spec.add_dependency 'ebnf', '< 1.0.2' 
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
