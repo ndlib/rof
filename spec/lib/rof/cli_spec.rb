@@ -41,6 +41,7 @@ describe ROF::CLI do
            "rdfs"=>"http://www.w3.org/2000/01/rdf-schema#",
            'ths' => 'http://id.loc.gov/vocabulary/relators/',
            "vracore"=>"http://purl.org/vra/",
+           "pav"=>"http://purl.org/pav/",
            "dc:dateSubmitted" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"},
            "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
            "dc:modified" => {"@type" => "http://www.w3.org/2001/XMLSchema#date"}

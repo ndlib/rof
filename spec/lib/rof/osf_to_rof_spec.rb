@@ -4,7 +4,7 @@ RSpec.describe ROF::OsfToRof do
   it "converts  an OSF Archive tar,gz to an ROF", memfs: true do
     #Test file dirs
     test_dir = Dir.mktmpdir('FROM_OSF')
-    ttl_dir = FileUtils.mkdir_p(File.join(test_dir, 'b6psa/data/obj/root')) 
+    ttl_dir = FileUtils.mkdir_p(File.join(test_dir, 'b6psa/data/obj/root'))
 
     # tar and ttl files
     tar_file = File.join(test_dir, 'b6psa.tar.gz')
@@ -25,6 +25,7 @@ RSpec.describe ROF::OsfToRof do
                      "rights"=>{"read-groups"=>["public"]},
                      "rels-ext"=> {"@context"=> {"@vocab"=>"info:fedora/fedora-system:def/relations-external#",
                                    "fedora-model"=>"info:fedora/fedora-system:def/model#",
+                                   "pav"=>"http://purl.org/pav/",
                                    "hydra"=>"http://projecthydra.org/ns/relations#",
                                    "hasModel"=>{"@id"=>"fedora-model:hasModel", "@type"=>"@id"},
                                    "hasEditor"=>{"@id"=>"hydra:hasEditor", "@type"=>"@id"},
@@ -45,6 +46,7 @@ RSpec.describe ROF::OsfToRof do
                                                  "rdfs"=>"http://www.w3.org/2000/01/rdf-schema#",
                                                  'ths' => 'http://id.loc.gov/vocabulary/relators/',
                                                  "vracore"=>"http://purl.org/vra/",
+                                                 "pav"=>"http://purl.org/pav/",
                                                  "dc:dateSubmitted"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
                                                  "dc:created"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"},
                                                  "dc:modified"=>{"@type"=>"http://www.w3.org/2001/XMLSchema#date"}},
