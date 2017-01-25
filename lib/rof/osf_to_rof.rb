@@ -12,18 +12,29 @@ module ROF
   class OsfToRof
     # Convert Osf Archive tar.gz  to ROF
     def self.osf_to_rof(config, osf_projects = nil)
+      new(config, osf_projects).call
+    end
+
+    def initialize(config, osf_projects = nil)
+      @config = config
+      @project = osf_projects
       @osf_map = ROF::OsfToNDMap
+    end
+
+    def call
       rof_array = []
-      return {} if osf_projects.nil?
-      this_project = osf_projects
-      ttl_data = ttl_from_targz(config, this_project,
-                                this_project['project_identifier'] + '.ttl')
-      rof_array[0] = build_archive_record(config, this_project, ttl_data)
+      return {} if project.nil?
+      ttl_data = ttl_from_targz(project['project_identifier'] + '.ttl')
+      rof_array[0] = build_archive_record(ttl_data)
       rof_array
     end
 
+    private
+
+    attr_reader :config, :project
+
     # reads a ttl file and makes it a JSON-LD file that we can parse
-    def self.fetch_from_ttl(ttl_file)
+    def fetch_from_ttl(ttl_file)
       graph = RDF::Turtle::Reader.open(ttl_file,
                                        prefixes:  ROF::OsfPrefixList.dup)
       JSON::LD::API.fromRdf(graph)
@@ -31,8 +42,8 @@ module ROF
 
     # extracts given ttl file from JHU tar.gz package
     # - assumed to live under data/obj/root
-    def self.ttl_from_targz(config, this_project, ttl_filename)
-      id =  this_project['project_identifier']
+    def ttl_from_targz(ttl_filename)
+      id =  project['project_identifier']
       ttl_path = File.join(id,
                            'data/obj/root',
                            ttl_filename)
@@ -44,14 +55,14 @@ module ROF
     end
 
     # Maps RELS-EXT
-    def self.map_rels_ext(_ttl_data)
+    def map_rels_ext(_ttl_data)
       rels_ext = {}
       rels_ext['@context'] = ROF::RelsExtRefContext.dup
       rels_ext
     end
 
     # sets metadata
-    def self.map_metadata(config, project, ttl_data)
+    def map_metadata(ttl_data)
       metadata = {}
       metadata['@context'] = ROF::RdfContext.dup
       # metdata derived from project ttl file
@@ -64,25 +75,25 @@ module ROF
       metadata['dc:source'] = 'https://osf.io/' + project['project_identifier']
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
-      metadata['dc:creator'] = map_creator(config, project, ttl_data)
+      metadata['dc:creator'] = map_creator(ttl_data)
       metadata
     end
 
     # Constructs OsfArchive Record from ttl_data, data from the UI form,
     # and task config data
-    def self.build_archive_record(config, this_project, ttl_data)
+    def build_archive_record(ttl_data)
       this_rof = {}
-      this_rof['owner'] = this_project['owner']
+      this_rof['owner'] = project['owner']
       this_rof['type'] = 'OsfArchive'
       this_rof['rights'] = map_rights(ttl_data[0])
       this_rof['rels-ext'] = map_rels_ext(ttl_data[0])
-      this_rof['metadata'] = map_metadata(config, this_project, ttl_data)
-      this_rof['files'] = [this_project['project_identifier'] + '.tar.gz']
+      this_rof['metadata'] = map_metadata(ttl_data)
+      this_rof['files'] = [project['project_identifier'] + '.tar.gz']
       this_rof
     end
 
     # sets subject
-    def self.map_subject(ttl_data)
+    def map_subject(ttl_data)
       if ttl_data.key?(@osf_map['dc:subject'])
         return ttl_data[@osf_map['dc:subject']][0]['@value']
       end
@@ -90,7 +101,7 @@ module ROF
     end
 
     # figures out the rights
-    def self.map_rights(ttl_data)
+    def map_rights(ttl_data)
       rights = {}
       if ttl_data[@osf_map['isPublic']][0]['@value'] == 'true'
         rights['read-groups'] = ['public']
@@ -100,14 +111,13 @@ module ROF
 
     # sets the creator- needs to read another ttl for the User data
     # only contrubutors with isBibliographic true are considered
-    def self.map_creator(config, project, ttl_data)
+    def map_creator(ttl_data)
       creator = []
       ttl_data[0][@osf_map['hasContributor']].each do |contributor|
         ttl_data.each do |item|
           next unless item['@id'] == contributor['@id']
           if item[@osf_map['isBibliographic']][0]['@value'] == 'true'
-            creator.push map_user_from_ttl(config, project,
-                                           item[@osf_map['hasUser']][0]['@id'])
+            creator.push map_user_from_ttl(item[@osf_map['hasUser']][0]['@id'])
           end
         end
       end
@@ -115,8 +125,8 @@ module ROF
     end
 
     # read user ttl file, extract User's full name
-    def self.map_user_from_ttl(config, project, file_subpath)
-      ttl_data = ttl_from_targz(config, project, File.basename(file_subpath))
+    def map_user_from_ttl(file_subpath)
+      ttl_data = ttl_from_targz(File.basename(file_subpath))
       ttl_data[0][@osf_map['hasFullName']][0]['@value']
     end
   end
