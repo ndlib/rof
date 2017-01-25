@@ -24,7 +24,7 @@ module ROF
     def call
       rof_array = []
       return {} if project.nil?
-      ttl_data = ttl_from_targz(project['project_identifier'] + '.ttl')
+      ttl_data = ttl_from_targz(project_identifier + '.ttl')
       rof_array[0] = build_archive_record(ttl_data)
       rof_array
     end
@@ -32,6 +32,10 @@ module ROF
     private
 
     attr_reader :config, :project
+
+    def project_identifier
+      project.fetch('project_identifier')
+    end
 
     # reads a ttl file and makes it a JSON-LD file that we can parse
     def fetch_from_ttl(ttl_file)
@@ -43,13 +47,10 @@ module ROF
     # extracts given ttl file from JHU tar.gz package
     # - assumed to live under data/obj/root
     def ttl_from_targz(ttl_filename)
-      id =  project['project_identifier']
-      ttl_path = File.join(id,
-                           'data/obj/root',
-                           ttl_filename)
-      ROF::Utility.file_from_targz(File.join(config['package_dir'], id + '.tar.gz'),
-                                   ttl_path)
-      ttl_data = fetch_from_ttl(File.join(config['package_dir'], ttl_path))
+      package_dir = config.fetch('package_dir')
+      ttl_path = File.join(project_identifier, 'data/obj/root', ttl_filename)
+      ROF::Utility.file_from_targz(File.join(package_dir, project_identifier + '.tar.gz'), ttl_path)
+      ttl_data = fetch_from_ttl(File.join(package_dir, ttl_path))
       # this is an array- the addition elements are the contributor(s)
       ttl_data
     end
@@ -72,7 +73,7 @@ module ROF
         ttl_data[0][@osf_map['dc:description']][0]['@value']
       metadata['dc:subject'] = map_subject(ttl_data[0])
       # metadata derived from osf_projects data, passed from UI
-      metadata['dc:source'] = 'https://osf.io/' + project['project_identifier']
+      metadata['dc:source'] = 'https://osf.io/' + project_identifier
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator(ttl_data)
@@ -88,7 +89,7 @@ module ROF
       this_rof['rights'] = map_rights(ttl_data[0])
       this_rof['rels-ext'] = map_rels_ext(ttl_data[0])
       this_rof['metadata'] = map_metadata(ttl_data)
-      this_rof['files'] = [project['project_identifier'] + '.tar.gz']
+      this_rof['files'] = [project_identifier + '.tar.gz']
       this_rof
     end
 
