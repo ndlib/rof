@@ -11,13 +11,14 @@ module ROF
   # It is called after the get-from-osf task, and before the work-xlat task
   class OsfToRof
     # Convert Osf Archive tar.gz  to ROF
-    def self.osf_to_rof(config, osf_projects = nil)
-      new(config, osf_projects).call
+    def self.osf_to_rof(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
+      new(config, osf_projects, previously_archived_pid_finder).call
     end
 
-    def initialize(config, osf_projects = nil)
+    def initialize(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
       @config = config
       @project = osf_projects
+      @previously_archived_pid_finder = previously_archived_pid_finder
       @osf_map = ROF::OsfToNDMap
     end
 
@@ -33,6 +34,16 @@ module ROF
 
     attr_reader :config, :project
 
+    # A function responsible for finding the previously archive pid.
+    # @return [#call]
+    # @see #default_previously_archived_pid_finder for interface
+    attr_reader :previously_archived_pid_finder
+
+    # @return [#call]
+    def default_previously_archived_pid_finder
+      ->(archive_type, osf_project_identifier) { }
+    end
+
     # this is an array- the addition elements are the contributor(s)
     # @return [Array<Hash>]
     # @see #ttl_from_targz
@@ -47,6 +58,11 @@ module ROF
     # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/app/repository_models/osf_archive.rb#L96
     def source_slug
       project.fetch('project_identifier')
+    end
+
+    # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/app/repository_models/osf_archive.rb#L106
+    def osf_project_identifier
+      # TODO: Don't have anything just yet; I assume this would be extracted from the ttl file
     end
 
     # reads a ttl file and makes it a JSON-LD file that we can parse
@@ -69,6 +85,7 @@ module ROF
     def map_rels_ext
       rels_ext = {}
       rels_ext['@context'] = ROF::RelsExtRefContext.dup
+      apply_previous_archived_version_if_applicable(rels_ext)
       rels_ext
     end
 
@@ -87,6 +104,15 @@ module ROF
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator
       metadata
+    end
+
+    # For reference to the assumed RELS-EXT see the following spec in CurateND
+    # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/spec/repository_models/osf_archive_spec.rb#L97
+    def apply_previous_archived_version_if_applicable(rels_ext)
+      # For the osf_project_identifier and the archive type (Project or Registration),
+      #   find the pid of the ingested object via the #previously_archived_pid_finder method
+      # If not found, return the rels_ext as is (no changes)
+      # If found, assign pav:previousVersion equal to the pid of the previously archived object, then return the mutated rels_ext
     end
 
     # Constructs OsfArchive Record from ttl_data, data from the UI form,
