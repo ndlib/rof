@@ -39,8 +39,7 @@ module ROF
 
     # reads a ttl file and makes it a JSON-LD file that we can parse
     def fetch_from_ttl(ttl_file)
-      graph = RDF::Turtle::Reader.open(ttl_file,
-                                       prefixes:  ROF::OsfPrefixList.dup)
+      graph = RDF::Turtle::Reader.open(ttl_file, prefixes:  ROF::OsfPrefixList.dup)
       JSON::LD::API.fromRdf(graph)
     end
 
