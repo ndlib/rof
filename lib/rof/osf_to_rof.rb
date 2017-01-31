@@ -10,12 +10,18 @@ module ROF
   # Class for managing OSF Archive data transformations
   # It is called after the get-from-osf task, and before the work-xlat task
   class OsfToRof
+    # @todo Set this to be something more meaningful than an empty lambda
+    # @return [#call]
+    def self.default_previously_archived_pid_finder
+      ->(archive_type, osf_project_identifier) { }
+    end
+
     # Convert Osf Archive tar.gz  to ROF
     def self.osf_to_rof(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
       new(config, osf_projects, previously_archived_pid_finder).call
     end
 
-    def initialize(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
+    def initialize(config, osf_projects = nil, previously_archived_pid_finder = self.class.default_previously_archived_pid_finder)
       @config = config
       @project = osf_projects
       @previously_archived_pid_finder = previously_archived_pid_finder
@@ -30,25 +36,14 @@ module ROF
       rof_array
     end
 
-    private
-
-    attr_reader :config, :project
-
-    # A function responsible for finding the previously archive pid.
-    # @return [#call]
-    # @see #default_previously_archived_pid_finder for interface
-    attr_reader :previously_archived_pid_finder
-
-    # @return [#call]
-    def default_previously_archived_pid_finder
-      ->(archive_type, osf_project_identifier) { }
+    # @api private
+    # @see https://github.com/ndlib/curate_nd/blob/677c05c836ff913c01dcbbfc5e5d21366b87d500/app/repository_models/osf_archive.rb#L62
+    def archive_type
+      # TODO: Somehow we need to know this value based on the end-point that we called
+      :archive_type
     end
 
-    # this is an array- the addition elements are the contributor(s)
-    # @return [Array<Hash>]
-    # @see #ttl_from_targz
-    attr_reader :ttl_data
-
+    # @api private
     # This is a bit of a misnomer; As used it represents the path to the project or registration
     # that we have ingested (e.g. https://osf.io/:source_slug)
     #
@@ -60,10 +55,26 @@ module ROF
       project.fetch('project_identifier')
     end
 
+    # @api private
     # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/app/repository_models/osf_archive.rb#L106
     def osf_project_identifier
       # TODO: Don't have anything just yet; I assume this would be extracted from the ttl file
+      :osf_project_identifier
     end
+
+    private
+
+    attr_reader :config, :project
+
+    # A function responsible for finding the previously archive pid.
+    # @return [#call]
+    # @see #default_previously_archived_pid_finder for interface
+    attr_reader :previously_archived_pid_finder
+
+    # this is an array- the addition elements are the contributor(s)
+    # @return [Array<Hash>]
+    # @see #ttl_from_targz
+    attr_reader :ttl_data
 
     # reads a ttl file and makes it a JSON-LD file that we can parse
     def fetch_from_ttl(ttl_file)
@@ -111,8 +122,9 @@ module ROF
     def apply_previous_archived_version_if_applicable(rels_ext)
       # For the osf_project_identifier and the archive type (Project or Registration),
       #   find the pid of the ingested object via the #previously_archived_pid_finder method
-      # If not found, return the rels_ext as is (no changes)
-      # If found, assign pav:previousVersion equal to the pid of the previously archived object, then return the mutated rels_ext
+      pid = previously_archived_pid_finder.call(archive_type, osf_project_identifier)
+      rels_ext['pav:previousVersion'] = pid if pid
+      rels_ext
     end
 
     # Constructs OsfArchive Record from ttl_data, data from the UI form,
