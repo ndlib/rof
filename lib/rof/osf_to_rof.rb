@@ -126,8 +126,8 @@ module ROF
 
     # read user ttl file, extract User's full name
     def map_user_from_ttl(file_subpath)
-      ttl_data = ttl_from_targz(File.basename(file_subpath))
-      ttl_data[0][@osf_map['hasFullName']][0]['@value']
+      user_ttl_data = ttl_from_targz(File.basename(file_subpath))
+      user_ttl_data[0][@osf_map['hasFullName']][0]['@value']
     end
   end
 end
