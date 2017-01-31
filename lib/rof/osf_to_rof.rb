@@ -24,7 +24,7 @@ module ROF
     def call
       rof_array = []
       return {} if project.nil?
-      @ttl_data = ttl_from_targz(project_identifier + '.ttl')
+      @ttl_data = ttl_from_targz(source_slug + '.ttl')
       rof_array[0] = build_archive_record
       rof_array
     end
@@ -38,7 +38,14 @@ module ROF
     # @see #ttl_from_targz
     attr_reader :ttl_data
 
-    def project_identifier
+    # This is a bit of a misnomer; As used it represents the path to the project or registration
+    # that we have ingested (e.g. https://osf.io/:source_slug)
+    #
+    # It was previously named :project_identifier in this class, but that gets conflated with the
+    # underlying object's osf_project_identifier (e.g. what OSF Project was this archive originally based on)
+    #
+    # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/app/repository_models/osf_archive.rb#L96
+    def source_slug
       project.fetch('project_identifier')
     end
 
@@ -53,8 +60,8 @@ module ROF
     # @return [Array<Hash>] the first element is the "work" and the additional elements, if any, are the contributor(s)
     def ttl_from_targz(ttl_filename)
       package_dir = config.fetch('package_dir')
-      ttl_path = File.join(project_identifier, 'data/obj/root', ttl_filename)
-      ROF::Utility.file_from_targz(File.join(package_dir, project_identifier + '.tar.gz'), ttl_path)
+      ttl_path = File.join(source_slug, 'data/obj/root', ttl_filename)
+      ROF::Utility.file_from_targz(File.join(package_dir, source_slug + '.tar.gz'), ttl_path)
       fetch_from_ttl(File.join(package_dir, ttl_path))
     end
 
@@ -75,7 +82,7 @@ module ROF
       metadata['dc:description'] = ttl_data[0][@osf_map['dc:description']][0]['@value']
       metadata['dc:subject'] = map_subject
       # metadata derived from osf_projects data, passed from UI
-      metadata['dc:source'] = 'https://osf.io/' + project_identifier
+      metadata['dc:source'] = 'https://osf.io/' + source_slug
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator
@@ -91,7 +98,7 @@ module ROF
       this_rof['rights'] = map_rights
       this_rof['rels-ext'] = map_rels_ext
       this_rof['metadata'] = map_metadata
-      this_rof['files'] = [project_identifier + '.tar.gz']
+      this_rof['files'] = [source_slug + '.tar.gz']
       this_rof
     end
 
