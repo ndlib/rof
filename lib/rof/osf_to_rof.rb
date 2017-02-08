@@ -65,6 +65,7 @@ module ROF
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator(config, project, ttl_data)
+      metadata['nd:osfProjectIdentifier'] = osf_url_from_filename(ttl_data[0][@osf_map['nd:osfProjectIdentifier']][0]['@id'])
       metadata
     end
 
@@ -87,6 +88,12 @@ module ROF
         return ttl_data[@osf_map['dc:subject']][0]['@value']
       end
       ''
+    end
+
+    # make osf url from bagfile name
+    def self.osf_url_from_filename(ttl_file)
+      project_id = ttl_file.rpartition('/')[2].rpartition('.')[0]
+      'https://osf.io/' + project_id
     end
 
     # figures out the rights

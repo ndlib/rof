@@ -14,6 +14,7 @@ module ROF
     'hasContributor' => 'http://www.dataconservancy.org/osf-business-object-model#hasContributor',
     'isBibliographic' => 'http://www.dataconservancy.org/osf-business-object-model#isBibliographic',
     'hasFullName' => 'http://www.dataconservancy.org/osf-business-object-model#hasFullName',
-    'hasUser' => 'http://www.dataconservancy.org/osf-business-object-model#hasUser'
+    'hasUser' => 'http://www.dataconservancy.org/osf-business-object-model#hasUser',
+    'nd:osfProjectIdentifier' => 'http://www.dataconservancy.org/osf-business-object-model#registeredFrom'
   }.freeze
 end
