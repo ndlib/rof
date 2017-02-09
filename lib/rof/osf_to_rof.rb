@@ -65,7 +65,7 @@ module ROF
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['dc:creator'] = map_creator(config, project, ttl_data)
-      metadata['nd:osfProjectIdentifier'] = osf_url_from_filename(ttl_data[0][@osf_map['nd:osfProjectIdentifier']][0]['@id'])
+      metadata['nd:osfProjectIdentifier'] = osf_url_from_filename(ttl_data[0][@osf_map['registeredFrom']][0]['@id'])
       metadata
     end
 

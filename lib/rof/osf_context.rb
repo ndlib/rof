@@ -1,5 +1,4 @@
 module ROF
-
   OsfPrefixList = {
     'dcterms' => 'http://purl.org/dc/terms/',
     'osf-model' => 'http://www.dataconservancy.org/osf-business-object-model#'
@@ -15,6 +14,6 @@ module ROF
     'isBibliographic' => 'http://www.dataconservancy.org/osf-business-object-model#isBibliographic',
     'hasFullName' => 'http://www.dataconservancy.org/osf-business-object-model#hasFullName',
     'hasUser' => 'http://www.dataconservancy.org/osf-business-object-model#hasUser',
-    'nd:osfProjectIdentifier' => 'http://www.dataconservancy.org/osf-business-object-model#registeredFrom'
+    'registeredFrom' => 'http://www.dataconservancy.org/osf-business-object-model#registeredFrom'
   }.freeze
 end
