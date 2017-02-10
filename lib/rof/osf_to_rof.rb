@@ -93,7 +93,7 @@ module ROF
     # make osf url from bagfile name
     def self.osf_url_from_filename(ttl_file)
       project_id = ttl_file.rpartition('/')[2].rpartition('.')[0]
-      'https://osf.io/' + project_id
+      project_id
     end
 
     # figures out the rights
