@@ -150,7 +150,7 @@ module ROF
     end
 
     # make osf url from bagfile name
-    def self.osf_url_from_filename(ttl_file)
+    def osf_url_from_filename(ttl_file)
       project_id = ttl_file.rpartition('/')[2].rpartition('.')[0]
       project_id
     end
