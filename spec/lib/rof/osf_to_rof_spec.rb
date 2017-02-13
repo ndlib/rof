@@ -1,25 +1,35 @@
 require 'spec_helper'
 
 RSpec.describe ROF::OsfToRof do
-  it "converts  an OSF Archive tar,gz to an ROF", memfs: true do
-    #Test file dirs
-    test_dir = Dir.mktmpdir('FROM_OSF')
-    ttl_dir = FileUtils.mkdir_p(File.join(test_dir, 'b6psa/data/obj/root'))
+  #Test file dirs
+  let(:test_dir) { Dir.mktmpdir('FROM_OSF') }
+  let(:ttl_dir) { FileUtils.mkdir_p(File.join(test_dir, 'b6psa/data/obj/root')) }
 
-    # tar and ttl files
-    tar_file = File.join(test_dir, 'b6psa.tar.gz')
-    proj_ttl_file = File.join(ttl_dir, 'b6psa.ttl')
-    user_ttl_file = File.join(ttl_dir, 'qpru8.ttl')
+  # tar and ttl files
+  let(:tar_file) { File.join(test_dir, 'b6psa.tar.gz') }
+  let(:proj_ttl_file) { File.join(ttl_dir, 'b6psa.ttl') }
+  let(:user_ttl_file) { File.join(ttl_dir, 'qpru8.ttl') }
 
-    config = { 'package_dir' => "#{test_dir}" }
-    osf_project = {
+  let(:config) { { 'package_dir' => "#{test_dir}" } }
+  let(:osf_project) do
+    {
       "project_identifier" => "b6psa",
       "administrative_unit" => "Library",
       "owner" => "msuhovec",
       "affiliation" => "OddFellows Local 151",
       "status" => "submitted",
     }
+  end
+  around do |the_example|
+    FileUtils.cp('spec/fixtures/osf/b6psa.tar.gz', tar_file)
+    begin
+      the_example.call
+    ensure
+      FileUtils.remove_entry test_dir
+    end
+  end
 
+  it "converts  an OSF Archive tar,gz to an ROF", memfs: true do
     expected_rof = [{"owner"=>"msuhovec",
                      "type"=>"OsfArchive",
                      "rights"=>{"read-groups"=>["public"]},
@@ -60,23 +70,38 @@ RSpec.describe ROF::OsfToRof do
                                                  "dc:creator"=>["Mark Suhovecky"],
                                                  "nd:osfProjectIdentifier"=>"ymt9w"},
                      "files"=>["b6psa.tar.gz"]}]
+    expect(File.exists?(proj_ttl_file)).to be false
+    expect(File.exists?(user_ttl_file)).to be false
 
-    FileUtils.cp('spec/fixtures/osf/b6psa.tar.gz', tar_file)
+    rof = ROF::OsfToRof.osf_to_rof(config, osf_project)
 
-    begin
-      expect(File.exists?(proj_ttl_file)).to be false
-      expect(File.exists?(user_ttl_file)).to be false
+    expect(rof).to eq( expected_rof )
 
-      rof = ROF::OsfToRof.osf_to_rof(config, osf_project)
+    # ingested history should be created
+    expect(File.exists?(proj_ttl_file)).to be true
+    expect(File.exists?(user_ttl_file)).to be true
+  end
 
-      expect(rof).to eq( expected_rof )
-
-      # ingested history should be created
-      expect(File.exists?(proj_ttl_file)).to be true
-      expect(File.exists?(user_ttl_file)).to be true
-    ensure
-      # remove the directory.
-      FileUtils.remove_entry test_dir
+  describe 'RELS-EXT["pav:previousVersion"]' do
+    let(:converter) { ROF::OsfToRof.new(config, osf_project, previous_pid_finder) }
+    let(:pid_of_previous_version) { '1234' }
+    describe 'when previous pid is found' do
+      let(:previous_pid_finder) { double(call: pid_of_previous_version) }
+      it 'will set rels-ext pav:previousVersion to the previous pid' do
+        rof = converter.call
+        rels_ext = rof[0].fetch('rels-ext')
+        expect(rels_ext.fetch('pav:previousVersion')).to eq(pid_of_previous_version)
+        expect(previous_pid_finder).to have_received(:call).with(converter.archive_type, converter.osf_project_identifier)
+      end
+    end
+    describe 'when previous pid is NOT found' do
+      let(:previous_pid_finder) { double(call: nil) }
+      it 'will not set rels-ext pav:previousVersion to the previous pid' do
+        rof = converter.call
+        rels_ext = rof[0].fetch('rels-ext')
+        expect { rels_ext.fetch('pav:previousVersion') }.to raise_error(KeyError)
+        expect(previous_pid_finder).to have_received(:call).with(converter.archive_type, converter.osf_project_identifier)
+      end
     end
   end
 end
