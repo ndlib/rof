@@ -67,7 +67,8 @@ RSpec.describe ROF::OsfToRof do
                                                  "dc:source"=>"https://osf.io/b6psa",
                                                  "dc:creator#adminstrative_unit"=>"Library",
                                                  "dc:creator#affiliation"=>"OddFellows Local 151",
-                                                 "dc:creator"=>["Mark Suhovecky"]},
+                                                 "dc:creator"=>["Mark Suhovecky"],
+                                                 "nd:osfProjectIdentifier"=>"ymt9w"},
                      "files"=>["b6psa.tar.gz"]}]
     expect(File.exists?(proj_ttl_file)).to be false
     expect(File.exists?(user_ttl_file)).to be false
