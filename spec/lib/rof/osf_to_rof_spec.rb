@@ -14,6 +14,7 @@ RSpec.describe ROF::OsfToRof do
   let(:osf_project) do
     {
       "project_identifier" => "b6psa",
+      "package_type" => "OSF Registration",
       "administrative_unit" => "Library",
       "owner" => "msuhovec",
       "affiliation" => "OddFellows Local 151",
@@ -29,7 +30,7 @@ RSpec.describe ROF::OsfToRof do
     end
   end
 
-  it "converts  an OSF Archive tar,gz to an ROF", memfs: true do
+  it "converts  an OSF Registration tar,gz to an ROF", memfs: true do
     expected_rof = [{"owner"=>"msuhovec",
                      "type"=>"OsfArchive",
                      "rights"=>{"read-groups"=>["public"]},
@@ -65,6 +66,7 @@ RSpec.describe ROF::OsfToRof do
                                                  "dc:description"=>"",
                                                  "dc:subject"=>"",
                                                  "dc:source"=>"https://osf.io/b6psa",
+						 "dc:type"=>"OSF Registration",
                                                  "dc:creator#adminstrative_unit"=>"Library",
                                                  "dc:creator#affiliation"=>"OddFellows Local 151",
                                                  "dc:creator"=>["Mark Suhovecky"],

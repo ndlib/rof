@@ -13,7 +13,7 @@ module ROF
     # @todo Set this to be something more meaningful than an empty lambda
     # @return [#call]
     def self.default_previously_archived_pid_finder
-      ->(archive_type, osf_project_identifier) { }
+      ->(archive_type, osf_project_identifier) {}
     end
 
     # Convert Osf Archive tar.gz  to ROF
@@ -39,8 +39,7 @@ module ROF
     # @api private
     # @see https://github.com/ndlib/curate_nd/blob/677c05c836ff913c01dcbbfc5e5d21366b87d500/app/repository_models/osf_archive.rb#L62
     def archive_type
-      # TODO: Somehow we need to know this value based on the end-point that we called
-      :archive_type
+      project.fetch('package_type')
     end
 
     # @api private
@@ -58,8 +57,8 @@ module ROF
     # @api private
     # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/app/repository_models/osf_archive.rb#L106
     def osf_project_identifier
-      # TODO: Don't have anything just yet; I assume this would be extracted from the ttl file
-      :osf_project_identifier
+      return source_slug if project['package_type'] == 'OSF Project'
+      osf_url_from_filename(ttl_data[0][@osf_map['registeredFrom']][0]['@id'])
     end
 
     private
@@ -113,8 +112,9 @@ module ROF
       metadata['dc:source'] = 'https://osf.io/' + source_slug
       metadata['dc:creator#adminstrative_unit'] = project['administrative_unit']
       metadata['dc:creator#affiliation'] = project['affiliation']
-      metadata['nd:osfProjectIdentifier'] = osf_url_from_filename(ttl_data[0][@osf_map['registeredFrom']][0]['@id'])
+      metadata['nd:osfProjectIdentifier'] = osf_project_identifier
       metadata['dc:creator'] = map_creator
+      metadata['dc:type'] = project['package_type']
       metadata
     end
 
@@ -133,7 +133,7 @@ module ROF
     def build_archive_record
       this_rof = {}
       this_rof['owner'] = project['owner']
-      this_rof['type'] = 'OsfArchive'
+      this_rof['type'] = "OsfArchive"
       this_rof['rights'] = map_rights
       this_rof['rels-ext'] = map_rels_ext
       this_rof['metadata'] = map_metadata
