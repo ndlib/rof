@@ -114,6 +114,7 @@ module ROF
       metadata['dc:creator#affiliation'] = project['affiliation']
       metadata['nd:osfProjectIdentifier'] = osf_project_identifier
       metadata['dc:creator'] = map_creator
+      metadata['dc:type'] = project['package_type']
       metadata
     end
 
@@ -132,7 +133,7 @@ module ROF
     def build_archive_record
       this_rof = {}
       this_rof['owner'] = project['owner']
-      this_rof['type'] =  project['package_type']
+      this_rof['type'] = "OsfArchive"
       this_rof['rights'] = map_rights
       this_rof['rels-ext'] = map_rels_ext
       this_rof['metadata'] = map_metadata
