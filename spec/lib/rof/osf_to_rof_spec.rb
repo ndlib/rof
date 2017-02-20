@@ -14,7 +14,7 @@ RSpec.describe ROF::OsfToRof do
   let(:osf_project) do
     {
       "project_identifier" => "b6psa",
-      "package_type" => "OSF Archive",
+      "package_type" => "OSF Registration",
       "administrative_unit" => "Library",
       "owner" => "msuhovec",
       "affiliation" => "OddFellows Local 151",
@@ -30,9 +30,9 @@ RSpec.describe ROF::OsfToRof do
     end
   end
 
-  it "converts  an OSF Archive tar,gz to an ROF", memfs: true do
+  it "converts  an OSF Registration tar,gz to an ROF", memfs: true do
     expected_rof = [{"owner"=>"msuhovec",
-                     "type"=>"OSF Archive",
+                     "type"=>"OSF Registration",
                      "rights"=>{"read-groups"=>["public"]},
                      "rels-ext"=> {"@context"=> {"@vocab"=>"info:fedora/fedora-system:def/relations-external#",
                                    "fedora-model"=>"info:fedora/fedora-system:def/model#",
