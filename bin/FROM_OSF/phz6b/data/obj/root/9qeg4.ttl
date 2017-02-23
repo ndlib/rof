@@ -1,0 +1,17 @@
+<>      a       <http://www.dataconservancy.org/osf-business-object-model#User> , <http://www.dataconservancy.org/osf-business-object-model#OSFBusinessObject> , <http://www.w3.org/2000/01/rdf-schema#Resource> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasDateUserRegistered>
+                "2015-09-08T13:06:17.799Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasFamilyName>
+                "Suhovecky" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasFullName>
+                "Mark Suhovecky" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasGivenName>
+                "Mark" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasLocale>
+                "en_US" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasMiddleNames>
+                "" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasSuffix>
+                "" ;
+        <http://www.dataconservancy.org/osf-business-object-model#isActive>
+                true .

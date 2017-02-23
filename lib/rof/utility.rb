@@ -67,12 +67,8 @@ module ROF
     # query SOLR for Previous version of OSF Project.
     # Return its fedora pid if it is found, nil otherwise
     def self.check_solr_for_previous(config, osf_project_identifier)
-      begin
-        solr_url = config.fetch('solr_url')
-      rescue KeyError
-        # if solr_url not present, we're running in test mode- return nil
-        return nil
-      end
+      solr_url = config.fetch('solr_url', nil)
+      return nil if solr_url.nil?
       solr = RSolr.connect url: "#{solr_url}/curatend"
       query = solr.get 'select', params: {
         q: "desc_metadata__osf_project_identifier_ssi:#{osf_project_identifier}",
