@@ -1,5 +1,6 @@
 require 'mime-types'
 require 'zlib'
+require 'rsolr'
 require 'rubygems/package'
 
 module ROF
@@ -63,13 +64,36 @@ module ROF
       s
     end
 
+    # query SOLR for Previous version of OSF Project.
+    # Return its fedora pid if it is found, nil otherwise
+    def self.check_solr_for_previous(config, osf_project_identifier)
+      begin
+        solr_url = config.fetch('solr_url')
+      rescue KeyError
+        # if solr_url not present, we're running in test mode- return nil
+        return nil
+      end
+      solr = RSolr.connect url: "#{solr_url}/curatend"
+      query = solr.get 'select', params: {
+        q: "desc_metadata__osf_project_identifier_ssi:#{osf_project_identifier}",
+        rows: 1,
+        sort_by: 'date_archived',
+        fl: ['id'],
+        wt: 'json'
+      }
+      return nil if (query['response']['numFound']).zero?
+      # should only be 1 SOLR doc (the most recent) in docs[0]
+      query['response']['docs'][0]['id']
+    end
+
     # read file from gzipped tar archive
     def self.file_from_targz(targzfile, file_name)
       File.open(targzfile, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|
             tar.seek(file_name) do |file_entry|
-              file_dest_dir = File.join(File.dirname(targzfile), File.dirname(file_entry.full_name))
+              file_dest_dir = File.join(File.dirname(targzfile),
+                                        File.dirname(file_entry.full_name))
               FileUtils.mkdir_p(file_dest_dir)
               File.open(File.join(file_dest_dir, File.basename(file_name)), 'wb') do |file_handle|
                 file_handle.write(file_entry.read)
