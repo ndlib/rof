@@ -1,0 +1,52 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+<>      a                    <http://www.dataconservancy.org/osf-business-object-model#NodeBase> , <http://www.dataconservancy.org/osf-business-object-model#Registration> , <http://www.dataconservancy.org/osf-business-object-model#OSFBusinessObject> , <http://www.dataconservancy.org/osf-business-object-model#DataEntity> , <http://www.dataconservancy.org/osf-business-object-model#Node> , <http://www.w3.org/2000/01/rdf-schema#Resource> ;
+        dcterms:created      "2016-09-01T19:11:41.494Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        dcterms:description  "JHU CLI Tarball\n" ;
+        dcterms:identifier   "phz6b" ;
+        dcterms:modified     "2016-12-01T05:00:17.866Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        dcterms:title        "JHU-OSF CLI Tool" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasCategory>
+                "PROJECT" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasContributor>
+                <#contributor0> , <#contributor1> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasDateCreated>
+                "2016-09-01T19:11:41.494Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasDateModified>
+                "2016-12-01T05:00:17.866Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasDescription>
+                "JHU CLI Tarball\n" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasId>
+                "phz6b" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasProvider>
+                <bag://phz6b/data/obj/root/phz6b_osfstorage.ttl> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasRoot>
+                <> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasTitle>
+                "JHU-OSF CLI Tool" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasWiki>
+                <bag://phz6b/data/bin/root/missing_storage_provider_home> ;
+        <http://www.dataconservancy.org/osf-business-object-model#isCollection>
+                false ;
+        <http://www.dataconservancy.org/osf-business-object-model#isFork>
+                false ;
+        <http://www.dataconservancy.org/osf-business-object-model#isPublic>
+                false ;
+        <http://www.dataconservancy.org/osf-business-object-model#isRegistration>
+                false .
+
+<#contributor1>  a  <http://www.dataconservancy.org/osf-business-object-model#Contributor> , <http://www.dataconservancy.org/osf-business-object-model#OSFBusinessObject> , <http://www.w3.org/2000/01/rdf-schema#Resource> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasPermission>
+                "WRITE" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasUser>
+                <bag://phz6b/data/obj/root/b5atf.ttl> ;
+        <http://www.dataconservancy.org/osf-business-object-model#isBibliographic>
+                true .
+
+<#contributor0>  a  <http://www.dataconservancy.org/osf-business-object-model#Contributor> , <http://www.dataconservancy.org/osf-business-object-model#OSFBusinessObject> , <http://www.w3.org/2000/01/rdf-schema#Resource> ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasPermission>
+                "ADMIN" ;
+        <http://www.dataconservancy.org/osf-business-object-model#hasUser>
+                <bag://phz6b/data/obj/root/9qeg4.ttl> ;
+        <http://www.dataconservancy.org/osf-business-object-model#isBibliographic>
+                true .

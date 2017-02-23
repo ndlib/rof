@@ -121,9 +121,10 @@ module ROF
     # For reference to the assumed RELS-EXT see the following spec in CurateND
     # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/spec/repository_models/osf_archive_spec.rb#L97
     def apply_previous_archived_version_if_applicable(rels_ext)
-      # For the osf_project_identifier and the archive type (Project or Registration),
-      #   find the pid of the ingested object via the #previously_archived_pid_finder method
+      # If a previously archived pid was passed in, use it to set pav:previousVersion
+      # If not, check SOLR for one.   
       pid = previously_archived_pid_finder.call(archive_type, osf_project_identifier)
+      pid = ROF::Utility.check_solr_for_previous(config, osf_project_identifier) if pid.nil?
       rels_ext['pav:previousVersion'] = pid if pid
       rels_ext
     end
@@ -133,7 +134,7 @@ module ROF
     def build_archive_record
       this_rof = {}
       this_rof['owner'] = project['owner']
-      this_rof['type'] = "OsfArchive"
+      this_rof['type'] = 'OsfArchive'
       this_rof['rights'] = map_rights
       this_rof['rels-ext'] = map_rels_ext
       this_rof['metadata'] = map_metadata

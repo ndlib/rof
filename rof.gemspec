@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mime-types", "~> 2.4"
   spec.add_dependency "rubydora", "~> 1.8.1"
   spec.add_dependency "noids_client"
+  spec.add_dependency "rsolr"
   spec.add_dependency 'deprecation', '~> 0.1'
   spec.add_dependency 'nokogiri', '~> 1.6.8.1' # Need this version for older rubies
   # only needed because we use ruby < 2.2.2 in production and that doesn't play

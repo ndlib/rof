@@ -15,7 +15,7 @@ config['solr_url'] = 'http://localhost:8080/solr'
 # parse the command line
 #
 opt = OptionParser.new do |opts|
-  opts.banner = %q{Usage: osf_to_rof --projectfile file --packagedir DIR  --outputdir DIR 
+  opts.banner = %q{Usage: osf_to_rof --solr_url --projectfile file --packagedir DIR  --outputdir DIR 
 }
 
   opts.on("", "--project_file project_file", "osf_projects file provided by requestor (required)") do |project_file|
