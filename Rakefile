@@ -27,12 +27,12 @@ namespace :commitment do
   end
   task :code_coverage do
     require 'json'
-    COVERAGE_GOAL = 89
+    # We are presently at 90%; we will not go below
+    COVERAGE_GOAL = 90
     $stdout.puts "Checking code_coverage"
     lastrun_filename = File.expand_path('../coverage/.last_run.json', __FILE__)
     if File.exist?(lastrun_filename)
       coverage_percentage = JSON.parse(File.read(lastrun_filename)).fetch('result').fetch('covered_percent').to_i
-      # We are presently at 89%; we will not go below
       if coverage_percentage < COVERAGE_GOAL
         abort("ERROR: Code Coverage Goal Not Met:\n\t#{coverage_percentage}%\tExpected\n\t100%\tActual")
       else
