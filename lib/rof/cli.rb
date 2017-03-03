@@ -4,7 +4,6 @@ require 'json'
 require 'rubydora'
 require 'rof/ingest'
 require 'rof/collection'
-require 'rof/get_from_fedora'
 require 'rof/osf_to_rof'
 module ROF
   module CLI

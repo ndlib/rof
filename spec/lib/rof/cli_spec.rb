@@ -63,7 +63,7 @@ describe ROF::CLI do
     fedora[:user] = 'fedoraAdmin'
     fedora[:password] = 'fedoraAdmin'
     VCR.use_cassette("fedora_to_rof1") do
-      fedora_data =  ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
+      fedora_data =  ROF::Translators::FedoraToRof.GetFromFedora(pid, fedora, config)
       expect(fedora_data).to eq(expected_output)
     end
   end
