@@ -23,12 +23,12 @@ module ROF
       #
       # If prefix is not nil, then "#{prefix}:" is prepended to
       # every identifier.
-      def initialize(prefix, options)
+      def initialize(prefix, options = {})
         @id_list =  case
                     when options[:id_list]
                       options[:id_list]
                     when options[:noid_server]
-                      NoidsPool.new(options[:noid_server], options[:pool_name])
+                      NoidsPool.new(options[:noid_server], options.fetch(:pool_name))
                     else
                       raise NoPool
                     end
