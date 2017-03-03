@@ -47,13 +47,13 @@ module ROF
       def to_rof
         # wrap the objects inside a JSON list
         pids.map do |pid|
-          convert_pid_to_rof_element(pid, fedora, config)
+          convert_pid_to_rof_element(pid)
         end
       end
 
       # connect to fedora and fetch object
       # returns array of fedora attributes or nil
-      def convert_pid_to_rof_element(pid, fedora, config)
+      def convert_pid_to_rof_element(pid)
         @fedora_info = {}
 
         doc = connection.find(pid)
@@ -62,7 +62,7 @@ module ROF
         @fedora_info['pid'] = pid
         @fedora_info['type'] = 'fobject'
 
-        readFedora(doc, config)
+        readFedora(doc)
 
         @fedora_info
       end
@@ -70,7 +70,7 @@ module ROF
       # Given a rubydora object, extract what we need
       # to create our ROF object in an associative array
       #
-      def readFedora(rdora_obj, config)
+      def readFedora(rdora_obj)
         @fedora_info['af-model'] = setModel(rdora_obj)
         # iterate through the data streams that are present.
         # use reflection to call appropriate method for each
@@ -78,10 +78,10 @@ module ROF
           next if dsname == 'DC'
           method_key = dsname.sub('-', '')
           if respond_to?(method_key)
-            send(method_key, ds, config)
+            send(method_key, ds)
           else
             # dump generic datastream
-            meta = create_meta(ds, config)
+            meta = create_meta(ds)
             @fedora_info["#{dsname}-meta"] = meta unless meta.empty?
 
             # if content is short < X bytes and valid utf-8, save as string
@@ -113,7 +113,7 @@ module ROF
         end
       end
 
-      def create_meta(ds, config)
+      def create_meta(ds)
         result = {}
 
         label = ds.profile['dsLabel']
@@ -142,7 +142,7 @@ module ROF
 
       # set metadata
       #
-      def descMetadata(ds, _config)
+      def descMetadata(ds)
         # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
         graph = RDF::Graph.new
         data = ds.datastream_content
@@ -158,7 +158,7 @@ module ROF
 
       # set rights
       #
-      def rightsMetadata(ds, _config)
+      def rightsMetadata(ds)
         # rights is an XML document
         # the access array may have read or edit elements
         # each of these elements may contain group or person elements
@@ -197,7 +197,7 @@ module ROF
         @fedora_info['rights'] = rights_array
       end
 
-      def RELSEXT(ds, _config)
+      def RELSEXT(ds)
         # RELS-EXT is RDF-XML - parse it
         ctx = ROF::RelsExtRefContext.dup
         ctx.delete('@base') # @base causes problems when converting TO json-ld (it is = "info:/fedora") but info is not a namespace
