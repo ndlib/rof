@@ -12,7 +12,7 @@ module ROF
       # @param outfile [String, (#write, #close)] A String that is interpretted as a path to a file. Else an IO object responding to #write and #close
       # @param config [Hash]
       # @return Void
-      def self.run(pids, fedora = nil, outfile = STDOUT, config = {})
+      def self.call(pids, fedora = nil, outfile = STDOUT, config = {})
         need_close = false
         # use outfile is_a String
         if outfile.is_a?(String)

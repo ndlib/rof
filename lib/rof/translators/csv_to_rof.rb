@@ -45,7 +45,7 @@ module ROF::Translators
     class NoPriorWork < RuntimeError
     end
 
-    def self.run(csv_contents)
+    def self.call(csv_contents)
       first_line = nil
       rof_contents = []
       previous_work = nil

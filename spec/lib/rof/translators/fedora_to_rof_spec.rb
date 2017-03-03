@@ -9,7 +9,7 @@ RSpec.describe ROF::Translators::FedoraToRof do
     expect { described_class.new([pid], fedora, {}) }.to raise_error('Woof')
   end
 
-  describe '.run' do
+  describe '.call' do
     it "retrieves a fedora object and converts it to ROF" do
       expected_output = [{
         "pid" => "und:dev0012829m",
@@ -60,7 +60,7 @@ RSpec.describe ROF::Translators::FedoraToRof do
       fedora[:user] = 'fedoraAdmin'
       fedora[:password] = 'fedoraAdmin'
       VCR.use_cassette("fedora_to_rof1") do
-        described_class.run([pid], fedora, outfile, config)
+        described_class.call([pid], fedora, outfile, config)
         expect(outfile).to have_received(:write).with(JSON.pretty_generate(expected_output))
       end
     end

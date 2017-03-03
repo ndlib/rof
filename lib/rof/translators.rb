@@ -12,7 +12,7 @@ module ROF
     # @return [Hash] in ROF format
     # @see ROF::Translators::CsvToRof for full details
     def self.csv_to_rof(csv_contents)
-      CsvToRof.run(csv_contents)
+      CsvToRof.call(csv_contents)
     end
 
     # @api public
@@ -25,7 +25,7 @@ module ROF
     # @param config [Hash]
     # @return Void
     def self.fedora_to_rof(pids, fedora = nil, outfile = STDOUT, config = {})
-      FedoraToRof.run(pids, fedora, outfile, config)
+      FedoraToRof.call(pids, fedora, outfile, config)
     end
   end
 end
