@@ -9,20 +9,19 @@ module ROF
 
     # compare fedora rof to bendo_rof
     # return true in equivalent, false if not
-    def self.fedora_vs_bendo( fedora_rof, bendo_rof, output)
-
+    def self.fedora_vs_bendo(fedora_rof, bendo_rof, _output = nil)
       error_count = 0
       # dereferencing an array of one element with [0]. Oh, the horror of it.
-      error_count += compare_rights( fedora_rof[0], bendo_rof[0], output)
-      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0], output)
-      error_count += compare_metadata(fedora_rof[0], bendo_rof[0], output)
-      error_count += compare_everything_else(fedora_rof[0], bendo_rof[0], output)
+      error_count += compare_rights( fedora_rof[0], bendo_rof[0])
+      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0])
+      error_count += compare_metadata(fedora_rof[0], bendo_rof[0])
+      error_count += compare_everything_else(fedora_rof[0], bendo_rof[0])
       error_count
     end
 
     # do rights comparison
     # return 0 if the same, >0 if different
-    def self.compare_rights( fedora_rof, bendo_rof, output )
+    def self.compare_rights(fedora_rof, bendo_rof)
 
       error_count =0
 
@@ -46,9 +45,10 @@ module ROF
       return 0 if f_rights == b_rights
       1
     end
+    private_class_method :rights_equal
 
     # convert RELS-EXT sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_rels_ext(fedora, bendo, _output = nil)
+    def self.compare_rels_ext(fedora, bendo)
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo['rels-ext'], ROF::RelsExtRefContext)
       fedora_rdf = jsonld_to_rdf(fedora['rels-ext'], ROF::RelsExtRefContext)
@@ -62,7 +62,7 @@ module ROF
     end
 
     # convert metadata sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_metadata(fedora, bendo, _output = nil)
+    def self.compare_metadata(fedora, bendo)
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo['metadata'], ROF::RdfContext)
       fedora_rdf = jsonld_to_rdf(fedora['metadata'], ROF::RdfContext)
@@ -71,7 +71,7 @@ module ROF
     end
 
     # compare what remains
-    def self.compare_everything_else( fedora, bendo, output)
+    def self.compare_everything_else( fedora, bendo)
       error_count =0
       fedora = remove_others(fedora)
       bendo = remove_others(bendo)

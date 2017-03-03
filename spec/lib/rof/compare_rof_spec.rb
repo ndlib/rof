@@ -6,33 +6,35 @@ module ROF
       it 'calls compare_rights, compare_rels_ext, compare_metadata, compare_everything_else accumulating errors' do
         fedora_rof = [:f]
         bendo_rof = [:b]
-        output = double
-        expect(described_class).to receive(:compare_rights).with(:f, :b, output).and_return(1)
-        expect(described_class).to receive(:compare_rels_ext).with(:f, :b, output).and_return(2)
-        expect(described_class).to receive(:compare_metadata).with(:f, :b, output).and_return(4)
-        expect(described_class).to receive(:compare_everything_else).with(:f, :b, output).and_return(8)
-        expect(described_class.fedora_vs_bendo(fedora_rof, bendo_rof, output)).to eq(1+2+4+8)
+        expect(described_class).to receive(:compare_rights).with(:f, :b).and_return(1)
+        expect(described_class).to receive(:compare_rels_ext).with(:f, :b).and_return(2)
+        expect(described_class).to receive(:compare_metadata).with(:f, :b).and_return(4)
+        expect(described_class).to receive(:compare_everything_else).with(:f, :b).and_return(8)
+        expect(described_class.fedora_vs_bendo(fedora_rof, bendo_rof)).to eq(1+2+4+8)
       end
     end
-    it "compares rights metadata different read-groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"read-groups"=> ["private"], "edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(1)
-    end
 
-    it "compares rights metadata same read-groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(0)
-    end
+    describe '#compare_rights' do
+      it "compares rights metadata different read-groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"read-groups"=> ["private"], "edit"=> ["rtillman"]}}
+        test_return = CompareRof.compare_rights(fedora, bendo)
+        expect(test_return).to eq(1)
+      end
 
-    it "compares rights metadata with different groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(1)
+      it "compares rights metadata same read-groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        test_return = CompareRof.compare_rights(fedora, bendo)
+        expect(test_return).to eq(0)
+      end
+
+      it "compares rights metadata with different groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"edit"=> ["rtillman"]}}
+        test_return = CompareRof.compare_rights(fedora, bendo)
+        expect(test_return).to eq(1)
+      end
     end
 
     it "compares metadata (same) " do
@@ -231,7 +233,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = CompareRof.compare_everything_else(fedora, bendo)
       expect(test_return).to eq(0)
     end
 
@@ -268,7 +270,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = CompareRof.compare_everything_else(fedora, bendo)
       expect(test_return).to eq(1)
     end
   end
