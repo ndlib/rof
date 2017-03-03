@@ -4,18 +4,14 @@ module ROF
   module Filters
 
     # If bendo server is set , add it into datasreams that contain an URl referencing bendo
-    #
     class Bendo
       def initialize(bendo=nil)
         @bendo = bendo
       end
 
+      # for *-meta objects containing "URL", sub in bendo string if provided
       def process(obj_list, _fname)
-
         ends_meta = Regexp.new('(.+)-meta')
-
-        # for *-meta objects containing "URL", sub in bendo string if provided
-
         obj_list.map! do |obj|
           obj.map do |name, value|
             if name =~ ends_meta
@@ -24,7 +20,6 @@ module ROF
               end
             end
           end
-          # print object
           obj
         end
       end
