@@ -54,4 +54,9 @@ if fedora_info == nil || pids.empty? then
 end
 
 # perform conversion
-ROF::Translators.fedora_to_rof(pids, fedora_info, file_path, config)
+begin
+  ROF::Translators.fedora_to_rof(pids, fedora_info, file_path, config)
+rescue => e
+  STDERR.puts "ERROR: #{e}"
+  exit 1
+end

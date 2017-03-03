@@ -22,25 +22,21 @@ module ROF
 
         rof = new(pids, fedora, config).to_rof
         outfile.write(JSON.pretty_generate(rof))
-        outfile.write()
       ensure
         outfile.close if outfile && need_close
       end
 
-      def initialize(pids, fedora, config)
+      def initialize(pids, fedora_connection_information, config)
         @pids = pids
-        @fedora = fedora
+        @fedora_connection_information = fedora_connection_information
         @config = config
         connect_to_fedora!
       end
-      attr_reader :pids, :fedora, :config, :connection
+      attr_reader :pids, :fedora_connection_information, :config, :connection
 
       private
         def connect_to_fedora!
-          @connection = Rubydora.connect(fedora)
-        rescue StandardError => e
-          $stderr.puts "Error: #{e} (with fedora #{fedora.inspect})"
-          exit!(1)
+          @connection = Rubydora.connect(fedora_connection_information)
         end
       public
 
