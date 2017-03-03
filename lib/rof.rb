@@ -6,11 +6,7 @@ require "rof/collection"
 require "rof/utility"
 require "rof/rdf_context"
 require "rof/translators"
-require "rof/filters/date_stamp"
-require "rof/filters/file_to_url"
-require "rof/filters/label"
-require "rof/filters/work"
-require "rof/filters/bendo"
+require "rof/filters"
 
 module ROF
 end

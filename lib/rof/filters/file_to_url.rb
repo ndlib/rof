@@ -6,10 +6,10 @@ module ROF
     # supposes the file keeps the same relative path the item originally had in
     # the rof file.
     class FileToUrl
-      def initialize()
+      def initialize(options = {})
       end
 
-      def process(obj_list, _fname)
+      def process(obj_list)
         obj_list.map! do |obj|
           bendo_item = obj['bendo-item']
           content_file = obj['content-file']

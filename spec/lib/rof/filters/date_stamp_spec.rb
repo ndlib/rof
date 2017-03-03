@@ -1,19 +1,23 @@
 require 'spec_helper'
+require 'support/an_rof_filter'
 
 module ROF
   module Filters
     describe DateStamp do
+      it_behaves_like "an ROF::Filter"
+      let(:valid_options) { {} }
+
       before(:all) do
         @today = Date.new(2015, 1, 23)
         @today_s = "2015-01-23Z"
-        @w = DateStamp.new(@today)
+        @w = DateStamp.new(as_of: @today)
       end
 
       it "it adds a metadata section if needed" do
         items = [{
           "type" => "ABC"
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "ABC",
@@ -32,7 +36,7 @@ module ROF
             "dc:title" => "something"
           }
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "BCD",
@@ -52,7 +56,7 @@ module ROF
             "dc:dateSubmitted" => "any date"
           }
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "CDE",
@@ -73,7 +77,7 @@ module ROF
             "dc:modified" => "any date"
           }
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "CDE",

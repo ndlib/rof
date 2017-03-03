@@ -23,12 +23,13 @@ module ROF
       #
       # If prefix is not nil, then "#{prefix}:" is prepended to
       # every identifier.
-      def initialize(prefix, options)
+      def initialize(options = {})
+        prefix = options.fetch(:prefix, nil)
         @id_list =  case
                     when options[:id_list]
                       options[:id_list]
                     when options[:noid_server]
-                      NoidsPool.new(options[:noid_server], options[:pool_name])
+                      NoidsPool.new(options[:noid_server], options.fetch(:pool_name))
                     else
                       raise NoPool
                     end
@@ -39,7 +40,7 @@ module ROF
 
       # mutate obj_list by assigning labels and resolving labels where needed
       # Every fobject will be assigned an pid and a bendo_item
-      def process(obj_list, _fname)
+      def process(obj_list)
         labels = {}
 
         # Use two passes. First assign ids, and then resolve labels
