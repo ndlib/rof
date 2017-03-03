@@ -21,7 +21,7 @@ describe ROF::CLI do
     it 'loads the JSON file, calls the translator then writes the output as JSON' do
       config = { 'project_file' => File.join(GEM_ROOT, 'spec/fixtures/for_utility_load_items_from_json_file/single_item.json') }
       expect(ROF::Utility).to receive(:load_items_from_json_file).with(config.fetch('project_file'), outfile).and_return(data_from_file)
-      expect(ROF::Translators::OsfToRof).to receive(:osf_to_rof).with(config, data_from_file[0]).and_return(rof_data)
+      expect(ROF::Translators::OsfToRof).to receive(:call).with(config, data_from_file[0]).and_return(rof_data)
       described_class.osf_to_rof(config, outfile)
       expect(outfile).to have_received(:write).with(JSON.pretty_generate(rof_data))
     end

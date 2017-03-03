@@ -75,7 +75,7 @@ RSpec.describe ROF::Translators::OsfToRof do
     expect(File.exists?(proj_ttl_file)).to be false
     expect(File.exists?(user_ttl_file)).to be false
 
-    rof = ROF::Translators::OsfToRof.osf_to_rof(config, osf_project)
+    rof = ROF::Translators::OsfToRof.call(config, osf_project)
 
     expect(rof).to eq( expected_rof )
 

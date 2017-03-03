@@ -17,7 +17,7 @@ module ROF::Translators
     end
 
     # Convert Osf Archive tar.gz  to ROF
-    def self.osf_to_rof(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
+    def self.call(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
       new(config, osf_projects, previously_archived_pid_finder).call
     end
 
