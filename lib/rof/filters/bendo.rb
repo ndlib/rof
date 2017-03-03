@@ -11,11 +11,15 @@ module ROF
 
       # for *-meta objects containing "URL", sub in bendo string if provided
       def process(obj_list, _fname)
+        # NOTE: This was refactored to short-circuit the loop. A side-effect is that the code
+        # is now returning the same object as was passed in. The previous behavior was that a
+        # new object_list was created via the #map! method.
+        return obj_list unless @bendo
         ends_meta = Regexp.new('(.+)-meta')
         obj_list.map! do |obj|
           obj.map do |name, value|
             if name =~ ends_meta
-              if obj[name]["URL"] && @bendo
+              if obj[name]["URL"]
                 obj[name]["URL"] = obj[name]["URL"].sub("bendo:",@bendo)
               end
             end
