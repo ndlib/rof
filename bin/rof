@@ -56,8 +56,6 @@ when "filter"
   filter = case ARGV[1]
            when "bendo"
              ROF::Filters::Bendo.new(bendo_info)
-           when "collections"
-             ROF::Filters::Collections.new
            when "datestamp"
              ROF::Filters::DateStamp.new
            when "file-to-url"
