@@ -87,7 +87,7 @@ module ROF
 
     protected
 
-    def self.load_items_from_json_file(fname, outfile)
+    def self.load_items_from_json_file(fname, outfile = STDERR)
       items = nil
       File.open(fname, 'r:UTF-8') do |f|
         items = JSON.parse(f.read)
