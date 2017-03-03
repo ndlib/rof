@@ -17,7 +17,7 @@ module ROF
         fedora = Rubydora.connect(fedora)
         doc = fedora.find(pid)
       rescue StandardError => e
-        puts "Error: #{e}"
+        $stderr.puts "Error: #{e}"
         exit 1
       end
 
@@ -65,7 +65,7 @@ module ROF
           abspath = File.join(config['download_path'], fname)
           @fedora_info["#{dsname}-file"] = fname
           if File.file?(config['download_path'])
-            puts "Error: --download directory #{config['download_path']} specified is an existing file."
+            $stderr.puts "Error: --download directory #{config['download_path']} specified is an existing file."
             exit 1
           end
           FileUtils.mkdir_p(config['download_path'])
