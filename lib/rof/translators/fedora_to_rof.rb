@@ -6,7 +6,7 @@ require 'rubydora'
 
 module ROF
   module Translators
-    module FedoraToRof
+    class FedoraToRof
       # @param pids [Array] Fedora PIDs
       # @param fedora [nil, Hash] Hash with connection information (e.g. URL, User)
       # @param outfile [String, (#write, #close)] A String that is interpretted as a path to a file. Else an IO object responding to #write and #close
@@ -20,19 +20,30 @@ module ROF
           need_close = true
         end
 
-        # wrap the objects inside a JSON list
-        result = []
-        pids.each do |pid|
-          result << GetFromFedora(pid, fedora, config)
-        end
-        outfile.write(JSON.pretty_generate(result))
+        rof = new(pids, fedora, config).to_rof
+        outfile.write(JSON.pretty_generate(rof))
+        outfile.write()
       ensure
         outfile.close if outfile && need_close
       end
 
+      def initialize(pids, fedora, config)
+        @pids = pids
+        @fedora = fedora
+        @config = config
+      end
+      attr_reader :pids, :fedora, :config
+
+      def to_rof
+        # wrap the objects inside a JSON list
+        pids.map do |pid|
+          GetFromFedora(pid, fedora, config)
+        end
+      end
+
       # connect to fedora and fetch object
       # returns array of fedora attributes or nil
-      def self.GetFromFedora(pid, fedora, config)
+      def GetFromFedora(pid, fedora, config)
         @fedora_info = {}
 
         # Try to connect to fedora, and search for the desired item
@@ -57,7 +68,7 @@ module ROF
       # Given a rubydora object, extract what we need
       # to create our ROF object in an associative array
       #
-      def self.readFedora(rdora_obj, config)
+      def readFedora(rdora_obj, config)
         @fedora_info['af-model'] = setModel(rdora_obj)
         # iterate through the data streams that are present.
         # use reflection to call appropriate method for each
@@ -100,7 +111,7 @@ module ROF
         end
       end
 
-      def self.create_meta(ds, config)
+      def create_meta(ds, config)
         result = {}
 
         label = ds.profile['dsLabel']
@@ -117,7 +128,7 @@ module ROF
 
       # set fedora_indo['af-model']
       #
-      def self.setModel(rdora_obj)
+      def setModel(rdora_obj)
         # only keep info:fedora/afmodel:XXXXX
         models = rdora_obj.profile['objModels'].map do |model|
           Regexp.last_match(1) if model =~ /^info:fedora\/afmodel:(.*)/
@@ -129,7 +140,7 @@ module ROF
 
       # set metadata
       #
-      def self.descMetadata(ds, _config)
+      def descMetadata(ds, _config)
         # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
         graph = RDF::Graph.new
         data = ds.datastream_content
@@ -145,7 +156,7 @@ module ROF
 
       # set rights
       #
-      def self.rightsMetadata(ds, _config)
+      def rightsMetadata(ds, _config)
         # rights is an XML document
         # the access array may have read or edit elements
         # each of these elements may contain group or person elements
@@ -184,7 +195,7 @@ module ROF
         @fedora_info['rights'] = rights_array
       end
 
-      def self.RELSEXT(ds, _config)
+      def RELSEXT(ds, _config)
         # RELS-EXT is RDF-XML - parse it
         ctx = ROF::RelsExtRefContext.dup
         ctx.delete('@base') # @base causes problems when converting TO json-ld (it is = "info:/fedora") but info is not a namespace
@@ -203,7 +214,7 @@ module ROF
 
       private
 
-      def self.strip_info_fedora(rels_ext)
+      def strip_info_fedora(rels_ext)
         rels_ext.each do |relation, targets|
           next if relation == '@context'
           if targets.is_a?(Hash)
