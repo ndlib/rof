@@ -1,7 +1,7 @@
 require('csv')
 require('json')
 
-module ROF
+module ROF::Translators
   # Turn a CSV file into a ROF file.
   #
   # pass in the contents of the CSV file.
