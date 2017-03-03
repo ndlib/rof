@@ -73,7 +73,7 @@ module ROF
 
     # convert OSF archive tar.gz to rof file
     def self.osf_to_rof(config, outfile = STDOUT)
-      osf_projects = ROF::Utility.load_items_from_json_file(config['project_file'], outfile) if config.key?('project_file')
+      osf_projects = ROF::Utility.load_items_from_json_file(config.fetch('project_file'), outfile)
       rof_data = ROF::Translators::OsfToRof.osf_to_rof(config, osf_projects[0])
       outfile.write(JSON.pretty_generate(rof_data))
     end
