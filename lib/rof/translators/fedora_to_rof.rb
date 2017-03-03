@@ -62,28 +62,33 @@ module ROF
         end
         attr_reader :pid, :config, :rdora_obj
 
-        def convert
-          readFedora
-          @fedora_info
-        end
-
         # Given a rubydora object, extract what we need
         # to create our ROF object in an associative array
         #
-        def readFedora
+        def convert
           @fedora_info['af-model'] = setModel
           # iterate through the data streams that are present.
           # use reflection to call appropriate method for each
           rdora_obj.datastreams.each do |dsname, ds|
-            next if dsname == 'DC'
-            method_key = dsname.sub('-', '')
-            if respond_to?(method_key)
-              send(method_key, ds)
-            else
-              default_datastream_conversion(dsname, ds)
-            end
+            method_name = DATASTREAM_NAME_TO_METHOD_MAP.fetch(dsname) { :default_datastream_conversion }
+            send(method_name, dsname, ds)
           end
+          @fedora_info
         end
+
+        DATASTREAM_NAME_TO_METHOD_MAP = {
+          'DC'               => :skip_datastream,
+          'RELS-EXT'         => :convert_rels_ext,
+          'rightsMetadata'   => :convert_rights_metadata,
+          'properties'       => :default_datastream_conversion,
+          'content'          => :default_datastream_conversion,
+          'descMetadata'     => :convert_desc_metadata,
+          'bendo-item'       => :default_datastream_conversion,
+          'characterization' => :default_datastream_conversion,
+          'thumbnail'        => :default_datastream_conversion
+        }
+
+        private
 
         def default_datastream_conversion(dsname, ds)
           # dump generic datastream
@@ -144,9 +149,12 @@ module ROF
 
         # The methods below are called if the like-named datastream exists in fedora
 
+        def skip_datastream(*)
+        end
+
         # set metadata
         #
-        def descMetadata(ds)
+        def convert_desc_metadata(_dsname, ds)
           # desMetadata is encoded in ntriples, convert to JSON-LD using our special context
           graph = RDF::Graph.new
           data = ds.datastream_content
@@ -162,7 +170,7 @@ module ROF
 
         # set rights
         #
-        def rightsMetadata(ds)
+        def convert_rights_metadata(_dsname, ds)
           # rights is an XML document
           # the access array may have read or edit elements
           # each of these elements may contain group or person elements
@@ -201,7 +209,7 @@ module ROF
           @fedora_info['rights'] = rights_array
         end
 
-        def RELSEXT(ds)
+        def convert_rels_ext(_dsname, ds)
           # RELS-EXT is RDF-XML - parse it
           ctx = ROF::RelsExtRefContext.dup
           ctx.delete('@base') # @base causes problems when converting TO json-ld (it is = "info:/fedora") but info is not a namespace
