@@ -1,8 +1,12 @@
 require 'spec_helper'
+require 'support/an_rof_filter'
 
 module ROF
   module Filters
     describe FileToUrl do
+      it_behaves_like "an ROF::Filter"
+      let(:valid_options) { {} }
+
       before(:all) do
         @w = FileToUrl.new
       end
@@ -11,7 +15,7 @@ module ROF
         items = [{
           "type" => "ABC"
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "type" => "ABC"
@@ -27,7 +31,7 @@ module ROF
           "bendo-item" => "12345",
           "thumbnail-content" => "a_file.png"
         }]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(2)
         expect(after.first).to eq({
           "type" => "ABC",
@@ -49,7 +53,7 @@ module ROF
         "content-meta" => {
           "mime-type" => "image/png"
         }}]
-        after = @w.process(items, '')
+        after = @w.process(items)
         expect(after.length).to eq(2)
         expect(after.first).to eq({
           "bendo-item" => "12345",

@@ -3,12 +3,12 @@ module ROF
 
     # If bendo server is set , add it into datasreams that contain an URl referencing bendo
     class Bendo
-      def initialize(bendo=nil)
-        @bendo = bendo
+      def initialize(options = {})
+        @bendo = options.fetch(:bendo_info)
       end
 
       # for *-meta objects containing "URL", sub in bendo string if provided
-      def process(obj_list, *)
+      def process(obj_list)
         # NOTE: This was refactored to short-circuit the loop. A side-effect is that the code
         # is now returning the same object as was passed in. The previous behavior was that a
         # new object_list was created via the #map! method.

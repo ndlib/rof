@@ -1,10 +1,13 @@
 require 'spec_helper'
+require 'support/an_rof_filter'
 
 module ROF
   module Filters
     describe Work do
+      it_behaves_like "an ROF::Filter"
+      let(:valid_options) { { file_name: '' } }
       it "handles variant work types" do
-        w = Work.new
+        w = Work.new(valid_options)
 
         item = {"type" => "Work", "owner" => "user1"}
         after = w.process_one_work(item)
@@ -32,7 +35,7 @@ module ROF
       end
 
       it "makes the first file be the representative" do
-        w = Work.new
+        w = Work.new(valid_options)
 
         item = {"type" => "Work", "owner" => "user1", "files" => ["a.txt", "b.jpeg"]}
         after = w.process_one_work(item)
@@ -50,7 +53,7 @@ module ROF
       end
 
       it "decodes files correctly" do
-        w = Work.new
+        w = Work.new(valid_options)
 
         item = {
           "type" => "Work",
@@ -72,7 +75,7 @@ module ROF
         expect(after.length).to eq(3)
         expect(after[0]).to include("type" => "fobject",
                                     "af-model" => "GenericWork",
-				    "rels-ext" => {}, 
+				    "rels-ext" => {},
                                     "pid" => "$(pid--0)")
         expect(after[1]).to include("type" => "fobject",
                                     "af-model" => "GenericFile",

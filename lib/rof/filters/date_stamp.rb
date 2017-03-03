@@ -6,8 +6,8 @@ module ROF
     # Also set the date modified to be the date given.
     # If not given, the date used defaults to the local time on the computer.
     class DateStamp
-      def initialize(date=nil)
-        @today = date || Date::today
+      def initialize(options = {})
+        @today = options.fetch(:as_of) { Date::today }
         @today_s = if @today.is_a?(Date)
                      @today.strftime('%FZ')
                    else
@@ -15,7 +15,7 @@ module ROF
                    end
       end
 
-      def process(obj_list, _fname)
+      def process(obj_list)
         obj_list.map! do |obj|
           if obj["metadata"].nil?
             obj["metadata"] = {
