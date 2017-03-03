@@ -31,30 +31,32 @@ module ROF
         @pids = pids
         @fedora = fedora
         @config = config
+        connect_to_fedora!
       end
-      attr_reader :pids, :fedora, :config
+      attr_reader :pids, :fedora, :config, :connection
+
+      private
+        def connect_to_fedora!
+          @connection = Rubydora.connect(fedora)
+        rescue StandardError => e
+          $stderr.puts "Error: #{e} (with fedora #{fedora.inspect})"
+          exit!(1)
+        end
+      public
 
       def to_rof
         # wrap the objects inside a JSON list
         pids.map do |pid|
-          GetFromFedora(pid, fedora, config)
+          convert_pid_to_rof_element(pid, fedora, config)
         end
       end
 
       # connect to fedora and fetch object
       # returns array of fedora attributes or nil
-      def GetFromFedora(pid, fedora, config)
+      def convert_pid_to_rof_element(pid, fedora, config)
         @fedora_info = {}
 
-        # Try to connect to fedora, and search for the desired item
-        # If either of these actions fail, handle it, and exit.
-        begin
-          fedora = Rubydora.connect(fedora)
-          doc = fedora.find(pid)
-        rescue StandardError => e
-          $stderr.puts "Error: #{e}"
-          exit 1
-        end
+        doc = connection.find(pid)
 
         # set pid, type
         @fedora_info['pid'] = pid
