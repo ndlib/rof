@@ -64,6 +64,13 @@ module ROF
       s
     end
 
+    # test for embargo xml cases
+    def self.has_embargo_date?(embargo_xml)
+      return false if embargo_xml == '' || embargo_xml.nil?
+      return false unless embargo_xml.elements['machine'].has_elements? && embargo_xml.elements['machine'].elements['date'].has_text?
+      true
+    end
+
     # query SOLR for Previous version of OSF Project.
     # Return its fedora pid if it is found, nil otherwise
     def self.check_solr_for_previous(config, osf_project_identifier)

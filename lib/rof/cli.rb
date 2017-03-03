@@ -4,7 +4,6 @@ require 'json'
 require 'rubydora'
 require 'rof/ingest'
 require 'rof/collection'
-require 'rof/get_from_fedora'
 require 'rof/osf_to_rof'
 module ROF
   module CLI
@@ -69,25 +68,6 @@ module ROF
       # filter will transform the items array in place
       result = filter.process(items, fname)
       outfile.write(JSON.pretty_generate(result))
-    end
-
-    # retrieve fedora object and convert to ROF
-    def self.convert_to_rof(pids, fedora = nil, outfile = STDOUT, config = {})
-      need_close = false
-      # use outfile is_a String
-      if outfile.is_a?(String)
-        outfile = File.open(outfile, 'w')
-        need_close = true
-      end
-
-      # wrap the objects inside a JSON list
-      result = []
-      pids.each do |pid|
-        result << ROF::FedoraToRof.GetFromFedora(pid, fedora, config)
-      end
-      outfile.write(JSON.pretty_generate(result))
-    ensure
-      outfile.close if outfile && need_close
     end
 
     # convert OSF archive tar.gz to rof file

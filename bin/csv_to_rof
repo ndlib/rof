@@ -22,5 +22,5 @@ end
 
 STDIN.set_encoding("UTF-8")
 csv_contents = STDIN.read
-rof = ROF::TranslateCSV.run(csv_contents)
+rof = ROF::Translators.csv_to_rof(csv_contents)
 puts JSON.pretty_generate(rof)
