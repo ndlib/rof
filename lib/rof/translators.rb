@@ -1,5 +1,6 @@
 require 'rof/translators/csv_to_rof'
 require 'rof/translators/fedora_to_rof'
+require 'rof/translators/osf_to_rof'
 
 module ROF
   # A namespace for organizing translating classes. A translating class is responsible for

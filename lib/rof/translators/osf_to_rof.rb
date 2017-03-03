@@ -6,7 +6,7 @@ require 'rof/osf_context'
 require 'rof/rdf_context'
 require 'rof/utility'
 
-module ROF
+module ROF::Translators
   # Class for managing OSF Archive data transformations
   # It is called after the get-from-osf task, and before the work-xlat task
   class OsfToRof
@@ -122,7 +122,7 @@ module ROF
     # @see https://github.com/ndlib/curate_nd/blob/115efec2e046257282a86fe2cd98c7d229d04cf9/spec/repository_models/osf_archive_spec.rb#L97
     def apply_previous_archived_version_if_applicable(rels_ext)
       # If a previously archived pid was passed in, use it to set pav:previousVersion
-      # If not, check SOLR for one.   
+      # If not, check SOLR for one.
       pid = previously_archived_pid_finder.call(archive_type, osf_project_identifier)
       pid = ROF::Utility.check_solr_for_previous(config, osf_project_identifier) if pid.nil?
       rels_ext['pav:previousVersion'] = pid if pid

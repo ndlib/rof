@@ -4,7 +4,7 @@ require 'json'
 require 'rubydora'
 require 'rof/ingest'
 require 'rof/collection'
-require 'rof/osf_to_rof'
+require 'rof/translators'
 module ROF
   module CLI
     # Ingest the file `fname` that is a level 0 rof file. It may contain any
@@ -73,7 +73,7 @@ module ROF
     # convert OSF archive tar.gz to rof file
     def self.osf_to_rof(config, outfile = STDOUT)
       osf_projects = load_items_from_file(config['project_file'], outfile) if config.key?('project_file')
-      rof_data = ROF::OsfToRof.osf_to_rof(config, osf_projects[0])
+      rof_data = ROF::Translators::OsfToRof.osf_to_rof(config, osf_projects[0])
       outfile.write(JSON.pretty_generate(rof_data))
     end
 
