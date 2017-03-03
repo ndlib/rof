@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe ROF::Translators::FedoraToRof do
+  let(:outfile) { double(close: true, write: true) }
+  let(:pid) { 'und:dev0012829m' }
+  it 'will fail to initialize without a valid fedora connection' do
+    fedora = double
+    allow(Rubydora).to receive(:connect).with(fedora).and_raise('Woof')
+    expect { described_class.new([pid], fedora, {}) }.to raise_error('Woof')
+  end
+
   describe '.run' do
     it "retrieves a fedora object and converts it to ROF" do
       expected_output = [{
@@ -46,18 +54,14 @@ RSpec.describe ROF::Translators::FedoraToRof do
         "characterization-meta" => {"mime-type"=>"text/xml"},
         "thumbnail-meta" => {"label"=>"File Datastream", "mime-type"=>"image/png"},
       }]
-      pid = 'und:dev0012829m'
       config = {}
       fedora = {}
       fedora[:url] = 'http://localhost:8080/fedora'
       fedora[:user] = 'fedoraAdmin'
       fedora[:password] = 'fedoraAdmin'
       VCR.use_cassette("fedora_to_rof1") do
-        outfile = double(close: true, write: true)
         described_class.run([pid], fedora, outfile, config)
         expect(outfile).to have_received(:write).with(JSON.pretty_generate(expected_output))
-        # fedora_data =  ROF::Translators::FedoraToRof.GetFromFedora(pid, fedora, config)
-        # expect(fedora_data).to eq(expected_output)
       end
     end
   end
