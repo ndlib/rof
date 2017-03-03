@@ -18,7 +18,7 @@ module ROF
     #
     # Returns the number of errors.
     def self.ingest_file(fname, search_paths = [], outfile = STDOUT, fedora = nil, bendo = nil)
-      items = load_items_from_file(fname, outfile)
+      items = load_items_from_json_file(fname, outfile)
       ingest_array(items, search_paths, outfile, fedora, bendo)
     end
 
@@ -60,7 +60,7 @@ module ROF
     end
 
     def self.filter_file(filter, fname, outfile = STDOUT)
-      items = load_items_from_file(fname, STDERR)
+      items = load_items_from_json_file(fname, STDERR)
       filter_array(filter, items, outfile)
     end
 
@@ -72,22 +72,22 @@ module ROF
 
     # convert OSF archive tar.gz to rof file
     def self.osf_to_rof(config, outfile = STDOUT)
-      osf_projects = load_items_from_file(config['project_file'], outfile) if config.key?('project_file')
+      osf_projects = load_items_from_json_file(config['project_file'], outfile) if config.key?('project_file')
       rof_data = ROF::Translators::OsfToRof.osf_to_rof(config, osf_projects[0])
       outfile.write(JSON.pretty_generate(rof_data))
     end
 
     # compare two rofs
     def self.compare_files(file1, file2, outfile = STDOUT, _fedora, _bendo)
-      fedora_rof = load_items_from_file(file1, outfile)
-      bendo_rof =  load_items_from_file(file2, outfile)
+      fedora_rof = load_items_from_json_file(file1, outfile)
+      bendo_rof =  load_items_from_json_file(file2, outfile)
 
       ROF::CompareRof.fedora_vs_bendo(fedora_rof, bendo_rof, outfile)
     end
 
     protected
 
-    def self.load_items_from_file(fname, outfile)
+    def self.load_items_from_json_file(fname, outfile)
       items = nil
       File.open(fname, 'r:UTF-8') do |f|
         items = JSON.parse(f.read)
