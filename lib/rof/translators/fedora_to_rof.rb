@@ -58,9 +58,9 @@ module ROF
           @connection = connection
           @config = config
           @fedora_info = { 'pid' => pid, 'type' => 'fobject' }
-          @rdora_obj = connection.find(pid)
+          @fedora_object = connection.find(pid)
         end
-        attr_reader :pid, :config, :rdora_obj
+        attr_reader :pid, :config, :fedora_object
 
         # Given a rubydora object, extract what we need
         # to create our ROF object in an associative array
@@ -69,7 +69,7 @@ module ROF
           @fedora_info['af-model'] = setModel
           # iterate through the data streams that are present.
           # use reflection to call appropriate method for each
-          rdora_obj.datastreams.each do |dsname, ds|
+          fedora_object.datastreams.each do |dsname, ds|
             method_name = DATASTREAM_NAME_TO_METHOD_MAP.fetch(dsname) { :default_datastream_conversion }
             send(method_name, dsname, ds)
           end
@@ -141,7 +141,7 @@ module ROF
         #
         def setModel
           # only keep info:fedora/afmodel:XXXXX
-          models = rdora_obj.profile['objModels'].map do |model|
+          models = fedora_object.profile['objModels'].map do |model|
             Regexp.last_match(1) if model =~ /^info:fedora\/afmodel:(.*)/
           end.compact
           models[0]
