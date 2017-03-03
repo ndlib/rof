@@ -14,8 +14,8 @@ module ROF
       error_count = 0
       # dereferencing an array of one element with [0]. Oh, the horror of it.
       error_count += compare_rights( fedora_rof[0], bendo_rof[0], output)
-      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0])
-      error_count += compare_metadata(fedora_rof[0], bendo_rof[0])
+      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0], output)
+      error_count += compare_metadata(fedora_rof[0], bendo_rof[0], output)
       error_count += compare_everything_else(fedora_rof[0], bendo_rof[0], output)
       error_count
     end
@@ -48,21 +48,21 @@ module ROF
     end
 
     # convert RELS-EXT sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_rels_ext(fedora, bendo)
+    def self.compare_rels_ext(fedora, bendo, _output = nil)
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo['rels-ext'], ROF::RelsExtRefContext)
       fedora_rdf = jsonld_to_rdf(fedora['rels-ext'], ROF::RelsExtRefContext)
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
-    
+
     def self.jsonld_to_rdf(doc, default_context)
       doc["@context"] = default_context unless doc.has_key?("@context")
       RDF::Graph.new << JSON::LD::API.toRdf(doc)
     end
 
     # convert metadata sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_metadata(fedora, bendo)
+    def self.compare_metadata(fedora, bendo, _output = nil)
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo['metadata'], ROF::RdfContext)
       fedora_rdf = jsonld_to_rdf(fedora['metadata'], ROF::RdfContext)

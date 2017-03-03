@@ -1,7 +1,19 @@
 require 'spec_helper'
 
 module ROF
-  describe "Compare ROF" do
+  describe CompareRof do
+    describe '.fedora_vs_bendo' do
+      it 'calls compare_rights, compare_rels_ext, compare_metadata, compare_everything_else accumulating errors' do
+        fedora_rof = [:f]
+        bendo_rof = [:b]
+        output = double
+        expect(described_class).to receive(:compare_rights).with(:f, :b, output).and_return(1)
+        expect(described_class).to receive(:compare_rels_ext).with(:f, :b, output).and_return(2)
+        expect(described_class).to receive(:compare_metadata).with(:f, :b, output).and_return(4)
+        expect(described_class).to receive(:compare_everything_else).with(:f, :b, output).and_return(8)
+        expect(described_class.fedora_vs_bendo(fedora_rof, bendo_rof, output)).to eq(1+2+4+8)
+      end
+    end
     it "compares rights metadata different read-groups" do
       fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
       bendo = { "rights"=> {"read-groups"=> ["private"], "edit"=> ["rtillman"]}}
