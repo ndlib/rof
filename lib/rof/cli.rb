@@ -70,11 +70,6 @@ module ROF
       outfile.write(JSON.pretty_generate(result))
     end
 
-    # retrieve fedora object and convert to ROF
-    def self.convert_to_rof(pids, fedora = nil, outfile = STDOUT, config = {})
-      Translators.fedora_to_rof(pids, fedora, outfile, config)
-    end
-
     # convert OSF archive tar.gz to rof file
     def self.osf_to_rof(config, outfile = STDOUT)
       osf_projects = load_items_from_file(config['project_file'], outfile) if config.key?('project_file')
