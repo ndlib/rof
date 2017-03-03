@@ -7,21 +7,36 @@ require 'rdf/isomorphic'
 module ROF
  class CompareRof
 
-    # compare fedora rof to bendo_rof
-    # return true in equivalent, false if not
+    # Compare two ROF objects; we'll call one fedora_rof and the other bendo_rof
+    # @return 0 if no errors; otherwise there are errors
     def self.fedora_vs_bendo(fedora_rof, bendo_rof, _output = nil)
-      error_count = 0
-      # dereferencing an array of one element with [0]. Oh, the horror of it.
-      error_count += compare_rights( fedora_rof[0], bendo_rof[0])
-      error_count += compare_rels_ext(fedora_rof[0], bendo_rof[0])
-      error_count += compare_metadata(fedora_rof[0], bendo_rof[0])
-      error_count += compare_everything_else(fedora_rof[0], bendo_rof[0])
-      error_count
+      new(fedora_rof[0], bendo_rof[0]).error_count
     end
+
+    def initialize(fedora_rof, bendo_rof)
+      @fedora_rof = fedora_rof
+      @bendo_rof = bendo_rof
+    end
+    attr_reader :fedora_rof, :bendo_rof
+
+    def error_count
+      @error_count = 0
+      @error_count += compare_rights(fedora_rof, bendo_rof)
+      @error_count += compare_rels_ext(fedora_rof, bendo_rof)
+      @error_count += compare_metadata(fedora_rof, bendo_rof)
+      @error_count += compare_everything_else(fedora_rof, bendo_rof)
+      @error_count
+    end
+
+    def errors?
+      error_count > 0
+    end
+
+    private
 
     # do rights comparison
     # return 0 if the same, >0 if different
-    def self.compare_rights(fedora_rof, bendo_rof)
+    def compare_rights(fedora_rof, bendo_rof)
 
       error_count =0
 
@@ -35,7 +50,7 @@ module ROF
     end
 
     # compare array or element for equivalence
-    def self.rights_equal(rights_attr, fedora, bendo)
+    def rights_equal(rights_attr, fedora, bendo)
       f_rights = fedora.fetch('rights', {}).fetch(rights_attr, [])
       b_rights = bendo.fetch('rights', {}).fetch(rights_attr, [])
 
@@ -45,33 +60,32 @@ module ROF
       return 0 if f_rights == b_rights
       1
     end
-    private_class_method :rights_equal
 
     # convert RELS-EXT sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_rels_ext(fedora, bendo)
+    def compare_rels_ext(fedora, bendo)
       error_count = 0
-      bendo_rdf = jsonld_to_rdf(bendo['rels-ext'], ROF::RelsExtRefContext)
-      fedora_rdf = jsonld_to_rdf(fedora['rels-ext'], ROF::RelsExtRefContext)
+      bendo_rdf = jsonld_to_rdf(bendo.fetch('rels-ext', {}), ROF::RelsExtRefContext)
+      fedora_rdf = jsonld_to_rdf(fedora.fetch('rels-ext', {}), ROF::RelsExtRefContext)
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
 
-    def self.jsonld_to_rdf(doc, default_context)
+    def jsonld_to_rdf(doc, default_context)
       doc["@context"] = default_context unless doc.has_key?("@context")
       RDF::Graph.new << JSON::LD::API.toRdf(doc)
     end
 
     # convert metadata sections to RDF::graph and compater w/ rdf-isomorphic
-    def self.compare_metadata(fedora, bendo)
+    def compare_metadata(fedora, bendo)
       error_count = 0
-      bendo_rdf = jsonld_to_rdf(bendo['metadata'], ROF::RdfContext)
-      fedora_rdf = jsonld_to_rdf(fedora['metadata'], ROF::RdfContext)
+      bendo_rdf = jsonld_to_rdf(bendo.fetch('metadata', {}), ROF::RdfContext)
+      fedora_rdf = jsonld_to_rdf(fedora.fetch('metadata', {}), ROF::RdfContext)
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
 
     # compare what remains
-    def self.compare_everything_else( fedora, bendo)
+    def compare_everything_else( fedora, bendo)
       error_count =0
       fedora = remove_others(fedora)
       bendo = remove_others(bendo)
@@ -81,7 +95,7 @@ module ROF
     end
 
     # remove elements we've dealt with already
-    def self.remove_others( rof_object)
+    def remove_others( rof_object)
       rof_object.delete('rights')
       rof_object.delete('rels-ext')
       rof_object.delete('metadata')
