@@ -60,13 +60,15 @@ module ROF
       outfile.close if outfile && need_close
     end
 
+    # Responsible for loading the given :fname into an array of items, the processing
+    # those items via the :filter, and finally writing results to the :output
+    #
+    # @param [#process] filter - the object that processes the items loaded from the fname
+    # @param [String] fname - the filename from which to load items
+    # @param [#write] outfile - the object to which we will #write the processed items
+    # @return void
     def self.filter_file(filter, fname, outfile = STDOUT)
       items = ROF::Utility.load_items_from_json_file(fname, STDERR)
-      filter_array(filter, items, outfile)
-    end
-
-    def self.filter_array(filter, items, outfile = STDOUT)
-      # filter will transform the items array in place
       result = filter.process(items)
       outfile.write(JSON.pretty_generate(result))
     end
