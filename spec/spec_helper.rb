@@ -1,6 +1,7 @@
 GEM_ROOT = File.expand_path("../../", __FILE__)
 $:.unshift File.join(GEM_ROOT, "lib")
 
+require 'coverage_helper'
 require 'rspec/its'
 require 'rspec/matchers'
 require 'equivalent-xml'
@@ -30,4 +31,3 @@ RSpec.configure do |config|
   #     --seed 1234
   config.order = 'random'
 end
-
