@@ -1,26 +1,37 @@
 require 'spec_helper'
 
 module ROF
-  describe "Compare ROF" do
-    it "compares rights metadata different read-groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"read-groups"=> ["private"], "edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(1)
+  describe CompareRof do
+    describe '.fedora_vs_bendo' do
+      it 'is a convenience method' do
+        expect_any_instance_of(described_class).to receive(:error_count)
+        fedora = [:f]
+        bendo = [:b]
+        described_class.fedora_vs_bendo(fedora, bendo)
+      end
     end
 
-    it "compares rights metadata same read-groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(0)
-    end
+    describe '#compare_rights' do
+      it "compares rights metadata different read-groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"read-groups"=> ["private"], "edit"=> ["rtillman"]}}
+        test_return = described_class.new(fedora, bendo).error_count
+        expect(test_return).to eq(1)
+      end
 
-    it "compares rights metadata with different groups" do
-      fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
-      bendo = { "rights"=> {"edit"=> ["rtillman"]}}
-      test_return = CompareRof.compare_rights(fedora, bendo, {})
-      expect(test_return).to eq(1)
+      it "compares rights metadata same read-groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        test_return = described_class.new(fedora, bendo).error_count
+        expect(test_return).to eq(0)
+      end
+
+      it "compares rights metadata with different groups" do
+        fedora = { "rights"=> { "read-groups"=> ["public"], "edit"=> ["rtillman"]}}
+        bendo = { "rights"=> {"edit"=> ["rtillman"]}}
+        test_return = described_class.new(fedora, bendo).error_count
+        expect(test_return).to eq(1)
+      end
     end
 
     it "compares metadata (same) " do
@@ -44,7 +55,7 @@ module ROF
           "dc:modified"=> "2016-07-22Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo)
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(0)
     end
 
@@ -69,7 +80,7 @@ module ROF
           "dc:modified"=> "2016-07-23Z",
           "dc:title"=> "carmella.jpeg"
         }}
-      test_return = CompareRof.compare_metadata(fedora, bendo)
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(1)
     end
 
@@ -98,7 +109,7 @@ module ROF
                   "dc:modified"=> "2016-07-22Z",
                   "dc:title"=> "carmella.jpeg"
                 }}
-      test_return = CompareRof.compare_metadata(fedora, bendo)
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(1)
     end
 
@@ -140,7 +151,7 @@ module ROF
 		      "und:dev00149x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo)
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(0)
     end
 
@@ -182,7 +193,7 @@ module ROF
 		      "und:dev00148x01"
 	            ]
 	}}
-      test_return = CompareRof.compare_rels_ext(fedora, bendo)
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(1)
     end
 
@@ -219,7 +230,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(0)
     end
 
@@ -256,7 +267,7 @@ module ROF
                "type"=> "fobject",
 	       "bendo-item"=> "dev00149w5f"
 	}
-      test_return = CompareRof.compare_everything_else(fedora, bendo, {})
+      test_return = described_class.new(fedora, bendo).error_count
       expect(test_return).to eq(1)
     end
   end
