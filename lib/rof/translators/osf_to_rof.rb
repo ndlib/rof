@@ -18,13 +18,13 @@ module ROF::Translators
     end
 
     # Convert Osf Archive tar.gz  to ROF
-    def self.call(config, osf_projects = nil, previously_archived_pid_finder = default_previously_archived_pid_finder)
-      new(config, osf_projects, previously_archived_pid_finder).call
+    def self.call(project, config, previously_archived_pid_finder = default_previously_archived_pid_finder)
+      new(project, config, previously_archived_pid_finder).call
     end
 
-    def initialize(config, osf_projects = nil, previously_archived_pid_finder = self.class.default_previously_archived_pid_finder)
+    def initialize(project, config, previously_archived_pid_finder = self.class.default_previously_archived_pid_finder)
       @config = config
-      @project = osf_projects
+      @project = project
       @previously_archived_pid_finder = previously_archived_pid_finder
       @osf_map = ROF::OsfToNDMap
     end

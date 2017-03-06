@@ -75,7 +75,7 @@ RSpec.describe ROF::Translators::OsfToRof do
     expect(File.exists?(proj_ttl_file)).to be false
     expect(File.exists?(user_ttl_file)).to be false
 
-    rof = ROF::Translators::OsfToRof.call(config, osf_project)
+    rof = ROF::Translators::OsfToRof.call(osf_project, config)
 
     expect(rof).to eq( expected_rof )
 
@@ -85,7 +85,7 @@ RSpec.describe ROF::Translators::OsfToRof do
   end
 
   describe 'RELS-EXT["pav:previousVersion"]' do
-    let(:converter) { ROF::Translators::OsfToRof.new(config, osf_project, previous_pid_finder) }
+    let(:converter) { ROF::Translators::OsfToRof.new(osf_project, config, previous_pid_finder) }
     let(:pid_of_previous_version) { '1234' }
     describe 'when previous pid is found' do
       let(:previous_pid_finder) { double(call: pid_of_previous_version) }

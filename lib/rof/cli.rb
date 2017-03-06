@@ -74,13 +74,13 @@ module ROF
     end
 
     # convert OSF archive tar.gz to rof file
+    # @param [String] project_file - The path to the OSF Project file
     # @param [Hash] config
-    # @option config [String] :project_file The path to the OSF Project file
     # @param [NilClass, String, #write] outfile - where should we write things
     # @see .with_outfile_handling for details on outfile
-    def self.osf_to_rof(config, outfile = STDOUT)
-      osf_projects = ROF::Utility.load_items_from_json_file(config.fetch('project_file'), outfile)
-      result = ROF::Translators::OsfToRof.call(config, osf_projects[0])
+    def self.osf_to_rof(project_file, config = {}, outfile = STDOUT)
+      osf_projects = ROF::Utility.load_items_from_json_file(project_file, outfile)
+      result = ROF::Translators::OsfToRof.call(osf_projects[0], config)
       with_outfile_handling(outfile) do |writer|
         writer.write(JSON.pretty_generate(result))
       end
