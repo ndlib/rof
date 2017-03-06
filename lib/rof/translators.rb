@@ -19,18 +19,5 @@ module ROF
     def self.csv_to_rof(csv_contents, config = {})
       CsvToRof.call(csv_contents, config)
     end
-
-    # @api public
-    #
-    # Write to the output file an ROF JSON document
-    #
-    # @param pids [Array] Fedora PIDs
-    # @param fedora [nil, Hash] Hash with connection information (e.g. URL, User)
-    # @param outfile [String, (#write, #close)] A String that is interpretted as a path to a file. Else an IO object responding to #write and #close
-    # @param config [Hash]
-    # @return Void
-    def self.fedora_to_rof(pids, fedora = nil, outfile = STDOUT, config = {})
-      FedoraToRof.call(pids, fedora, outfile, config)
-    end
   end
 end

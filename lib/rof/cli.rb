@@ -86,8 +86,16 @@ module ROF
       end
     end
 
-    def self.fedora_to_rof(pids, fedora_info, outfile, config)
-      ROF::Translators.fedora_to_rof(pids, fedora_info, file_path, config)
+    # Convert the given fedora PIDs to ROF JSON document
+    # @param [Array] pids - The path to the OSF Project file
+    # @param [Hash] config
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
+    def self.fedora_to_rof(pids, config = {}, outfile = STDOUT)
+      result = ROF::Translators::FedoraToRof.call(pids, config)
+      with_outfile_handling(outfile) do |writer|
+        writer.write(JSON.pretty_generate(result))
+      end
     end
 
     # compare two rofs

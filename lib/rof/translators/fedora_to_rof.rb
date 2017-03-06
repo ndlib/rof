@@ -7,29 +7,20 @@ require 'rof/translator'
 
 module ROF
   module Translators
+    # Responsible for translating Fedora PIDs to ROF objects
     class FedoraToRof
-      # @param pids [Array] Fedora PIDs
-      # @param fedora [nil, Hash] Hash with connection information (e.g. URL, User)
-      # @param outfile [String, (#write, #close)] A String that is interpretted as a path to a file. Else an IO object responding to #write and #close
-      # @param config [Hash]
-      # @return Void
-      def self.call(pids, fedora = nil, outfile = STDOUT, config = {})
-        need_close = false
-        # use outfile is_a String
-        if outfile.is_a?(String)
-          outfile = File.open(outfile, 'w')
-          need_close = true
-        end
-
-        rof = new(pids, fedora, config).to_rof
-        outfile.write(JSON.pretty_generate(rof))
-      ensure
-        outfile.close if outfile && need_close
+      # @param [Array] pids - Fedora PIDs
+      # @param [Hash] config - Hash with symbol keys
+      # @option config [Hash] :fedora_connection_information - The Hash that contains the connection information for Fedora
+      # @return [Hash] The ROF representation of teh Fedora objects
+      # @see Rubydora.connect
+      def self.call(pids, config = {})
+        new(pids, config).to_rof
       end
 
-      def initialize(pids, fedora_connection_information, config)
+      def initialize(pids, config = {})
         @pids = pids
-        @fedora_connection_information = fedora_connection_information
+        @fedora_connection_information = config.fetch(:fedora_connection_information)
         @config = config
         connect_to_fedora!
       end
