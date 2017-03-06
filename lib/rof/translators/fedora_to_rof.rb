@@ -8,7 +8,7 @@ require 'rof/translator'
 module ROF
   module Translators
     # Responsible for translating Fedora PIDs to ROF objects
-    class FedoraToRof
+    class FedoraToRof < ROF::Translator
       # @param [Array] pids - Fedora PIDs
       # @param [Hash] config - Hash with symbol keys
       # @option config [Hash] :fedora_connection_information - The Hash that contains the connection information for Fedora

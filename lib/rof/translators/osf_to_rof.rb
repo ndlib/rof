@@ -10,7 +10,7 @@ require 'rof/translator'
 module ROF::Translators
   # Class for managing OSF Archive data transformations
   # It is called after the get-from-osf task, and before the work-xlat task
-  class OsfToRof
+  class OsfToRof < ROF::Translator
     # @todo Set this to be something more meaningful than an empty lambda
     # @return [#call]
     def self.default_previously_archived_pid_finder
