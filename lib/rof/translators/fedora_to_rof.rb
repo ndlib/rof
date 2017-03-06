@@ -3,6 +3,7 @@ require 'rexml/document'
 require 'rdf/ntriples'
 require 'rdf/rdfxml'
 require 'rubydora'
+require 'rof/translator'
 
 module ROF
   module Translators

@@ -1,3 +1,4 @@
+require 'rof/translator'
 require('csv')
 require('json')
 

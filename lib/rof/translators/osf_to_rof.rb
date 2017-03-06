@@ -5,6 +5,7 @@ require 'rdf/turtle'
 require 'rof/osf_context'
 require 'rof/rdf_context'
 require 'rof/utility'
+require 'rof/translator'
 
 module ROF::Translators
   # Class for managing OSF Archive data transformations
