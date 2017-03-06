@@ -137,8 +137,8 @@ module ROF
 
       # Encapsulates connection to Noids Server
       class NoidsPool
-        def initialize(noids_server, pool_name)
-          @pool = NoidsClient::Connection.new(noids_server).get_pool(pool_name)
+        def initialize(noids_server_url, pool_name)
+          @pool = NoidsClient::Connection.new(noids_server_url).get_pool(pool_name)
         end
 
         def shift

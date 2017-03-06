@@ -112,5 +112,27 @@ module ROF
         end
       end
     end
+    RSpec.describe Label::NoidsPool do
+      let(:noids_server_url) { 'https://noids.library.nd.edu' }
+      let(:pool_name) { 'rof' }
+      let(:inner_pool) { double(mint: [double], closed?: double) }
+      let(:connection) { double('Noids Conneciton', get_pool: inner_pool) }
+      before do
+        expect(NoidsClient::Connection).to receive(:new).with(noids_server_url).and_return(connection)
+        expect(connection).to receive(:get_pool).with(pool_name).and_return(inner_pool)
+      end
+      describe '#shift' do
+        subject { described_class.new(noids_server_url, pool_name).shift }
+        it "returns the first value of the inner pool's #mint method" do
+          expect(subject).to eq(inner_pool.mint.first)
+        end
+      end
+      describe '#empty?' do
+        subject { described_class.new(noids_server_url, pool_name).empty? }
+        it 'returns whether the inner pool is closed' do
+          expect(subject).to eq(inner_pool.closed?)
+        end
+      end
+    end
   end
 end
