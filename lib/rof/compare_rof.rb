@@ -28,10 +28,6 @@ module ROF
       @error_count
     end
 
-    def errors?
-      error_count > 0
-    end
-
     private
 
     # do rights comparison
