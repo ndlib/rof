@@ -1,8 +1,9 @@
+require 'rof/filter'
 module ROF
   module Filters
 
     # If bendo server is set , add it into datasreams that contain an URl referencing bendo
-    class Bendo
+    class Bendo < ROF::Filter
       def initialize(options = {})
         @bendo = options.fetch(:bendo_info)
       end

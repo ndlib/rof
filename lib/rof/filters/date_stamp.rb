@@ -1,3 +1,4 @@
+require 'rof/filter'
 require 'date'
 
 module ROF
@@ -5,7 +6,7 @@ module ROF
     # Set the upload date to be the date given, provided it doesn't already exist.
     # Also set the date modified to be the date given.
     # If not given, the date used defaults to the local time on the computer.
-    class DateStamp
+    class DateStamp < ROF::Filter
       def initialize(options = {})
         @today = options.fetch(:as_of) { Date::today }
         @today_s = if @today.is_a?(Date)

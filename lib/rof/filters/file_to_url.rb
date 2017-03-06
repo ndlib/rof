@@ -1,3 +1,5 @@
+require 'rof/filter'
+
 module ROF
   module Filters
     # Convert any content datastream files into a bendo URL, and alter the rof
@@ -5,7 +7,7 @@ module ROF
     # will only exist for items having a bendo-item id set. The URL generated
     # supposes the file keeps the same relative path the item originally had in
     # the rof file.
-    class FileToUrl
+    class FileToUrl < ROF::Filter
       def initialize(options = {})
       end
 
