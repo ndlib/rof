@@ -5,8 +5,9 @@ module ROF
     describe '.csv_to_rof' do
       it 'delegates to CsvToRof.call' do
         contents = double
-        expect(described_class::CsvToRof).to receive(:call).with(contents)
-        described_class.csv_to_rof(contents)
+        config = double
+        expect(described_class::CsvToRof).to receive(:call).with(contents, config)
+        described_class.csv_to_rof(contents, config)
       end
     end
 

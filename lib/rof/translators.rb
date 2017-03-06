@@ -13,10 +13,11 @@ module ROF
   module Translators
     # @api public
     # @param [String] csv_contents - in the form of a CSV
+    # @param [Hash] config - Hash with symbols for keys
     # @return [Hash] in ROF format
     # @see ROF::Translators::CsvToRof for full details
-    def self.csv_to_rof(csv_contents)
-      CsvToRof.call(csv_contents)
+    def self.csv_to_rof(csv_contents, config = {})
+      CsvToRof.call(csv_contents, config)
     end
 
     # @api public
