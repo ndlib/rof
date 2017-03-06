@@ -12,7 +12,7 @@ module ROF
   # @see ROF::Translators::OsfToRof
   module Translators
     # @api public
-    # @param csv_contents [String] in the form of a CSV
+    # @param [String] csv_contents - in the form of a CSV
     # @return [Hash] in ROF format
     # @see ROF::Translators::CsvToRof for full details
     def self.csv_to_rof(csv_contents)

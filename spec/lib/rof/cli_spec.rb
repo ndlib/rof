@@ -26,4 +26,30 @@ describe ROF::CLI do
       expect(outfile).to have_received(:write).with(JSON.pretty_generate(rof_data))
     end
   end
+
+  describe '.with_outfile_handling' do
+    let(:writer) { double(close: true) }
+    context 'when given a string' do
+      let(:outfile) { '/hello/world' }
+      it 'will open a file' do
+        expect(File).to receive(:open).with('/hello/world', 'w').and_return(writer)
+        expect {|b| described_class.with_outfile_handling(outfile, &b) }.to yield_with_args(writer)
+        expect(writer).to have_received(:close)
+      end
+    end
+    context 'when given nil' do
+      let(:outfile) { nil }
+      it 'will write to /dev/null' do
+        expect(File).to receive(:open).with('/dev/null', 'w').and_return(writer)
+        expect {|b| described_class.with_outfile_handling(outfile, &b) }.to yield_with_args(writer)
+        expect(writer).to have_received(:close)
+      end
+    end
+    context 'when given something else' do
+      it 'will assume it is can be "written" to' do
+        expect {|b| described_class.with_outfile_handling(writer, &b) }.to yield_with_args(writer)
+        expect(writer).to have_received(:close)
+      end
+    end
+  end
 end

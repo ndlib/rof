@@ -23,41 +23,38 @@ module ROF
       ingest_array(items, search_paths, outfile, fedora, bendo)
     end
 
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
     def self.ingest_array(items, search_paths = [], outfile = STDOUT, fedora = nil, bendo = nil)
-      need_close = false
-      if outfile.nil?
-        outfile = File.open('/dev/null', 'w')
-        need_close = true
-      end
       fedora = Rubydora.connect(fedora) if fedora
       item_count = 1
       error_count = 0
       verb = fedora.nil? ? 'Verifying' : 'Ingesting'
-      overall_benchmark = Benchmark.measure do
-        items.each do |item|
-          begin
-            outfile.write("#{item_count}. #{verb} #{item['pid']} ...")
-            item_count += 1
-            individual_benchmark = Benchmark.measure do
-              ROF.Ingest(item, fedora, search_paths, bendo)
-            end
-            outfile.write("ok. %0.3fs\n" % individual_benchmark.real)
-          rescue Exception => e
-            error_count += 1
-            outfile.write("error. #{e}\n")
-            # TODO(dbrower): add option to toggle displaying backtraces
-            if e.backtrace
-              outfile.write(e.backtrace.join("\n\t"))
-              outfile.write("\n")
+      with_outfile_handling(outfile) do |writer|
+        overall_benchmark = Benchmark.measure do
+          items.each do |item|
+            begin
+              writer.write("#{item_count}. #{verb} #{item['pid']} ...")
+              item_count += 1
+              individual_benchmark = Benchmark.measure do
+                ROF.Ingest(item, fedora, search_paths, bendo)
+              end
+              writer.write("ok. %0.3fs\n" % individual_benchmark.real)
+            rescue Exception => e
+              error_count += 1
+              writer.write("error. #{e}\n")
+              # TODO(dbrower): add option to toggle displaying backtraces
+              if e.backtrace
+                writer.write(e.backtrace.join("\n\t"))
+                writer.write("\n")
+              end
             end
           end
         end
+        writer.write("Total time %0.3fs\n" % overall_benchmark.real)
+        writer.write("#{error_count} errors\n")
       end
-      outfile.write("Total time %0.3fs\n" % overall_benchmark.real)
-      outfile.write("#{error_count} errors\n")
       error_count
-    ensure
-      outfile.close if outfile && need_close
     end
 
     # Responsible for loading the given :fname into an array of items, the processing
@@ -65,22 +62,32 @@ module ROF
     #
     # @param [#process] filter - the object that processes the items loaded from the fname
     # @param [String] fname - the filename from which to load items
-    # @param [#write] outfile - the object to which we will #write the processed items
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
     # @return void
     def self.filter_file(filter, fname, outfile = STDOUT)
       items = ROF::Utility.load_items_from_json_file(fname, STDERR)
       result = filter.process(items)
-      outfile.write(JSON.pretty_generate(result))
+      with_outfile_handling(outfile) do |writer|
+        writer.write(JSON.pretty_generate(result))
+      end
     end
 
     # convert OSF archive tar.gz to rof file
     # @param [Hash] config
     # @option config [String] :project_file The path to the OSF Project file
-    # @param [#write] outfile
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
     def self.osf_to_rof(config, outfile = STDOUT)
       osf_projects = ROF::Utility.load_items_from_json_file(config.fetch('project_file'), outfile)
-      rof_data = ROF::Translators::OsfToRof.call(config, osf_projects[0])
-      outfile.write(JSON.pretty_generate(rof_data))
+      result = ROF::Translators::OsfToRof.call(config, osf_projects[0])
+      with_outfile_handling(outfile) do |writer|
+        writer.write(JSON.pretty_generate(result))
+      end
+    end
+
+    def self.fedora_to_rof(pids, fedora_info, outfile, config)
+      ROF::Translators.fedora_to_rof(pids, fedora_info, file_path, config)
     end
 
     # compare two rofs
@@ -89,6 +96,25 @@ module ROF
       bendo_rof =  ROF::Utility.load_items_from_json_file(file2, outfile)
 
       ROF::CompareRof.fedora_vs_bendo(fedora_rof, bendo_rof, outfile)
+    end
+
+    # Provides a normalized handling of outfiles:
+    #
+    # @param [NilClass, String, #write] outfile - The IO point that we will write to
+    # @yieldparam [#write] writer - An object that can be written to
+    def self.with_outfile_handling(outfile)
+      need_close = false
+      # use outfile is_a String
+      if outfile.is_a?(String)
+        outfile = File.open(outfile, 'w')
+        need_close = true
+      elsif outfile.nil?
+        outfile = File.open('/dev/null', 'w')
+        need_close = true
+      end
+      yield(outfile)
+    ensure
+      outfile.close if outfile && (need_close || outfile.respond_to?(:close))
     end
   end
 end
