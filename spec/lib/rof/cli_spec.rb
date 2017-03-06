@@ -40,6 +40,18 @@ describe ROF::CLI do
     end
   end
 
+  describe '.csv_to_rof' do
+    let(:outfile) { double(write: true) }
+    let(:csv) { "1,2,3" }
+    let(:rof_data) { [{ "rof" => "true" }] }
+    let(:config) { {} }
+    it 'calls the translator then writes the output as JSON' do
+      expect(ROF::Translators::CsvToRof).to receive(:call).with(csv, config).and_return(rof_data)
+      described_class.csv_to_rof(csv, config, outfile)
+      expect(outfile).to have_received(:write).with(JSON.pretty_generate(rof_data))
+    end
+  end
+
   describe '.with_outfile_handling' do
     let(:writer) { double(close: true) }
     context 'when given a string' do

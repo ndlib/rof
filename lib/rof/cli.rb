@@ -98,6 +98,18 @@ module ROF
       end
     end
 
+    # Convert the given CSV to ROF JSON document
+    # @param [String] The contents of a CSV file
+    # @param [Hash] config
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
+    def self.csv_to_rof(csv, config = {}, outfile = STDOUT)
+      result = ROF::Translators::CsvToRof.call(csv, config)
+      with_outfile_handling(outfile) do |writer|
+        writer.write(JSON.pretty_generate(result))
+      end
+    end
+
     # compare two rofs
     def self.compare_files(file1, file2, outfile = STDOUT, _fedora, _bendo)
       fedora_rof = ROF::Utility.load_items_from_json_file(file1, outfile)
