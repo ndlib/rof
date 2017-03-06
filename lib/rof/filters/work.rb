@@ -1,5 +1,5 @@
 require 'mime-types'
-
+require 'rof/filter'
 module ROF
   module Filters
     # Expand objects of type "Work(-(.+))?" into a
@@ -8,7 +8,7 @@ module ROF
     # adds a depositor
     # turns original object into an fobject/$1
     # and copies the access to each fobject.
-    class Work
+    class Work < ROF::Filter
       class NoFile < RuntimeError
       end
 

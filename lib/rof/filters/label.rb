@@ -1,3 +1,4 @@
+require 'rof/filter'
 require 'noids_client'
 
 module ROF
@@ -5,7 +6,7 @@ module ROF
     # Class Label locates in-place labels of the form
     # "$(label_name)" in the ROF file, assigns each
     # label a pid, then replaces the label with that pid.
-    class Label
+    class Label < ROF::Filter
       class MissingLabel < RuntimeError
       end
 
@@ -137,8 +138,8 @@ module ROF
 
       # Encapsulates connection to Noids Server
       class NoidsPool
-        def initialize(noids_server, pool_name)
-          @pool = NoidsClient::Connection.new(noids_server).get_pool(pool_name)
+        def initialize(noids_server_url, pool_name)
+          @pool = NoidsClient::Connection.new(noids_server_url).get_pool(pool_name)
         end
 
         def shift
