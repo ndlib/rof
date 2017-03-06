@@ -28,7 +28,7 @@ namespace :commitment do
   task :code_coverage do
     require 'json'
     # Our goal is to stay at this coverage level or higher; As the level increases, we bump up the goal
-    COVERAGE_GOAL = 94
+    COVERAGE_GOAL = 95
     $stdout.puts "Checking code_coverage"
     lastrun_filename = File.expand_path('../coverage/.last_run.json', __FILE__)
     if File.exist?(lastrun_filename)

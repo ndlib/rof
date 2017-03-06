@@ -3,19 +3,21 @@ require 'rdf/ntriples'
 require 'rdf/rdfxml'
 require 'rof/rdf_context'
 require 'rdf/isomorphic'
+require 'active_support/core_ext/array/wrap'
 
 module ROF
  class CompareRof
 
     # Compare two ROF objects; we'll call one fedora_rof and the other bendo_rof
     # @return 0 if no errors; otherwise there are errors
-    def self.fedora_vs_bendo(fedora_rof, bendo_rof, _output = nil)
-      new(fedora_rof[0], bendo_rof[0]).error_count
+    def self.fedora_vs_bendo(fedora_rof, bendo_rof, _output = nil, options = {})
+      new(Array.wrap(fedora_rof)[0], Array.wrap(bendo_rof)[0], options).error_count
     end
 
-    def initialize(fedora, bendo)
+    def initialize(fedora, bendo, options = {})
       @fedora = Array.wrap(fedora).first
       @bendo = Array.wrap(bendo).first
+      @skip_rels_ext_context = options.fetch(:skip_rels_ext_context) { false }
     end
     attr_reader :fedora, :bendo
 
@@ -59,8 +61,10 @@ module ROF
     # convert RELS-EXT sections to RDF::graph and compater w/ rdf-isomorphic
     def compare_rels_ext
       error_count = 0
-      bendo_rdf = jsonld_to_rdf(bendo.fetch('rels-ext', {}), ROF::RelsExtRefContext)
-      fedora_rdf = jsonld_to_rdf(fedora.fetch('rels-ext', {}), ROF::RelsExtRefContext)
+      # Because Sipity's RELS-EXT context was out of whack, I need a switch to skip comparing
+      # the @context of the rels-ext document
+      bendo_rdf = jsonld_to_rdf(bendo.fetch('rels-ext', {}), ROF::RelsExtRefContext, @skip_rels_ext_context)
+      fedora_rdf = jsonld_to_rdf(fedora.fetch('rels-ext', {}), ROF::RelsExtRefContext, @skip_rels_ext_context)
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
