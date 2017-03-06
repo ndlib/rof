@@ -3,10 +3,12 @@ require 'spec_helper'
 RSpec.describe ROF::Translators::FedoraToRof do
   let(:outfile) { double(close: true, write: true) }
   let(:pid) { 'und:dev0012829m' }
+  let(:config) { { fedora_connection_information: fedora_connection_information } }
+  let(:fedora_connection_information) { { url: 'http://localhost:8080/fedora', user: 'fedoraAdmin', password: 'fedoraAdmin' } }
+
   it 'will fail to initialize without a valid fedora connection' do
-    fedora = double
-    allow(Rubydora).to receive(:connect).with(fedora).and_raise('Woof')
-    expect { described_class.new([pid], fedora, {}) }.to raise_error('Woof')
+    allow(Rubydora).to receive(:connect).with(fedora_connection_information).and_raise('Woof')
+    expect { described_class.new([pid], config) }.to raise_error('Woof')
   end
 
   describe '.call' do
@@ -54,14 +56,8 @@ RSpec.describe ROF::Translators::FedoraToRof do
         "characterization-meta" => {"mime-type"=>"text/xml"},
         "thumbnail-meta" => {"label"=>"File Datastream", "mime-type"=>"image/png"},
       }]
-      config = {}
-      fedora = {}
-      fedora[:url] = 'http://localhost:8080/fedora'
-      fedora[:user] = 'fedoraAdmin'
-      fedora[:password] = 'fedoraAdmin'
       VCR.use_cassette("fedora_to_rof1") do
-        described_class.call([pid], fedora, outfile, config)
-        expect(outfile).to have_received(:write).with(JSON.pretty_generate(expected_output))
+        expect(described_class.call([pid], config)).to eq(expected_output)
       end
     end
   end

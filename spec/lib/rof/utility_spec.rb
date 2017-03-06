@@ -23,6 +23,35 @@ module ROF
        end
     end
 
+    describe '.load_items_from_json_file' do
+      let(:logger) { double(puts: true) }
+      subject { described_class.load_items_from_json_file(filename, logger) }
+      context 'with a parse error' do
+        let(:filename) { File.join(GEM_ROOT, 'spec/fixtures/for_utility_load_items_from_json_file/parse_error.json') }
+        it 'will log the error and abort' do
+          expect(described_class).to receive(:exit!)
+          subject
+          expect(logger).to have_received(:puts).with(kind_of(String))
+        end
+      end
+      context 'with a single item' do
+        let(:filename) { File.join(GEM_ROOT, 'spec/fixtures/for_utility_load_items_from_json_file/single_item.json') }
+        it 'will return an Array' do
+          expect(described_class).not_to receive(:exit!)
+          expect(subject).to eq([{ "hello" => "world" }])
+          expect(logger).not_to have_received(:puts).with(kind_of(String))
+        end
+      end
+      context 'with a multiple items' do
+        let(:filename) { File.join(GEM_ROOT, 'spec/fixtures/for_utility_load_items_from_json_file/multiple_items.json') }
+        it 'will return an Array' do
+          expect(described_class).not_to receive(:exit!)
+          expect(subject).to eq([{ "hello" => "world" }, { "good" => "bye" }])
+          expect(logger).not_to have_received(:puts).with(kind_of(String))
+        end
+      end
+    end
+
     describe '.has_embargo_date?' do
       it 'handles embargo presence or absence' do
         rights_tests = [

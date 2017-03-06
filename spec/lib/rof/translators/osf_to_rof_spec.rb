@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ROF::OsfToRof do
+RSpec.describe ROF::Translators::OsfToRof do
   #Test file dirs
   let(:test_dir) { Dir.mktmpdir('FROM_OSF') }
   let(:ttl_dir) { FileUtils.mkdir_p(File.join(test_dir, 'b6psa/data/obj/root')) }
@@ -75,7 +75,7 @@ RSpec.describe ROF::OsfToRof do
     expect(File.exists?(proj_ttl_file)).to be false
     expect(File.exists?(user_ttl_file)).to be false
 
-    rof = ROF::OsfToRof.osf_to_rof(config, osf_project)
+    rof = ROF::Translators::OsfToRof.call(osf_project, config)
 
     expect(rof).to eq( expected_rof )
 
@@ -85,7 +85,7 @@ RSpec.describe ROF::OsfToRof do
   end
 
   describe 'RELS-EXT["pav:previousVersion"]' do
-    let(:converter) { ROF::OsfToRof.new(config, osf_project, previous_pid_finder) }
+    let(:converter) { ROF::Translators::OsfToRof.new(osf_project, config, previous_pid_finder) }
     let(:pid_of_previous_version) { '1234' }
     describe 'when previous pid is found' do
       let(:previous_pid_finder) { double(call: pid_of_previous_version) }

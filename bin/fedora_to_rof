@@ -55,7 +55,8 @@ end
 
 # perform conversion
 begin
-  ROF::Translators.fedora_to_rof(pids, fedora_info, file_path, config)
+  config[:fedora_connection_information] = fedora_info
+  ROF::CLI.fedora_to_rof(pids, config, file_path)
 rescue => e
   STDERR.puts "ERROR: #{e}"
   exit 1

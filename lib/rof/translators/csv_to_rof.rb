@@ -1,3 +1,4 @@
+require 'rof/translator'
 require('csv')
 require('json')
 
@@ -31,7 +32,7 @@ module ROF::Translators
   # with the previous work translated into ROF. This will allow a work to have
   # attached files with different access permissions, owners, etc...
   # Any extra files are appended to the file list for the work.
-  class CsvToRof
+  class CsvToRof < ROF::Translator
     class MissingOwnerOrType < RuntimeError
     end
 
@@ -45,7 +46,7 @@ module ROF::Translators
     class NoPriorWork < RuntimeError
     end
 
-    def self.call(csv_contents)
+    def self.call(csv_contents, config = {})
       first_line = nil
       rof_contents = []
       previous_work = nil

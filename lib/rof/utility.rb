@@ -71,6 +71,22 @@ module ROF
       true
     end
 
+    # @api public
+    # @param fname [String] Path to filename
+    # @param outfile [#puts] Where to write exceptions
+    # @return [Array] The items in the JSON document, coerced into an Array (if a single item was encountered)
+    def self.load_items_from_json_file(fname, outfile = STDERR)
+      items = nil
+      File.open(fname, 'r:UTF-8') do |f|
+        items = JSON.parse(f.read)
+      end
+      items = [items] unless items.is_a? Array
+      items
+    rescue JSON::ParserError => e
+      outfile.puts("Error reading #{fname}:#{e}")
+      exit!(1)
+    end
+
     # query SOLR for Previous version of OSF Project.
     # Return its fedora pid if it is found, nil otherwise
     def self.check_solr_for_previous(config, osf_project_identifier)
