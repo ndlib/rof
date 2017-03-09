@@ -91,8 +91,14 @@ module ROF
     def compare_everything_else
       error_count =0
       exclude_keys = ['rights', 'rels-ext', 'metadata', 'thumbnail-file']
-      # comparsion using builtin equivalency operation
-      error_count = 1 unless bendo.except(*exclude_keys) == fedora.except(*exclude_keys)
+      all_keys_to_check = (bendo.keys + fedora.keys - exclude_keys).uniq
+      all_keys_to_check.each do |key|
+        bendo_value = bendo.fetch(key, nil)
+        fedora_value = fedora.fetch(key, nil)
+        next if Array.wrap(bendo_value) == Array.wrap(fedora_value)
+        error_count += 1
+        break
+      end
       error_count
     end
   end
