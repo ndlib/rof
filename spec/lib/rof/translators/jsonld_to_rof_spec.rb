@@ -11,12 +11,14 @@ module ROF
       describe '.call' do
         [
           'm039k358q5c',
-          'zk51vd69n1r'
+          'zk51vd69n1r',
+          'nk322b9161g'
         ].each do |noid|
           context "with JSON-LD from NOID=#{noid} CurateND work that was ingested via the batch ingester" do
             it 'will return ROF that is a subset of the ROF used by the batch ingestor' do
+              rof = File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/#{noid}.rof"))
               jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/#{noid}.jsonld")))
-              rof_generated_via_batch = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/metadata-#{noid}.rof")))
+              rof_generated_via_batch = JSON.load(rof)
               expected_output = Array.wrap(rof_generated_via_batch)
               actual_output = described_class.call(jsonld_from_curatend, {})
               # Quick check that top level keys are the same
@@ -49,12 +51,12 @@ module ROF
                   value.keys.sort.each do |sorted_key|
                     hash[sorted_key] ||= []
                     Array.wrap(value[sorted_key]).sort.each do |sorted_value|
-                      hash[sorted_key] << sorted_value.gsub("\n", "")
+                      hash[sorted_key] << normalize_string(sorted_value)
                     end
                   end
                   value = hash
                 else
-                  value.gsub!("\n", "")
+                  normalize_string(value)
                 end
                 returning_hash[key] << value
               end
@@ -62,8 +64,15 @@ module ROF
             end
             returning_hash
           else
-            Array.wrap(input).map { |obj| obj.gsub("\n", '') }
+            Array.wrap(input).map { |obj| normalize_string(obj) }
           end
+        end
+
+        def normalize_string(input)
+          # Forcing escaped unicode hexadecimal to the "human" readable format
+          input.gsub!(/\\u([0-F]{4})/) { '' << Regexp.last_match[1].to_i(16) }
+          input.gsub!("\n", '')
+          input
         end
       end
     end
