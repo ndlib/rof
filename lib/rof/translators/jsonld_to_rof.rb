@@ -17,6 +17,9 @@ module ROF
     # @see ROF::Translators::JsonldToRof::PredicateHandler
     # @see ROF::Translators::JsonldToRof::StatementHandler
     module JsonldToRof
+      PredicateHandler.register('info:fedora/fedora-system:def/relations-external') do |handler|
+        handler.map('#isMemberOfCollection', to: ['rels-ext', 'isMemberOfCollection'])
+      end
       PredicateHandler.register('https://library.nd.edu/ns/terms/') do |handler|
         handler.map('accessEdit', to: ['rights', 'edit'])
         handler.map('accessRead', to: ['rights', 'read'])
@@ -26,6 +29,12 @@ module ROF
         handler.map('bendoitem', to: ["bendo-item"])
         handler.map('depositor') do |object, accumulator|
           accumulator.register_properties('depositor', object)
+        end
+        handler.map('owner') do |object, accumulator|
+          accumulator.register_properties('owner', object)
+        end
+        handler.map('representativeFile') do |object, accumulator|
+          accumulator.register_properties('representative', object)
         end
       end
 

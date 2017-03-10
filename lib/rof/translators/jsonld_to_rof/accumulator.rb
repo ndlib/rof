@@ -47,7 +47,7 @@ module ROF
         # @return [Array] of given node_name and node_value
         def register_properties(node_name, node_value)
           @properties ||= []
-          @properties << [node_name, node_value]
+          @properties << [node_name, coerce_object_to_string(node_value)]
           [node_name, node_value]
         end
 
@@ -78,7 +78,7 @@ module ROF
         # @return [String] pid
         # @raise PidAlreadySetError - if you attempted to a different PID
         def add_pid(pid)
-          pid = coerce(pid)
+          pid = coerce_object_to_string(pid)
           if @rof.key?('pid')
             if @rof['pid'] != pid
               raise PidAlreadySetError, "Attempted to set pid=#{pid}, but it is already set to #{@rof['pid']}"
@@ -102,7 +102,7 @@ module ROF
           while slug = location.shift
             if location.empty?
               data[slug] ||= []
-              data[slug] << coerce(value)
+              data[slug] << coerce_object_to_string(value)
             else
               data[slug] ||= {}
               data = data[slug]
@@ -113,7 +113,7 @@ module ROF
 
         private
 
-        def coerce(object)
+        def coerce_object_to_string(object)
           return object if object.nil?
           if object.to_s =~ %r{https?://curate.nd.edu/show/([^\\]+)/?}
             return "und:#{$1}"

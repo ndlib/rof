@@ -99,11 +99,21 @@ module ROF
       all_keys_to_check.each do |key|
         bendo_value = bendo.fetch(key, nil)
         fedora_value = fedora.fetch(key, nil)
-        next if Array.wrap(bendo_value) == Array.wrap(fedora_value)
+        next if normalize_value(bendo_value) == normalize_value(fedora_value)
         error_count += 1
         break
       end
       error_count
+    end
+
+    private
+
+    # Because sometimes we have carriage returns and line breaks but we really don't care
+    # @todo Do we care about line breaks?
+    def normalize_value(values)
+      Array.wrap(values).map do |value|
+        value.is_a?(String) ? value.gsub("\n", "") : value
+      end
     end
   end
 end
