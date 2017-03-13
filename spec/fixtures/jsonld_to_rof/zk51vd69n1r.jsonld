@@ -1,0 +1,94 @@
+{
+  "@context": {
+    "bibo": "http://purl.org/ontology/bibo/",
+    "dc": "http://purl.org/dc/terms/",
+    "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+    "fedora-model": "info:fedora/fedora-system:def/model#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "frels": "info:fedora/fedora-system:def/relations-external#",
+    "hasEditor": {
+      "@id": "hydra:hasEditor",
+      "@type": "@id"
+    },
+    "hasEditorGroup": {
+      "@id": "hydra:hasEditorGroup",
+      "@type": "@id"
+    },
+    "hasMember": {
+      "@id": "frels:hasMember",
+      "@type": "@id"
+    },
+    "hasModel": {
+      "@id": "fedora-model:hasModel",
+      "@type": "@id"
+    },
+    "hydra": "http://projecthydra.org/ns/relations#",
+    "isEditorOf": {
+      "@id": "hydra:isEditorOf",
+      "@type": "@id"
+    },
+    "isMemberOfCollection": {
+      "@id": "frels:isMemberOfCollection",
+      "@type": "@id"
+    },
+    "isPartOf": {
+      "@id": "frels:isPartOf",
+      "@type": "@id"
+    },
+    "mrel": "http://id.loc.gov/vocabulary/relators/",
+    "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+    "nd": "https://library.nd.edu/ns/terms/",
+    "pav": "http://purl.org/pav/",
+    "previousVersion": "pav:previousVersion",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "und": "https://curate.nd.edu/show/",
+    "vracore": "http://purl.org/vra/"
+  },
+  "@graph": [
+    {
+      "@id": "_:b0",
+      "dc:contributor": "David R.Hyde",
+      "ms:role": "Research Director"
+    },
+    {
+      "@id": "_:b1",
+      "ms:discipline": "Biological Sciences",
+      "ms:level": "Doctoral Dissertation",
+      "ms:name": "Doctor of Philosophy"
+    },
+    {
+      "@id": "und:zk51vd69n1r",
+      "dc:contributor": {
+        "@id": "_:b0"
+      },
+      "dc:creator": "Jingling Li",
+      "dc:date": "2017-02-13",
+      "dc:dateSubmitted": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date",
+        "@value": "2017-02-14"
+      },
+      "dc:description#abstract": "<p>The zebrafish retina provides an excellent model to study neuronal regeneration because it possesses the inherent capacity to generate new neurons in the growing retina throughout its life and to restore any neuronal types that are lost upon injury. In response to retinal cell loss caused by injury or disease, zebrafish Müller glial cells re-enter the cell cycle to produce neuronal progenitor cells that continue to proliferate and differentiate into any retinal neuronal type that was lost. We previously demonstrated that tumor necrosis factor α (TNFα) is required and sufficient to initiate this proliferation response (Nelson et al., 2013; Conner et al., 2014). However, the activation and upstream regulator of TNFα signaling during retinal regeneration remained undetermined. </p><p>In this study, I investigated the roles of two A Disintegrin And Metalloproteases 17 (ADAM17) paralogs, ADAM17a and ADAM17b, in stimulating regeneration of the damaged zebrafish retina and TNFα processing. Reduced expression of either ADAM17 paralog significantly suppressed Müller glia cell cycle re-entry in the light-damaged retina, which indicates that both ADAM17a and ADAM17b are necessary and functionally nonredundant in initiating Müller glia proliferation during retinal regeneration. The recombinant soluble TNFα rescued Müller glia proliferation in damaged <i>adam17b</i> morphant retinas, but not <i>adam17a</i> morphant retinas. We also demonstrated that knocking down ADAM17b expression reduced TNFα processing in the light-damaged retina, which results in decreased levels the soluble form of TNFα. In contrast, the <i>adam17a</i> morphant retina did not exhibit reduced amounts of the soluble TNFα. Intravitreal injection of the soluble TNFα into light-damaged retinas rescued Müller glia proliferation in <i>adam17b</i> morphant retinas, which produced proliferating neuronal progenitor cells (NPC). However, fewer NPCs in the TNFα-rescued light-damaged <i>adam17b</i> morphant retinas committed to the <i>atoh7</i> neuronal lineage relative to control retinas and differentiated into greater numbers of amacrine cells rather than photoreceptors. Thus, ADAM17b is required to process TNFα prior to Müller glia proliferation and is necessary for NPC commitment to a neuronal lineage.</p>",
+      "dc:modified": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date",
+        "@value": "2017-02-25Z"
+      },
+      "dc:rights": "All rights reserved",
+      "dc:title": "Characterization of the Roles of ADAM17a and ADAM17b during Zebrafish Retinal Regeneration",
+      "hydra:hasEditor": {
+        "@id": "und:qb98mc9021z"
+      },
+      "hydra:hasEditorGroup": {
+        "@id": "und:q524jm23g92"
+      },
+      "ms:degree": {
+        "@id": "_:b1"
+      },
+      "nd:accessEdit": "curate_batch_user",
+      "nd:accessRead": "ljinglin",
+      "nd:accessReadGroup": "public",
+      "nd:afmodel": "Etd",
+      "nd:bendoitem": "zk51vd69n1r",
+      "nd:depositor": "curate_batch_user"
+    }
+  ]
+}
