@@ -15,17 +15,48 @@ module ROF
         def initialize(initial_rof = {})
           @rof = initial_rof
           @blank_nodes = {}
+          @blank_node_locations = {}
         end
 
         # @api public
         # @return [Hash]
         def to_rof
           rof = @rof.deep_dup
+          expand_blank_node_locations(rof)
           append_properties_to(rof)
           rof
         end
 
         private
+
+        # The antics of the blank node! See the specs for blank nodes to see the expected behavior.
+        def expand_blank_node_locations(rof)
+          @blank_node_locations.each_pair do |node, locations|
+            locations.each_pair do |location, key_value_pairs|
+              data = rof
+              location[0..-2].each do |slug|
+                data[slug] ||= {}
+                data = data[slug]
+              end
+
+              # We may encounter a shallow map, if so we need for it to behave differently
+              slug = location[-1]
+              if slug
+                data[slug] ||= []
+                hash = {}
+              else
+                hash = data
+              end
+              Array.wrap(key_value_pairs).each do |key_value|
+                key_value.each_pair do |key, value|
+                  hash[key] ||= []
+                  hash[key] += Array.wrap(value)
+                end
+              end
+              data[slug] << hash if slug
+            end
+          end
+        end
 
         def append_properties_to(rof)
           return rof unless @properties
@@ -92,24 +123,38 @@ module ROF
         # @api public
         # @param [Array<String>, String] location - a list of nested hash keys (or a single string)
         # @param [String] value - a translated value for the original RDF Statement
+        # @param [false, RDF::Node] blank_node
         # @return [Array] location, value
-        def add_predicate_location_and_value(location, value)
+        def add_predicate_location_and_value(location, value, blank_node = false)
           # Because I am making transformation on the location via #shift method, I need a duplication.
-          location = Array.wrap(location.deep_dup)
+          location = Array.wrap(location)
           if location == ['pid']
             return add_pid(value)
           end
-          data = @rof
-          while slug = location.shift
-            if location.empty?
-              data[slug] ||= []
-              data[slug] << coerce_object_to_string(value)
-            else
-              data[slug] ||= {}
-              data = data[slug]
-            end
+          if blank_node
+            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+          else
+            add_predicate_location_and_value_direct_for_non_blank_node(location, value)
           end
           [location, value]
+        end
+
+        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+          fetch_blank_node(blank_node) # Ensure the node exists
+          @blank_node_locations[blank_node] ||= {}
+          @blank_node_locations[blank_node][location[0..-2]] ||= []
+          @blank_node_locations[blank_node][location[0..-2]] << { location[-1] => Array.wrap(coerce_object_to_string(value)) }
+        end
+
+        def add_predicate_location_and_value_direct_for_non_blank_node(location, value)
+          data = @rof
+          location[0..-2].each do |slug|
+            data[slug] ||= {}
+            data = data[slug]
+          end
+          slug = location[-1]
+          data[slug] ||= []
+          data[slug] << coerce_object_to_string(value)
         end
 
         private

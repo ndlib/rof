@@ -31,9 +31,9 @@ module ROF
         # @param [ROF::Translators::JsonldToRof::Accumulator] accumulator - a data accumulator that will be changed in place
         # @return [ROF::Translators::JsonldToRof::Accumulator] the given accumulator
         # @raise [ROF::Translators::JsonldToRof::UnhandledPredicateError] when we are unable to handle the given predicate
-        def self.call(predicate, object, accumulator)
+        def self.call(predicate, object, accumulator, blank_node = false)
           handler = registry.handler_for(predicate)
-          handler.handle(object, accumulator)
+          handler.handle(object, accumulator, blank_node)
           accumulator
         end
 
@@ -150,9 +150,9 @@ module ROF
               @handlers = Array.wrap(handlers)
             end
 
-            def handle(object, accumulator)
+            def handle(object, accumulator, blank_node)
               @handlers.each do |handler|
-                handler.call(object, accumulator)
+                handler.call(object, accumulator, blank_node)
               end
               accumulator
             end
@@ -164,10 +164,10 @@ module ROF
               @slug = slug
             end
             attr_reader :slug
-            def call(object, accumulator)
+            def call(object, accumulator, blank_node)
               to = @url_handler.within + Array.wrap(slug)
               to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
-              accumulator.add_predicate_location_and_value(to, object)
+              accumulator.add_predicate_location_and_value(to, object, blank_node)
             end
           end
           private_constant :ImplicitLocationHandler
@@ -181,7 +181,8 @@ module ROF
             end
             attr_reader :slug
 
-            def call(object, accumulator)
+            # @todo Are there differences that need to be handled for the blank_node?
+            def call(object, accumulator, _blank_node)
               @block.call(object, accumulator)
             end
           end
@@ -195,13 +196,13 @@ module ROF
             end
             attr_reader :slug
 
-            def call(object, accumulator)
+            def call(object, accumulator, blank_node)
               to = @options.fetch(:to)
               unless force?
                 to = @url_handler.within + Array.wrap(to)
                 to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
               end
-              accumulator.add_predicate_location_and_value(to, object)
+              accumulator.add_predicate_location_and_value(to, object, blank_node)
             end
 
             def force?

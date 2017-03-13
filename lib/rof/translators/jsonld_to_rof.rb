@@ -38,6 +38,7 @@ module ROF
         handler.map('accessRead', to: ['rights', 'read'])
         handler.map('accessEditGroup', to: ['rights', 'edit-groups'])
         handler.map('accessReadGroup', to: ['rights', 'read-groups'])
+        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'])
         handler.map('afmodel', to: ["af-model"])
         handler.map('bendoitem', to: ["bendo-item"])
         handler.map('depositor') do |object, accumulator|

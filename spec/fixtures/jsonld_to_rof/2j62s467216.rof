@@ -1,0 +1,93 @@
+[
+  {
+    "type": "fobject",
+    "pid": "und:2j62s467216",
+    "af-model": "Etd",
+    "rights": {
+      "read": [
+        "clane"
+      ],
+      "edit": [
+        "curate_batch_user"
+      ],
+      "read-groups": [
+        "public"
+      ],
+      "embargo-date": "2021-12-31",
+      "edit-groups": [
+        "und:q524jm23g92"
+      ]
+    },
+    "metadata": {
+      "@context": {
+        "dc": "http://purl.org/dc/terms/",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+        "ths": "http://id.loc.gov/vocabulary/relators/"
+      },
+      "dc:title#alternate": [
+
+      ],
+      "dc:subject": [
+
+      ],
+      "dc:rights": [
+        "All rights reserved"
+      ],
+      "dc:language": [
+
+      ],
+      "dc:date": [
+        "2015-06-10"
+      ],
+      "dc:title": "The Diversity of Vocations: Choosing a State of Life in Early Modern France",
+      "dc:contributor": [
+        {
+          "dc:contributor": "Brad S. Gregory",
+          "ms:role": "Research Director"
+        },
+        {
+          "dc:contributor": "John Van Engen",
+          "ms:role": "Committee Member"
+        },
+        {
+          "dc:contributor": "Margaret Meserve",
+          "ms:role": "Committee Member"
+        },
+        {
+          "dc:contributor": "Thomas Kselman",
+          "ms:role": "Committee Member"
+        }
+      ],
+      "ms:degree": {
+        "ms:name": [
+          "Doctor of Philosophy"
+        ],
+        "ms:discipline": [
+          "History"
+        ],
+        "ms:level": "Doctoral Dissertation"
+      },
+      "dc:creator": [
+        "Christopher J. Lane"
+      ],
+      "dc:dateSubmitted": "2016-02-18Z",
+      "dc:modified": "2016-02-19Z"
+    },
+    "rels-ext": {
+      "@context": {
+        "hydramata-rel": "http://projecthydra.org/ns/relations#"
+      },
+      "hydramata-rel:hasEditor": [
+        "und:qb98mc9021z"
+      ],
+      "hydramata-rel:hasEditorGroup": [
+        "und:q524jm23g92"
+      ]
+    },
+    "properties-meta": {
+      "mime-type": "text/xml"
+    },
+    "properties": "<fields><depositor>curate_batch_user</depositor><representative>und:47429882s8w</representative></fields>"
+  }
+]

@@ -87,6 +87,12 @@ module ROF
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo.fetch('metadata', {}), ROF::RdfContext)
       fedora_rdf = jsonld_to_rdf(fedora.fetch('metadata', {}), ROF::RdfContext)
+      # bendo_rdf.each_statement do |statement|
+      #   puts statement.to_s
+      # end
+      # fedora_rdf.each_statement do |statement|
+      #   puts statement.to_s
+      # end
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
@@ -99,6 +105,8 @@ module ROF
       all_keys_to_check.each do |key|
         bendo_value = bendo.fetch(key, nil)
         fedora_value = fedora.fetch(key, nil)
+        # Treat an empty hash and an empty array as equal
+        next if bendo_value.empty? && fedora_value.empty?
         next if normalize_value(bendo_value) == normalize_value(fedora_value)
         error_count += 1
         break
