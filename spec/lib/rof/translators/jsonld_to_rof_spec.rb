@@ -12,7 +12,8 @@ module ROF
         [
           'm039k358q5c',
           'zk51vd69n1r',
-          'nk322b9161g'
+          'nk322b9161g',
+          'p8418k7430d'
         ].each do |noid|
           context "with JSON-LD from NOID=#{noid} CurateND work that was ingested via the batch ingester" do
             it 'will return ROF that is a subset of the ROF used by the batch ingestor' do
@@ -21,12 +22,13 @@ module ROF
               rof_generated_via_batch = JSON.load(rof)
               expected_output = Array.wrap(rof_generated_via_batch)
               actual_output = described_class.call(jsonld_from_curatend, {})
-              # Quick check that top level keys are the same
-              expect(actual_output.first.keys.sort).to eq(expected_output.first.keys.sort)
-              actual_output.first.keys.each do |key|
-                actual_metadata = normalize(actual_output.first.fetch(key))
-                expected_metadata = normalize(expected_output.first.fetch(key))
-                expect(actual_metadata).to eq(expected_metadata)
+              keys = (actual_output.first.keys + expected_output.first.keys).uniq
+              keys.each do |key|
+                actual_metadata = normalize(actual_output.first.fetch(key, {}))
+                expected_metadata = normalize(expected_output.first.fetch(key, {}))
+                # We may have {} for one, and [] for another. In this case, both are empty, so we'll skip.
+                next if actual_metadata.empty? && expected_metadata.empty?
+                expect(actual_metadata).to eq(expected_metadata), "Mismatch on #{key}.\n\tJSON-LD: #{actual_metadata.inspect}\n\tROF: #{expected_metadata.inspect}"
               end
               comparer = ROF::CompareRof.new(actual_output, expected_output, skip_rels_ext_context: true)
               expect(comparer.compare_rights).to eq(0)
@@ -37,6 +39,7 @@ module ROF
           end
         end
 
+        # @todo For any key with an empty array, delete that key
         # Responsible for normalizing a Hash or non-Hash
         def normalize(input)
           if input.is_a?(Hash)

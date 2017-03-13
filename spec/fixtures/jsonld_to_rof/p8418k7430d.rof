@@ -1,0 +1,67 @@
+[
+  {
+    "type": "fobject",
+    "af-model": "Patent",
+    "pid": "und:p8418k7430d",
+    "rights": {
+      "read-groups": [
+        "public"
+      ],
+      "edit": [
+        "rtillman"
+      ]
+    },
+    "properties": "<fields>\n<depositor>batch_ingest</depositor>\n<owner>rtillman</owner>\n<representative>und:pc289g57c13</representative>\n</fields>\n",
+    "properties-meta": {
+      "mime-type": "text/xml"
+    },
+    "collections": null,
+    "metadata": {
+      "dc:identifier#patent": "US 8655033 B2",
+      "dc:creator#administrative_unit": "University of Notre Dame::College of Engineering::Electrical Engineering",
+      "dc:source": "http://patft.uspto.gov/netacgi/nph-Parser?Sect2=PTO1&Sect2=HITOFF&p=1&u=/netahtml/PTO/search-bool.html&r=1&f=G&l=50&d=PALL&RefSrch=yes&Query=PN/8655033",
+      "dc:issued": "2014-02-18",
+      "dc:title": "Iterative Reconstruction",
+      "dc:description": "An improved iterative reconstruction method to reconstruct a first image includes generating an imaging beam, receiving said imaging beam on a detector array, generating projection data based on said imaging beams received by said detector array, providing said projection data to an image reconstructor, enlarging one of a plurality of voxels and a plurality of detectors of the provided projection data, reconstructing portions of the first image with the plurality of enlarged voxels or detectors, and iteratively reconstructing the portions of the first image to create a reconstructed image.",
+      "dc:creator": [
+        "Kai Zeng",
+        "Charles Addison Bouman Jr.",
+        "Bruno Kristiaan Bernard De Man",
+        "Jiang Hsieh",
+        "Ken David Sauer",
+        "Jean-Baptiste Daniel Marie Thibault",
+        "Zhou Yu"
+      ],
+      "dc:rightsHolder": [
+        "University of Notre Dame Du Lac",
+        "General Electric Company (Schenectady, NY)",
+        "Purdue Research Foundation (West Lafayette, IN)"
+      ],
+      "dc:identifier#other_application": "12/607,309",
+      "dc:date#application": "2009-10-28",
+      "dc:date#prior_publication": "2011-04-28",
+      "dc:identifier#prior_publication": "US 20110097007 A1",
+      "dc:extent#claims": "32",
+      "dc:subject#uspc": "382/128; 382/131;",
+      "dc:subject#cpc": "G06T 11/006 (20130101); G06T 2211/424 (20130101)",
+      "dc:subject#ipc": "G06K 9/00",
+      "dc:creator#local": "Ken David Sauer",
+      "dc:publisher": "United States Patent and Trademark Office",
+      "dc:language": "eng",
+      "dc:rights": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "@context": {
+        "dc": "http://purl.org/dc/terms/",
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "dc:dateSubmitted": {
+          "@type": "http://www.w3.org/2001/XMLSchema#date"
+        },
+        "dc:modified": {
+          "@type": "http://www.w3.org/2001/XMLSchema#date"
+        }
+      },
+      "dc:dateSubmitted": "2016-06-07Z",
+      "dc:modified": "2016-06-07Z"
+    }
+  }
+]
