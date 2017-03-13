@@ -1,0 +1,89 @@
+[
+{
+  "pid": "und:js956d59913",
+  "type": "fobject",
+  "af-model": "Dataset",
+  "rels-ext": {
+    "@context": {
+      "@vocab": "info:fedora/fedora-system:def/relations-external#",
+      "fedora-model": "info:fedora/fedora-system:def/model#",
+      "hydra": "http://projecthydra.org/ns/relations#",
+      "hasModel": {
+        "@id": "fedora-model:hasModel",
+        "@type": "@id"
+      },
+      "hasEditor": {
+        "@id": "hydra:hasEditor",
+        "@type": "@id"
+      },
+      "hasEditorGroup": {
+        "@id": "hydra:hasEditorGroup",
+        "@type": "@id"
+      },
+      "isPartOf": {
+        "@type": "@id"
+      },
+      "isMemberOfCollection": {
+        "@type": "@id"
+      },
+      "isEditorOf": {
+        "@id": "hydra:isEditorOf",
+        "@type": "@id"
+      },
+      "hasMember": {
+        "@type": "@id"
+      },
+      "previousVersion": "http://purl.org/pav/previousVersion"
+    },
+    "@id": "und:js956d59913",
+    "isMemberOfCollection": "und:2v23vt16z2z"
+  },
+  "properties-meta": {
+    "mime-type": "text/xml"
+  },
+  "properties": "<fields>\n<depositor>avyushko</depositor>\n<owner>avyushko</owner>\n<representative>und:8s45q813p1v</representative>\n</fields>",
+  "rights": {
+    "read-groups": [
+      "public"
+    ],
+    "edit": [
+      "avyushko"
+    ]
+  },
+  "metadata": {
+    "@context": {
+      "bibo": "http://purl.org/ontology/bibo/",
+      "dc": "http://purl.org/dc/terms/",
+      "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+      "foaf": "http://xmlns.com/foaf/0.1/",
+      "mrel": "http://id.loc.gov/vocabulary/relators/",
+      "nd": "https://library.nd.edu/ns/terms/",
+      "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+      "vracore": "http://purl.org/vra/",
+      "dc:dateSubmitted": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:created": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:modified": {
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      }
+    },
+    "@id": "info:fedora/und:js956d59913",
+    "dc:abstract": "Umbrella is a tool for specifying and materializing comprehensive execution environments, from the hardware all the way up to software and data. A user simply invokes Umbrella with the desired task, and Umbrella parses the specification, determines the minimum mechanism necessary to run the task, downloads missing dependencies, and executes the application through the available minimal mechanism, which may be direct execution, a system container (Parrot, Docker, chroot), a local virtual machine (i.e., VMware), or submission to a cloud environment (i.e., Amazon EC2) or grid environment (i.e., HTCondor).\n\nThis is a specification developed specifically to run with Bertini Software version 1.5, which is also available from CurateND.",
+    "dc:created": "2016-03-22",
+    "dc:creator": "Alexander Vyushkov",
+    "dc:creator#administrative_unit": [
+      "University of Notre Dame::College of Science::Applied and Computational Mathematics and Statistics",
+      "University of Notre Dame::College of Engineering::Computer Science and Engineering"
+    ],
+    "dc:dateSubmitted": "2016-03-22Z",
+    "dc:modified": "2016-11-16Z",
+    "dc:publisher": "Alexander Vyushkov",
+    "dc:rights": "All rights reserved",
+    "dc:subject": "Software Containerization",
+    "dc:title": "Bertini Software v.1.5 Umbrella Specification"
+  },
+  "bendo-item": "8p58pc30d86"
+}]
