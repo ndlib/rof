@@ -94,7 +94,8 @@ module ROF
         # @param [String] value - a translated value for the original RDF Statement
         # @return [Array] location, value
         def add_predicate_location_and_value(location, value)
-          location = Array.wrap(location)
+          # Because I am making transformation on the location via #shift method, I need a duplication.
+          location = Array.wrap(location.deep_dup)
           if location == ['pid']
             return add_pid(value)
           end
