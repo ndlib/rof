@@ -17,6 +17,10 @@ module ROF
     # @see ROF::Translators::JsonldToRof::PredicateHandler
     # @see ROF::Translators::JsonldToRof::StatementHandler
     module JsonldToRof
+      PredicateHandler.register('http://purl.org/ontology/bibo/') do |handler|
+        handler.namespace_prefix('bibo:')
+        handler.within(['metadata'])
+      end
       PredicateHandler.register('info:fedora/fedora-system:def/relations-external') do |handler|
         handler.map('#isMemberOfCollection', to: ['rels-ext', 'isMemberOfCollection'])
       end
