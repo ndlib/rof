@@ -20,6 +20,15 @@ module ROF
       PredicateHandler.register('info:fedora/fedora-system:def/relations-external') do |handler|
         handler.map('#isMemberOfCollection', to: ['rels-ext', 'isMemberOfCollection'])
       end
+      PredicateHandler.register('http://id.loc.gov/vocabulary/relators/') do |handler|
+        handler.namespace_prefix('mrel:')
+        handler.within(['metadata'])
+      end
+      PredicateHandler.register('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#') do |handler|
+        handler.namespace_prefix('ebucore:')
+        handler.within(['metadata'])
+      end
+
       PredicateHandler.register('https://library.nd.edu/ns/terms/') do |handler|
         handler.map('accessEdit', to: ['rights', 'edit'])
         handler.map('accessRead', to: ['rights', 'read'])

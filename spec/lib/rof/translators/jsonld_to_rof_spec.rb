@@ -10,6 +10,7 @@ module ROF
     RSpec.describe JsonldToRof do
       describe '.call' do
         [
+          'cr56n01253w',
           'm039k358q5c',
           'zk51vd69n1r',
           'nk322b9161g',
@@ -17,9 +18,9 @@ module ROF
         ].each do |noid|
           context "with JSON-LD from NOID=#{noid} CurateND work that was ingested via the batch ingester" do
             it 'will return ROF that is a subset of the ROF used by the batch ingestor' do
-              rof = File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/#{noid}.rof"))
+              rof_generated_via_batch = normalize_rof(noid)
+
               jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/#{noid}.jsonld")))
-              rof_generated_via_batch = JSON.load(rof)
               expected_output = Array.wrap(rof_generated_via_batch)
               actual_output = described_class.call(jsonld_from_curatend, {})
               keys = (actual_output.first.keys + expected_output.first.keys).uniq
@@ -38,6 +39,22 @@ module ROF
             end
           end
         end
+
+        def normalize_rof(noid)
+          path_to_rof = File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld_to_rof/#{noid}.rof"))
+
+          # Normalizing some of the @context entries to reflect JSON-LD entries
+          if path_to_rof.include?('"ths": "http://id.loc.gov/vocabulary/relators/"')
+            path_to_rof.gsub!('"ths": "http://id.loc.gov/vocabulary/relators/"', '"mrel": "http://id.loc.gov/vocabulary/relators/"')
+            path_to_rof.gsub!('"ths:', '"mrel:')
+          end
+          rof = JSON.load(path_to_rof)
+          # Removing @id as they are superflous
+          rof[0]['metadata'].delete('@id') if rof[0].key?('metadata')
+          rof[0]['rels-ext'].delete('@id') if rof[0].key?('rels-ext')
+          rof
+        end
+
 
         # @todo For any key with an empty array, delete that key
         # Responsible for normalizing a Hash or non-Hash
