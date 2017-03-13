@@ -1,0 +1,98 @@
+[
+  {
+    "pid": "und:h989r21069m",
+    "type": "fobject",
+    "af-model": "Video",
+    "rels-ext": {
+      "@context": {
+        "@vocab": "info:fedora/fedora-system:def/relations-external#",
+        "fedora-model": "info:fedora/fedora-system:def/model#",
+        "hydra": "http://projecthydra.org/ns/relations#",
+        "hasModel": {
+          "@id": "fedora-model:hasModel",
+          "@type": "@id"
+        },
+        "hasEditor": {
+          "@id": "hydra:hasEditor",
+          "@type": "@id"
+        },
+        "hasEditorGroup": {
+          "@id": "hydra:hasEditorGroup",
+          "@type": "@id"
+        },
+        "isPartOf": {
+          "@type": "@id"
+        },
+        "isMemberOfCollection": {
+          "@type": "@id"
+        },
+        "isEditorOf": {
+          "@id": "hydra:isEditorOf",
+          "@type": "@id"
+        },
+        "hasMember": {
+          "@type": "@id"
+        },
+        "previousVersion": "http://purl.org/pav/previousVersion"
+      },
+      "@id": "und:h989r21069m",
+      "isMemberOfCollection": "und:bz60cv45x5d"
+    },
+    "bendo-item": "c534fn12g79",
+    "rights": {
+      "read-groups": [
+        "public"
+      ],
+      "edit": [
+        "rtillman,vpattiso"
+      ]
+    },
+    "properties-meta": {
+      "mime-type": "text/xml"
+    },
+    "properties": "<fields><depositor>batch_ingest</depositor>\n<owner>rtillman,vpattiso</owner>\n<representative>und:hd76rx93h0x</representative>\n</fields>\n",
+    "metadata": {
+      "@context": {
+        "bibo": "http://purl.org/ontology/bibo/",
+        "dc": "http://purl.org/dc/terms/",
+        "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+        "foaf": "http://xmlns.com/foaf/0.1/",
+        "hydramata-rel": "http://projecthydra.org/ns/relations#",
+        "mrel": "http://id.loc.gov/vocabulary/relators/",
+        "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+        "nd": "https://library.nd.edu/ns/terms/",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "ths": "http://id.loc.gov/vocabulary/relators/",
+        "vracore": "http://purl.org/vra/",
+        "dc:dateSubmitted": {
+          "@type": "http://www.w3.org/2001/XMLSchema#date"
+        },
+        "dc:created": {
+          "@type": "http://www.w3.org/2001/XMLSchema#date"
+        },
+        "dc:modified": {
+          "@type": "http://www.w3.org/2001/XMLSchema#date"
+        }
+      },
+      "@id": "info:fedora/und:h989r21069m",
+      "dc:created": "2011-06-04",
+      "dc:creator#administrative_unit": "University of Notre Dame::Centers and Institutes::Institute for Latino Studies",
+      "dc:dateSubmitted": "2017-02-22Z",
+      "dc:description": "Conversation with Gilberto Cardenas and Tomás Ybarra-Frausto.",
+      "dc:issued": "2011-06-04",
+      "dc:language": "English",
+      "dc:modified": "2017-02-22Z",
+      "dc:relation": "https://youtu.be/_V1lHMMWXR0",
+      "dc:rights": "All rights reserved",
+      "dc:subject": [
+        "Arts & Arts Related",
+        "Visual Artists"
+      ],
+      "dc:title": "Conversation with Gilberto Cardenas and Tomás Ybarra-Frausto",
+      "ebucore:duration": "0:41:33",
+      "ebucore:hasGenre": "Oral histories",
+      "ths:ive": "Gilberto Cardenas",
+      "ths:ivr": "Thomás Ybarra-Frausto"
+    }
+  }
+]

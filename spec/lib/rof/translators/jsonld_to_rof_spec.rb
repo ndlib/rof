@@ -10,6 +10,7 @@ module ROF
     RSpec.describe JsonldToRof do
       describe '.call' do
         [
+          'h989r21069m',
           'cr56n01253w',
           'm039k358q5c',
           'zk51vd69n1r',
