@@ -1,0 +1,96 @@
+[
+  {
+    "type": "fobject",
+    "pid": "und:0g354f18610",
+    "af-model": "Etd",
+    "rights": {
+      "read": [
+        "jlee20"
+      ],
+      "edit": [
+        "curate_batch_user"
+      ],
+      "read-groups": [
+        "public"
+      ],
+      "embargo-date": "2016-02-28",
+      "edit-groups": [
+        "und:q524jm23g92"
+      ]
+    },
+    "metadata": {
+      "@context": {
+        "dc": "http://purl.org/dc/terms/",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+        "ths": "http://id.loc.gov/vocabulary/relators/"
+      },
+      "dc:title#alternate": [
+
+      ],
+      "dc:subject": [
+
+      ],
+      "dc:description#abstract": [
+        "<p>The goal of this dissertation is to bring together in conversation Aquinas's thoughts on anger and the <i>han</i> (恨)-full anger as a culture-bound syndrome in South Korean people and society, and to make a constructive proposal for working with the anger of the <i>han</i>-filled. Aquinas' ontological cognitivist theory of passion and anger in particular provides a useful hermeneutical tool to analyze and articulate the inner structure of <i>han</i>-full anger and its moral character. The study of <i>han</i>-full anger offers Aquinas’s normative language of anger a chance to encounter the etymological and phenomenological reality of embodied anger and further the life of its bearer living in a marginalized life. Finally, Aquinas’s virtue ethics, taken together with <i>han</i> studies, suggests a modified way to work with the <i>han</i>-full anger. </p>"
+      ],
+      "dc:rights": [
+        "All rights reserved"
+      ],
+      "dc:language": [
+
+      ],
+      "dc:date": [
+        "2015-06-29"
+      ],
+      "dc:title": "Anger in Thomas Aquinas and <i>Han</i>-full Anger",
+      "dc:contributor": [
+        {
+          "dc:contributor": "Maura Ryan",
+          "ms:role": "Research Director"
+        },
+        {
+          "dc:contributor": "Jean Porter",
+          "ms:role": "Committee Member"
+        },
+        {
+          "dc:contributor": "David Clairmont",
+          "ms:role": "Committee Member"
+        },
+        {
+          "dc:contributor": "Andrew S. Park",
+          "ms:role": "Committee Member"
+        }
+      ],
+      "ms:degree": {
+        "ms:name": [
+          "Doctor of Philosophy"
+        ],
+        "ms:discipline": [
+          "Philosophy"
+        ],
+        "ms:level": "Doctoral Dissertation"
+      },
+      "dc:creator": [
+        "Joungeun Lee"
+      ],
+      "dc:dateSubmitted": "2016-02-18Z",
+      "dc:modified": "2016-02-19Z"
+    },
+    "rels-ext": {
+      "@context": {
+        "hydramata-rel": "http://projecthydra.org/ns/relations#"
+      },
+      "hydramata-rel:hasEditor": [
+        "und:qb98mc9021z"
+      ],
+      "hydramata-rel:hasEditorGroup": [
+        "und:q524jm23g92"
+      ]
+    },
+    "properties-meta": {
+      "mime-type": "text/xml"
+    },
+    "properties": "<fields><depositor>curate_batch_user</depositor><representative>und:rv042r3997b</representative></fields>"
+  }
+]

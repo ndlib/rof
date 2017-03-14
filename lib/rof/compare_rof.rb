@@ -87,12 +87,6 @@ module ROF
       error_count = 0
       bendo_rdf = jsonld_to_rdf(bendo.fetch('metadata', {}), ROF::RdfContext)
       fedora_rdf = jsonld_to_rdf(fedora.fetch('metadata', {}), ROF::RdfContext)
-      # bendo_rdf.each_statement do |statement|
-      #   puts statement.to_s
-      # end
-      # fedora_rdf.each_statement do |statement|
-      #   puts statement.to_s
-      # end
       error_count +=1 if ! bendo_rdf.isomorphic_with? fedora_rdf
       error_count
     end
