@@ -125,7 +125,12 @@ module ROF
     end
 
     # compare two rofs
-    def self.compare_files(file1, file2, outfile = STDOUT, _fedora, _bendo)
+    # @param [String] file1 - path to "left" file in the comparison
+    # @param [String] file2 - path to "right" file in the comparison
+    # @param [#write] outfile - where to write any errors (default STDOUT)
+    # @return [Integer] number of comparisons that failed. If 0, then the two given files are logically equal
+    # @todo Should the outfile default to STDERR
+    def self.compare_files(file1, file2, outfile = STDOUT)
       fedora_rof = ROF::Utility.load_items_from_json_file(file1, outfile)
       bendo_rof =  ROF::Utility.load_items_from_json_file(file2, outfile)
 

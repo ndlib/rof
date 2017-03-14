@@ -47,7 +47,7 @@ fedora_info = nil if fedora_info.empty?
 
 case ARGV[0]
 when "compare"
-  error_count = ROF::CLI.compare_files(ARGV[1], ARGV[2], STDOUT, fedora_info, bendo_info)
+  error_count = ROF::CLI.compare_files(ARGV[1], ARGV[2], STDOUT)
   exit 1 if error_count > 0
 when "ingest", "validate"
   error_count = ROF::CLI.ingest_file(ARGV[1], search_path, STDOUT, fedora_info, bendo_info)
