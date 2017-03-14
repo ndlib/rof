@@ -20,6 +20,10 @@ module ROF
   # Otherwise fedora is a Rubydora::Reporitory object (for now...)
   # Returns a list of ingested datastreams, if everything is okay.
   # Otherwise raises an exception depending on the error.
+  # @param [Hash] item - has string based keys
+  # @param [#find_or_initialize, nil] fedora - when nil then we verify that item is in the proper format; otherwise we update
+  # @param [Array] search_paths
+  # @param [nil, String] bendo - when nil, no attempts to substitute the bendo URL
   def self.Ingest(item, fedora=nil, search_paths=[], bendo=nil)
     raise NotFobjectError if item["type"] != "fobject"
     raise TooManyIdentitiesError if item.key?("id") && item.key?("pid")
