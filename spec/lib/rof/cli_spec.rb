@@ -52,6 +52,18 @@ describe ROF::CLI do
     end
   end
 
+  describe '.jsonld_to_rof' do
+    let(:outfile) { double(write: true) }
+    let(:jsonld) { double('JSON-LD') }
+    let(:rof_data) { [{ "rof" => "true" }] }
+    let(:config) { {} }
+    it 'calls the translator then writes the output as JSON' do
+      expect(ROF::Translators::CsvToRof).to receive(:call).with(jsonld, config).and_return(rof_data)
+      described_class.csv_to_rof(jsonld, config, outfile)
+      expect(outfile).to have_received(:write).with(JSON.pretty_generate(rof_data))
+    end
+  end
+
   describe '.with_outfile_handling' do
     let(:writer) { double(close: true) }
     context 'when given a string' do

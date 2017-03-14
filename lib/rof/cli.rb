@@ -103,8 +103,22 @@ module ROF
     # @param [Hash] config
     # @param [NilClass, String, #write] outfile - where should we write things
     # @see .with_outfile_handling for details on outfile
+    # @see ROF::Translators::CsvToRof.call
     def self.csv_to_rof(csv, config = {}, outfile = STDOUT)
       result = ROF::Translators::CsvToRof.call(csv, config)
+      with_outfile_handling(outfile) do |writer|
+        writer.write(JSON.pretty_generate(result))
+      end
+    end
+
+    # Convert the given JSON-LD to ROF JSON document
+    # @param [String] The contents of a CSV file
+    # @param [Hash] config
+    # @param [NilClass, String, #write] outfile - where should we write things
+    # @see .with_outfile_handling for details on outfile
+    # @see ROF::Translators::JsonldToRof.call
+    def self.jsonld_to_rof(jsonld, config = {}, outfile = STDOUT)
+      result = ROF::Translators::JsonldToRof.call(jsonld, config)
       with_outfile_handling(outfile) do |writer|
         writer.write(JSON.pretty_generate(result))
       end
