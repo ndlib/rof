@@ -1,6 +1,6 @@
 module ROF
   # provide translation between access strings and the ROF access hash
-  # e.g. ("public", owner=dbrower) --> {read-groups: "public", edit: "dbrower"}
+  # e.g. ("public", owner=dbrower) --> Hash.new(read-groups: "public", edit: "dbrower")
   class Access
     class DecodeError < RuntimeError
     end
