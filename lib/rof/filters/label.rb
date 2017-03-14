@@ -22,7 +22,7 @@ module ROF
       # Use :id_list to pass in a ruby object responding to #shift and #empty? to generate
       # ids. This is usually a list, to facilitate testing.
       #
-      # If prefix is not nil, then "#{prefix}:" is prepended to
+      # If prefix is not nil, then "<prefix>:" is prepended to
       # every identifier.
       def initialize(options = {})
         prefix = options.fetch(:prefix, nil)
