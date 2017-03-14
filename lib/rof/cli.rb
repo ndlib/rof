@@ -99,7 +99,7 @@ module ROF
     end
 
     # Convert the given CSV to ROF JSON document
-    # @param [String] The contents of a CSV file
+    # @param [String] csv - The contents of a CSV file
     # @param [Hash] config
     # @param [NilClass, String, #write] outfile - where should we write things
     # @see .with_outfile_handling for details on outfile
@@ -112,7 +112,7 @@ module ROF
     end
 
     # Convert the given JSON-LD to ROF JSON document
-    # @param [String] The contents of a CSV file
+    # @param [Hash] jsonld - contents of a CSV file
     # @param [Hash] config
     # @param [NilClass, String, #write] outfile - where should we write things
     # @see .with_outfile_handling for details on outfile
