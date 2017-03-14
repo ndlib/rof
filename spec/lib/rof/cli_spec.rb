@@ -58,8 +58,8 @@ describe ROF::CLI do
     let(:rof_data) { [{ "rof" => "true" }] }
     let(:config) { {} }
     it 'calls the translator then writes the output as JSON' do
-      expect(ROF::Translators::CsvToRof).to receive(:call).with(jsonld, config).and_return(rof_data)
-      described_class.csv_to_rof(jsonld, config, outfile)
+      expect(ROF::Translators::JsonldToRof).to receive(:call).with(jsonld, config).and_return(rof_data)
+      described_class.jsonld_to_rof(jsonld, config, outfile)
       expect(outfile).to have_received(:write).with(JSON.pretty_generate(rof_data))
     end
   end
