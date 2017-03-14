@@ -91,12 +91,16 @@ module ROF
           attr_reader :url
 
           # The final key in the location array should be prefixed with the namespace_prefix; By default this is ""
+          # @param [String, nil] prefix - what is the namespace prefix to apply to the last location in the array.
+          # @return [String]
           def namespace_prefix(prefix = nil)
             return @namespace_prefix if prefix.nil?
             @namespace_prefix = prefix
           end
 
           # Prepend the within array to the location array
+          # @param [Array<String>, nil] location - where in the ROF document are we putting the value
+          # @return [Array<String>]
           def within(location = nil)
             return @within if location.nil?
             @within = Array.wrap(location)
@@ -157,6 +161,7 @@ module ROF
               accumulator
             end
           end
+          private_constant :LocationExtractor
 
           class ImplicitLocationHandler
             def initialize(url_handler, slug)
