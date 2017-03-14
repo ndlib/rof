@@ -25,8 +25,8 @@ module ROF
         # @param [ROF::Translators::JsonldToRof::Accumulator] accumulator - a data accumulator that will be changed in place
         # @return [ROF::Translators::JsonldToRof::Accumulator] the given accumulator
         # @raise [ROF::Translators::JsonldToRof::UnknownRdfObjectTypeError] when the RDF::Object's subject is not a valid type
-        def self.call(predicate, object, accumulator)
-          new(predicate, object, accumulator).call
+        def self.call(predicate, object, accumulator, options = {})
+          new(predicate, object, accumulator, options).call
           accumulator
         end
 
@@ -36,8 +36,8 @@ module ROF
         # @param [RDF::Object] object - the RDF object that we will parse and add to the appropriate spot in the accumulator
         # @param [ROF::Translators::JsonldToRof::Accumulator] accumulator - a data accumulator that will be changed in place
         # @return [#call]
-        def self.new(predicate, object, accumulator)
-          klass_for(object).new(predicate, object, accumulator)
+        def self.new(predicate, object, accumulator, options)
+          klass_for(object).new(predicate, object, accumulator, options)
         end
 
         class UnknownRdfObjectTypeError < RuntimeError
@@ -59,61 +59,64 @@ module ROF
 
         # @api private
         class UriPredicateObjectHandler
-          def initialize(predicate, object, accumulator)
+          def initialize(predicate, object, accumulator, options)
             @predicate = predicate
             @object = object
             @accumulator = accumulator
+            @options = options
           end
 
           def call
-            PredicateHandler.call(predicate, object, accumulator)
+            PredicateHandler.call(predicate, object, accumulator, options[:blank_node])
             accumulator
           end
 
           private
-          attr_reader :predicate, :object, :accumulator
+          attr_reader :predicate, :object, :accumulator, :options
         end
         private_constant :UriPredicateObjectHandler
 
         # @api private
         # Blank Nodes; Oh how we love thee. Let me count the ways
         class NodePredicateObjectHandler
-          def initialize(predicate, object, accumulator)
+          def initialize(predicate, object, accumulator, options)
             @predicate = predicate
             @object = object
             @accumulator = accumulator
+            @options = options
           end
 
           def call
             blank_node = accumulator.fetch_blank_node(object)
             blank_node.each_pair do |blank_node_predicate, blank_node_objects|
               blank_node_objects.each do |blank_node_object|
-                PredicateObjectHandler.call(blank_node_predicate, blank_node_object, accumulator)
+                PredicateObjectHandler.call(blank_node_predicate, blank_node_object, accumulator, blank_node: object)
               end
             end
             accumulator
           end
 
           private
-          attr_reader :predicate, :object, :accumulator
+          attr_reader :predicate, :object, :accumulator, :options
         end
         private_constant :NodePredicateObjectHandler
 
         # @api private
         class LiteralPredicateObjectHandler
-          def initialize(predicate, object, accumulator)
+          def initialize(predicate, object, accumulator, options)
             @predicate = predicate
             @object = object
             @accumulator = accumulator
+            @options = options
           end
 
           def call
-            PredicateHandler.call(predicate, object, accumulator)
+            PredicateHandler.call(predicate, object, accumulator, options[:blank_node])
             accumulator
           end
 
           private
-          attr_reader :predicate, :object, :accumulator
+          attr_reader :predicate, :object, :accumulator, :options
         end
         private_constant :LiteralPredicateObjectHandler
       end

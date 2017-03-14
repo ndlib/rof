@@ -31,7 +31,7 @@ module ROF
               statement = RDF::Statement.new(subject: rdf_object, predicate: RDF::URI.new('http://www.ndltd.org/standards/metadata/etdms/1.1/name'), object: RDF::Literal.new('Awesome Sauce'))
               accumulator.add_blank_node(statement)
               subject
-              expect(accumulator.to_rof.fetch('metadata').fetch('ms:degree').fetch('ms:name')).to eq(['Awesome Sauce'])
+              expect(accumulator.to_rof.fetch('metadata').fetch('ms:degree')).to eq([{ "ms:name" => ['Awesome Sauce'] }])
             end
           end
 

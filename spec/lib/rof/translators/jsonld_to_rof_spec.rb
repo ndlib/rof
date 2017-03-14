@@ -10,8 +10,10 @@ module ROF
     RSpec.describe JsonldToRof do
       describe '.call' do
         [
+          '2j62s467216',
           'js956d59913',
           'xg94hm53h0c',
+          '0g354f18610',
           '2v23vt16z2z',
           'h989r21069m',
           'cr56n01253w',
@@ -28,14 +30,19 @@ module ROF
               expected_output = Array.wrap(rof_generated_via_batch)
               actual_output = described_class.call(jsonld_from_curatend, {})
               keys = (actual_output.first.keys + expected_output.first.keys).uniq
+              expected_rof = {}
+              actual_rof = {}
               keys.each do |key|
                 actual_metadata = normalize(actual_output.first.fetch(key, {}))
+                actual_rof[key] = actual_metadata
+
                 expected_metadata = normalize(expected_output.first.fetch(key, {}))
+                expected_rof[key] = expected_metadata
                 # We may have {} for one, and [] for another. In this case, both are empty, so we'll skip.
                 next if actual_metadata.empty? && expected_metadata.empty?
                 expect(actual_metadata).to eq(expected_metadata), "Mismatch on #{key}.\n\tJSON-LD: #{actual_metadata.inspect}\n\tROF: #{expected_metadata.inspect}"
               end
-              comparer = ROF::CompareRof.new(actual_output, expected_output, skip_rels_ext_context: true)
+              comparer = ROF::CompareRof.new(actual_rof, expected_rof, skip_rels_ext_context: true)
               expect(comparer.compare_rights).to eq(0)
               expect(comparer.compare_rels_ext).to eq(0)
               expect(comparer.compare_metadata).to eq(0)
@@ -75,7 +82,7 @@ module ROF
                   value.keys.sort.each do |sorted_key|
                     hash[sorted_key] ||= []
                     Array.wrap(value[sorted_key]).sort.each do |sorted_value|
-                      hash[sorted_key] << normalize_string(sorted_value)
+                      hash[sorted_key] << normalize_string(sorted_value.dup)
                     end
                   end
                   value = hash
@@ -84,7 +91,16 @@ module ROF
                 end
                 returning_hash[key] << value
               end
-              returning_hash[key] = returning_hash[key].sort if returning_hash[key].respond_to?(:sort)
+              begin
+                returning_hash[key] = returning_hash[key].sort if returning_hash[key].respond_to?(:sort)
+              rescue ArgumentError
+                returning_hash[key]
+              end
+              # next unless returning_hash[key].present?
+              if returning_hash[key]
+                returning_hash[key] = returning_hash[key].reject(&:empty?)
+                returning_hash.delete(key) if returning_hash[key].empty?
+              end
             end
             returning_hash
           else

@@ -99,6 +99,8 @@ module ROF
       all_keys_to_check.each do |key|
         bendo_value = bendo.fetch(key, nil)
         fedora_value = fedora.fetch(key, nil)
+        # Treat an empty hash and an empty array as equal
+        next if bendo_value.empty? && fedora_value.empty?
         next if normalize_value(bendo_value) == normalize_value(fedora_value)
         error_count += 1
         break
