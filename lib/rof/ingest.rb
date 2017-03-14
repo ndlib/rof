@@ -21,9 +21,10 @@ module ROF
   # Returns a list of ingested datastreams, if everything is okay.
   # Otherwise raises an exception depending on the error.
   # @param [Hash] item - has string based keys
-  # @param [#find_or_initialize, nil] fedora - when nil then we verify that item is in the proper format; otherwise we update
+  # @param [#find_or_initialize, nil] fedora - when nil then we verify that item is in the proper format; otherwise we ingest or update
   # @param [Array] search_paths
   # @param [nil, String] bendo - when nil, no attempts to substitute the bendo URL
+  # @return [Array<String>] List of ingested data streams; Implies everything ingested ok.
   def self.Ingest(item, fedora=nil, search_paths=[], bendo=nil)
     raise NotFobjectError if item["type"] != "fobject"
     raise TooManyIdentitiesError if item.key?("id") && item.key?("pid")
