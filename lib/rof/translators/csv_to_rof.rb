@@ -77,6 +77,9 @@ module ROF::Translators
         end
         raise MissingOwnerOrType if result['type'].nil? || result['owner'].nil?
         result['rights'] = ROF::Access.decode(result.fetch('access', 'private'), result['owner'])
+        # We need to map access with pid to rels-ext predicates
+        result['rels-ext'] ||= {}
+        result = collect_rels_ext_from_access(result)
         result.delete('access')
         result = collect_metadata(result)
         # is this a generic file which should be attached to the previous work?
@@ -108,6 +111,42 @@ module ROF::Translators
       metadata['@context'] = ROF::RdfContext
       rof['metadata'] = metadata
       rof
+    end
+
+    def self.collect_rels_ext_from_access(rof)
+      # pull any access fields of the form XXX:YYY into
+      # a rels-ext section
+      access_string =  rof.fetch('access', 'private').split(";")
+      access_string.reject{|access_clause| !access_clause.include?"="}
+      access_string.each do |access|
+        convert_to_relsext(access, rof)
+      end
+      return rof
+    end
+
+    def self.convert_to_relsext(access, rof)
+      access_arr = access.split("=")
+      access_arr.last.split("|").each do |access_user|
+        if access_user =~ /([^:]+):.+/
+          case access_arr.first
+            when "read"
+              rof['rels-ext']['hydramata-rel:hasViewer'] ||=[]
+              rof['rels-ext']['hydramata-rel:hasViewer'] << access_user
+            when "readgroup"
+              rof['rels-ext']['hydramata-rel:hasViewerGroup'] ||= []
+              rof['rels-ext']['hydramata-rel:hasViewerGroup'] << access_user
+            when "edit"
+              rof['rels-ext']['hydramata-rel:hasEditor'] ||= []
+              rof['rels-ext']['hydramata-rel:hasEditor'] << access_user
+            when "editgroup"
+              rof['rels-ext']['hydramata-rel:hasEditorGroup'] ||= []
+              rof['rels-ext']['hydramata-rel:hasEditorGroup'] << access_user
+            else
+              raise DecodeError
+          end
+        end
+      end
+      return rof
     end
   end
 end
