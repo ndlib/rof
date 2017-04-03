@@ -16,6 +16,9 @@ module ROF
       class OutOfIdentifiers < RuntimeError
       end
 
+      class AccessMappingNotFound < RuntimeError
+      end
+
       # @param options [Hash]
       # @option options [String, nil] :prefix - if truthy, prepend "<prefix>:" to each identifier
       # @option options [Array, nil] :id_list - circumvent using the :noids configuration and instead use these for next_ids

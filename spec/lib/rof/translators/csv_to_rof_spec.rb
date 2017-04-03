@@ -28,21 +28,6 @@ module ROF::Translators
       expect(rof).to eq([{"type" => "Work", "owner" => "user1", "rights" => {"edit" => ["user1", "user2", "user3"]}}])
     end
 
-    it " convert access field to relations if supplied with pid rights" do
-      s = %q{type,owner,access
-      Work,user1,"private;edit=user2,und:pid;editgroup=und:group_pid"
-      }
-      rof = CsvToRof.call(s)
-      expect(rof).to eq([{
-        "type" => "Work",
-        "owner" => "user1",
-        "rels-ext" => {
-          "hydramata-rel:hasEditor"=> ["und:pid"],
-          "hydramata-rel:hasEditorGroup"=> ["und:group_pid"]},
-        "rights" => {"edit"=>["user1", "user2", "und:pid"], "edit-groups"=>["und:group_pid"]}
-      }])
-    end
-
     it "puts metadata into substructure" do
       s = %q{type,owner,dc:title,foaf:name
       Work,user1,"Q, A Letter",Jane Smith|Zander
