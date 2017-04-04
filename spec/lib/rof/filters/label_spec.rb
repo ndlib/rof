@@ -16,7 +16,7 @@ module ROF
           noid_server = double
           pool_name = double
           expect(described_class::NoidsPool).to receive(:new).with(noid_server, pool_name)
-          expect { Label.new(noid_server: noid_server, pool_name: pool_name) }.not_to raise_error
+          expect { Label.new(noids: { noid_server: noid_server, pool_name: pool_name }) }.not_to raise_error
         end
         it 'will fail if not given a list of IDs nor a noid_server' do
           expect { Label.new }.to raise_error(described_class::NoPool)
