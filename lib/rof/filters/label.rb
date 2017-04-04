@@ -16,21 +16,18 @@ module ROF
       class OutOfIdentifiers < RuntimeError
       end
 
-      # Create a new label assigner and resolver. The source of identifiers
-      # is given using options.
-      # Use :noid_server and :pool_name to connect to an external noid server.
-      # Use :id_list to pass in a ruby object responding to #shift and #empty? to generate
-      # ids. This is usually a list, to facilitate testing.
-      #
-      # If prefix is not nil, then "<prefix>:" is prepended to
-      # every identifier.
+      # @param options [Hash]
+      # @option options [String, nil] :prefix - if truthy, prepend "<prefix>:" to each identifier
+      # @option options [Array, nil] :id_list - circumvent using the :noids configuration and instead use these for next_ids
+      # @option options [Hash] :noids - A Hash with keys :noid_server and :pool_name; Responsible for minting next_ids
+      # @raise NoPool if we don't have a means of determining the next_id
       def initialize(options = {})
         prefix = options.fetch(:prefix, nil)
         @id_list =  case
                     when options[:id_list]
                       options[:id_list]
-                    when options[:noid_server]
-                      NoidsPool.new(options[:noid_server], options.fetch(:pool_name))
+                    when options[:noids]
+                      NoidsPool.new(options[:noids].fetch(:noid_server), options[:noids].fetch(:pool_name))
                     else
                       raise NoPool
                     end
