@@ -35,8 +35,8 @@ RSpec.describe ROF::Filters::AccessToRelsext do
             "edit-groups" => ["und:editgrouppid"]
             },
            "rels-ext" => {
-              "hydramata-rel:hasEditor" => ["und:pid"],
-              "hydramata-rel:hasEditorGroup"=> ["und:editgrouppid"]
+              "hasEditor" => ["und:pid"],
+              "hasEditorGroup"=> ["und:editgrouppid"]
            }
           }
         ]

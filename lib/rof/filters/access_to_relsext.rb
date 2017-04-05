@@ -24,17 +24,17 @@ module ROF
             rof['rels-ext'] ||= {}
             case access_type
               when "read"
-                rof['rels-ext']['hydramata-rel:hasViewer'] ||=[]
-                rof['rels-ext']['hydramata-rel:hasViewer'] << access_user
+                rof['rels-ext']['hasViewer'] ||=[]
+                rof['rels-ext']['hasViewer'] << access_user
               when "read-groups"
-                rof['rels-ext']['hydramata-rel:hasViewerGroup'] ||= []
-                rof['rels-ext']['hydramata-rel:hasViewerGroup'] << access_user
+                rof['rels-ext']['hasViewerGroup'] ||= []
+                rof['rels-ext']['hasViewerGroup'] << access_user
               when "edit"
-                rof['rels-ext']['hydramata-rel:hasEditor'] ||= []
-                rof['rels-ext']['hydramata-rel:hasEditor'] << access_user
+                rof['rels-ext']['hasEditor'] ||= []
+                rof['rels-ext']['hasEditor'] << access_user
               when "edit-groups"
-                rof['rels-ext']['hydramata-rel:hasEditorGroup'] ||= []
-                rof['rels-ext']['hydramata-rel:hasEditorGroup'] << access_user
+                rof['rels-ext']['hasEditorGroup'] ||= []
+                rof['rels-ext']['hasEditorGroup'] << access_user
               else
                 raise AccessMappingNotFound
             end

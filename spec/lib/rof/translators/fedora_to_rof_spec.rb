@@ -35,7 +35,7 @@ RSpec.describe ROF::Translators::FedoraToRof do
              "dc"=>"http://purl.org/dc/terms/",
              "ebucore"=>"http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
              "foaf"=>"http://xmlns.com/foaf/0.1/",
-             'hydramata-rel' => 'http://projecthydra.org/ns/relations#',
+             'hydra' => 'http://projecthydra.org/ns/relations#',
              "mrel"=>"http://id.loc.gov/vocabulary/relators/",
              "ms" => 'http://www.ndltd.org/standards/metadata/etdms/1.1/',
              "nd"=>"https://library.nd.edu/ns/terms/",
