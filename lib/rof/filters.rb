@@ -17,6 +17,7 @@ module ROF
       "file-to-url" => ROF::Filters::FileToUrl,
       "label" => ROF::Filters::Label,
       "work" => ROF::Filters::Work,
+      "access-to-relsext" => ROF::Filters::AccessToRelsext
     }
     # @api public
     #
