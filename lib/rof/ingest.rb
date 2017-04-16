@@ -59,10 +59,10 @@ module ROF
     item.each do |key,value|
       case key
       # fields having special treatement
-      when "rights"
+      when "rights", "rightsMetadata"
         self.ingest_rights_metadata(item, doc)
         ds_touched << "rightsMetadata"
-      when "metadata"
+      when "metadata", "descMetadata"
         self.ingest_ld_metadata(item, doc)
         ds_touched << "descMetadata"
 
