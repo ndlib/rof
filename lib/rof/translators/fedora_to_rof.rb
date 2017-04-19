@@ -86,7 +86,6 @@ module ROF
         private
 
         def default_datastream_conversion(dsname, ds)
-          puts "datastream = #{dsname}"
           # dump generic datastream
           meta = create_meta(ds)
           @fedora_info["#{dsname}-meta"] = meta unless meta.empty?
