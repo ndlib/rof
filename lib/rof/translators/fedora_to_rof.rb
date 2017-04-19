@@ -27,9 +27,11 @@ module ROF
       attr_reader :pids, :fedora_connection_information, :config, :connection
 
       private
-        def connect_to_fedora!
-          @connection = Rubydora.connect(fedora_connection_information)
-        end
+
+      def connect_to_fedora!
+        @connection = Rubydora.connect(fedora_connection_information)
+      end
+
       public
 
       def to_rof
@@ -59,7 +61,12 @@ module ROF
           # use reflection to call appropriate method for each
           fedora_object.datastreams.each do |dsname, ds|
             method_name = DATASTREAM_NAME_TO_METHOD_MAP.fetch(dsname) { :default_datastream_conversion }
-            send(method_name, dsname, ds)
+            begin
+              send(method_name, dsname, ds)
+            rescue => e
+              # if a named method throws a conversion, try the default datastream conversion
+              default_datastream_conversion(dsname, ds)
+            end
           end
           @fedora_info
         end
@@ -74,11 +81,12 @@ module ROF
           'bendo-item'       => :default_datastream_conversion,
           'characterization' => :default_datastream_conversion,
           'thumbnail'        => :default_datastream_conversion
-        }
+        }.freeze
 
         private
 
         def default_datastream_conversion(dsname, ds)
+          puts "datastream = #{dsname}"
           # dump generic datastream
           meta = create_meta(ds)
           @fedora_info["#{dsname}-meta"] = meta unless meta.empty?
