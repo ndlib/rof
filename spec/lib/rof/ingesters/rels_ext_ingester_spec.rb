@@ -57,6 +57,29 @@ module ROF
           subject.call
         end
       end
+
+      context 'it handles nested objects' do
+        let(:item) {
+            { "pid" => 'abc:1234',
+              "rels-ext" => {
+                "isMemberOf" => { "@id" => "xyz:789" }
+            }}
+        }
+
+        let(:expected_content) {
+%Q{
+<?xml version='1.0' encoding='utf-8' ?>
+<rdf:RDF xmlns:ns0='info:fedora/fedora-system:def/model#' xmlns:ns1='info:fedora/fedora-system:def/relations-external#' xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+  <rdf:Description rdf:about='info:fedora/abc:1234'>
+    <ns0:hasModel rdf:resource='info:fedora/afmodel:Shoe' />
+    <ns1:isMemberOf rdf:resource='info:fedora/xyz:789' />
+  </rdf:Description>
+</rdf:RDF>
+}
+        }
+
+        its(:call) { should be_equivalent_to(expected_content) }
+      end
     end
   end
 end

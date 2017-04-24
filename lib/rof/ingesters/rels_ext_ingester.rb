@@ -52,14 +52,28 @@ module ROF
         # This is kinda hacky. Is there a better way?
         input.each do |relation, targets|
           next if relation == "@context" || relation == "@id" || relation == "hasModel"
-          targets = [targets] if targets.is_a? String
+          targets = [targets] if targets.is_a?(String) || targets.is_a?(Hash)
           input[relation] = targets.map do |target|
-            target.is_a?(String) ? {"@id" => "info:fedora/#{target}"} : target
+            target.is_a?(String) ? {"@id" => "info:fedora/#{target}"} : prefix_ids_recursive(target)
           end
         end
 
         graph = RDF::Graph.new << JSON::LD::API.toRdf(input)
         graph.dump(:rdfxml)
+      end
+
+      # prefix all strings or hash values with "info:fedora/"
+      # recursively decends into arrays and hashes
+      def prefix_ids_recursive(data)
+          return "info:fedora/" + data if data.is_a?(String)
+          if data.is_a?(Array)
+              return data.map { |x| prefix_ids_recursive(x) }
+          end
+          if data.is_a?(Hash)
+              return Hash[data.map { |k,v| [k, prefix_ids_recursive(v)] }]
+          end
+          # don't know what data is. just return it
+          data
       end
 
       def persist(content)
