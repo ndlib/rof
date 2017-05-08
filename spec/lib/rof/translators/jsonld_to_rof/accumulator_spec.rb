@@ -115,6 +115,40 @@ module ROF
             end
           end
         end
+
+        describe '#to_rof' do
+          let(:initial_rof) do
+            {
+              "rights"=> {
+                "edit"=>["curate_batch_user"],
+                "embargo-date"=>["2016-11-16"],
+                "read"=>["wma1"],
+                "read-groups"=>["public"]
+              }
+            }
+          end
+          context 'with one embargo-date' do
+            it 'will have a single embargo date' do
+              rof = initial_rof
+              rof['rights']['embargo-date'] = ['2016-1-2']
+              expect(described_class.new(rof).to_rof['rights'].fetch('embargo-date')).to eq('2016-1-2')
+            end
+          end
+          context 'with more than one embargo-date' do
+            it 'will raise an exception' do
+              rof = initial_rof
+              rof['rights']['embargo-date'] = ['2016-1-2', '2016-2-3']
+              expect { described_class.new(rof).to_rof }.to raise_error(described_class::TooManyEmbargoDatesError)
+            end
+          end
+          context 'no embargo-date' do
+            it 'will not have an embargo-date' do
+              rof = initial_rof
+              rof['rights'].delete('embargo-date')
+              expect { described_class.new(rof).to_rof['rights'].fetch('embargo-date') }.to raise_error(KeyError)
+            end
+          end
+        end
       end
     end
   end

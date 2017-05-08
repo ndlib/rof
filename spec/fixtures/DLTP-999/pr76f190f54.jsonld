@@ -81,6 +81,7 @@
         "@id": "_:b1"
       },
       "nd:accessEdit": "curate_batch_user",
+      "nd:accessEmbargoDate": "2016-11-16",
       "nd:accessRead": "wma1",
       "nd:accessReadGroup": "public",
       "nd:afmodel": "Etd",

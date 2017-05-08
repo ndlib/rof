@@ -22,15 +22,16 @@ module ROF
         # @return [Hash]
         def to_rof
           rof = @rof.deep_dup
-          expand_blank_node_locations(rof)
-          append_properties_to(rof)
+          expand_blank_node_locations!(rof)
+          rof = append_properties_to(rof)
+          rof = force_cardinality_for_backwards_compatability(rof)
           rof
         end
 
         private
 
         # The antics of the blank node! See the specs for blank nodes to see the expected behavior.
-        def expand_blank_node_locations(rof)
+        def expand_blank_node_locations!(rof)
           @blank_node_locations.each_pair do |node, locations|
             locations.each_pair do |location, key_value_pairs|
               data = rof
@@ -67,6 +68,19 @@ module ROF
           end
           xml += '</fields>'
           rof['properties'] = xml
+          rof
+        end
+
+        class TooManyEmbargoDatesError < RuntimeError
+        end
+
+        def force_cardinality_for_backwards_compatability(rof)
+          rights = rof.fetch('rights', {})
+          if rights.key?('embargo-date')
+            embargo_dates = Array.wrap(rights['embargo-date'])
+            raise TooManyEmbargoDatesError if embargo_dates.size > 1
+            rof['rights']['embargo-date'] = embargo_dates.first
+          end
           rof
         end
 
