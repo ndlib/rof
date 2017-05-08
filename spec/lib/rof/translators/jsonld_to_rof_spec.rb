@@ -8,6 +8,14 @@ module ROF
     # find . -maxdepth 2 -name '*.rof' -type f | xargs grep -l <pid>
     # ```
     RSpec.describe JsonldToRof do
+      describe 'DLTP-999 regression' do
+        it 'converts @graph > @id keys to pid' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-999/pr76f190f54.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1) # We have one item
+          expect(output.first.fetch('pid')).to eq('und:pr76f190f54')
+        end
+      end
       describe '.call' do
         [
           '2j62s467216',
