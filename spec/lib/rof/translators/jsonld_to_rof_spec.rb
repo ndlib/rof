@@ -14,6 +14,7 @@ module ROF
           output = described_class.call(jsonld_from_curatend, {})
           expect(output.size).to eq(1) # We have one item
           expect(output.first.fetch('pid')).to eq('und:pr76f190f54')
+          expect(output.first['rights'].fetch('embargo-date')).to eq("2016-11-16")
         end
       end
       describe '.call' do
