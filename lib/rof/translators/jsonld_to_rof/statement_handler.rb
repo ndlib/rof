@@ -63,8 +63,11 @@ module ROF
             PredicateObjectHandler.call(@statement.predicate, @statement.object, @accumulator)
           end
 
+          # Handle the various CurateND environments instead of just curate.nd.edu
+          REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{https://curate(?:[\w\.]*).nd.edu/show/([^\\]+)/?}.freeze
+
           def handle_subject
-            return nil unless @statement.subject.to_s =~ %r{https://curate.nd.edu/show/([^\\]+)/?}
+            return nil unless @statement.subject.to_s =~ REGEXP_FOR_A_CURATE_RDF_SUBJECT
             pid = "und:#{$1}"
             @accumulator.add_pid(pid)
           end
