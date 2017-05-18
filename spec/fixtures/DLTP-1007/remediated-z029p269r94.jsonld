@@ -1,0 +1,127 @@
+{
+  "@context": {
+    "bibo": "http://purl.org/ontology/bibo/",
+    "dc": "http://purl.org/dc/terms/",
+    "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+    "fedora-model": "info:fedora/fedora-system:def/model#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "frels": "info:fedora/fedora-system:def/relations-external#",
+    "hasEditor": {
+      "@id": "hydra:hasEditor",
+      "@type": "@id"
+    },
+    "hasEditorGroup": {
+      "@id": "hydra:hasEditorGroup",
+      "@type": "@id"
+    },
+    "hasMember": {
+      "@id": "frels:hasMember",
+      "@type": "@id"
+    },
+    "hasModel": {
+      "@id": "fedora-model:hasModel",
+      "@type": "@id"
+    },
+    "hasViewer": {
+      "@id": "hydra:hasViewer",
+      "@type": "@id"
+    },
+    "hasViewerGroup": {
+      "@id": "hydra:hasViewerGroup",
+      "@type": "@id"
+    },
+    "hydra": "http://projecthydra.org/ns/relations#",
+    "isEditorOf": {
+      "@id": "hydra:isEditorOf",
+      "@type": "@id"
+    },
+    "isMemberOfCollection": {
+      "@id": "frels:isMemberOfCollection",
+      "@type": "@id"
+    },
+    "isPartOf": {
+      "@id": "frels:isPartOf",
+      "@type": "@id"
+    },
+    "mrel": "http://id.loc.gov/vocabulary/relators/",
+    "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+    "nd": "https://library.nd.edu/ns/terms/",
+    "pav": "http://purl.org/pav/",
+    "previousVersion": "pav:previousVersion",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "und": "https://curatesvrpprd.library.nd.edu/show/",
+    "vracore": "http://purl.org/vra/"
+  },
+  "@graph": [
+    {
+      "@id": "_:b0",
+      "dc:contributor": "Dr. Spock",
+      "ms:role": "Committee Member"
+    },
+    {
+      "@id": "_:b1",
+      "dc:contributor": "Dr. Quinn",
+      "ms:role": "Committee Chair"
+    },
+    {
+      "@id": "_:b2",
+      "dc:contributor": "Dr. Zhivago",
+      "ms:role": "Committee Member"
+    },
+    {
+      "@id": "_:b3",
+      "ms:discipline": "Civil Engineering and Geological Sciences",
+      "ms:level": "Master's Thesis",
+      "ms:name": "MSCE"
+    },
+    {
+      "@id": "und:z029p269r94",
+      "dc:contributor": [
+        {
+          "@id": "_:b0"
+        },
+        {
+          "@id": "_:b1"
+        },
+        {
+          "@id": "_:b2"
+        }
+      ],
+      "dc:creator": "Bob the Builder",
+      "dc:creator#administrative_unit": "University of Notre Dame::College of Engineering::Civil and Environmental Engineering and Earth Sciences::Civil Engineering",
+      "dc:date": "2006-03-24",
+      "dc:date#approved": "2011-01-04",
+      "dc:date#created": "2010-12-20",
+      "dc:dateSubmitted": "2006-04-01",
+      "dc:description#abstract": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "dc:identifier#other": "etd-04012006-182810",
+      "dc:language": "English",
+      "dc:publisher": "University of Notre Dame",
+      "dc:publisher#country": "United States of America",
+      "dc:rights": "All rights reserved",
+      "dc:subject": [
+        "Structural health monitoring",
+        "multipath",
+        "GPS"
+      ],
+      "dc:title": "Lorem Ipsum",
+      "hydra:hasEditor": {
+        "@id": "und:qb98mc9021z"
+      },
+      "hydra:hasEditorGroup": {
+        "@id": "und:q524jm23g92"
+      },
+      "mrel:ths": "Dr. Worm",
+      "ms:degree": {
+        "@id": "_:b3"
+      },
+      "nd:accessEdit": "curate_batch_user",
+      "nd:accessReadGroup": "public",
+      "nd:afmodel": "Etd",
+      "nd:depositor": "curate_batch_user",
+      "nd:representativeFile": {
+        "@id": "und:z603qv36b1d"
+      }
+    }
+  ]
+}

@@ -175,7 +175,7 @@ module ROF
 
         def coerce_object_to_string(object)
           return object if object.nil?
-          if object.to_s =~ %r{https?://curate.nd.edu/show/([^\\]+)/?}
+          if object.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
             return "und:#{$1}"
           elsif object.respond_to?(:value)
             return object.value
