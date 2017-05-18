@@ -71,6 +71,10 @@ module ROF
         handler.map('role', to: ['metadata', 'dc:contributor', 'ms:role'], force: true)
       end
 
+      # The $1 will be the PID
+      # @see Related specs for expected behavior
+      REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{\Ahttps?://curate(?:[\w\.]*).nd.edu/show/([[:alnum:]]+)/?}.freeze
+
       # @api public
       #
       # Convert's the given JSON-LD into an ROF document that can be used to batch ingest into Fedora.

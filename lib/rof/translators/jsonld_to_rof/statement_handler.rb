@@ -64,10 +64,9 @@ module ROF
           end
 
           # Handle the various CurateND environments instead of just curate.nd.edu
-          REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{https://curate(?:[\w\.]*).nd.edu/show/([^\\]+)/?}.freeze
 
           def handle_subject
-            return nil unless @statement.subject.to_s =~ REGEXP_FOR_A_CURATE_RDF_SUBJECT
+            return nil unless @statement.subject.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
             pid = "und:#{$1}"
             @accumulator.add_pid(pid)
           end

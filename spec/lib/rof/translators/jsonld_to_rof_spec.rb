@@ -17,6 +17,37 @@ module ROF
           expect(output.first['rights'].fetch('embargo-date')).to eq("2016-11-16")
         end
       end
+
+      describe 'DLTP-1007 regression' do
+        it 'converts representative XML correctly' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1007/remediated-z029p269r94.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1)
+          properties = output.first.fetch('properties')
+          expect(properties).to include('<representative>und:z603qv36b1d</representative>')
+        end
+      end
+
+      describe '::REGEXP_FOR_A_CURATE_RDF_SUBJECT' do
+        it 'handles data as expected' do
+          [
+            ["https://curate.nd.edu/downloads/abcd123", nil],
+            ["http://curate.nd.edu/downloads/abcd123", nil],
+            ["http://curatepprd.nd.edu/downloads/abcd123", nil],
+            ["http://curatepprd.nd.edu/show/abcd123", "abcd123"],
+            ["https://curatepprd.nd.edu/show/abcd123", "abcd123"],
+            ["https://curatepprd.library.nd.edu/show/abcd123", "abcd123"],
+            ["https://curate.nd.edu/show/abcd123", "abcd123"],
+            ["http://curate.nd.edu/show/abcd123", "abcd123"],
+            ["http://mycurate.nd.edu/show/abcd123", nil],
+            ["http://curate.nd.edu/show/abcd123/extra", 'abcd123'],
+          ].each do |input, expected|
+            input =~ described_class::REGEXP_FOR_A_CURATE_RDF_SUBJECT
+            expect($1).to eq(expected)
+          end
+        end
+      end
+
       describe '.call' do
         [
           '2j62s467216',
