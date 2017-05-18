@@ -71,15 +71,33 @@ module ROF
           rof
         end
 
-        class TooManyEmbargoDatesError < RuntimeError
+        class TooManyElementsError < RuntimeError
+          def initialize(context, expected_count, got_count)
+            super(%(Expected #{expected_count} in "#{context}" but instead got #{got_count}))
+          end
         end
 
         def force_cardinality_for_backwards_compatability(rof)
+          rof = force_rights_cardinality(rof)
+          rof = force_bendo_cardinality(rof)
+          rof
+        end
+
+        def force_rights_cardinality(rof)
           rights = rof.fetch('rights', {})
           if rights.key?('embargo-date')
             embargo_dates = Array.wrap(rights['embargo-date'])
-            raise TooManyEmbargoDatesError if embargo_dates.size > 1
+            raise TooManyElementsError.new('rights > embargo-date', 1, embargo_dates.size) if embargo_dates.size > 1
             rof['rights']['embargo-date'] = embargo_dates.first
+          end
+          rof
+        end
+
+        def force_bendo_cardinality(rof)
+          if rof.key?('bendo-item')
+            bendo_items = Array.wrap(rof['bendo-item'])
+            raise TooManyElementsError.new('bendo-item', 1, bendo_items.size) if bendo_items.size > 1
+            rof['bendo-item'] = bendo_items.first
           end
           rof
         end
