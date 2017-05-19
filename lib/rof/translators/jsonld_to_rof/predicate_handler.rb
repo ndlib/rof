@@ -4,6 +4,11 @@ module ROF
   module Translators
     module JsonldToRof
       # Responsible for dealing with registered predicates and how those are handled.
+      #
+      # The two primary entry points are `.call` and `.register`
+      #
+      # @see ROF::Translators::JsonldToRof::PredicateHandler.call
+      # @see ROF::Translators::JsonldToRof::PredicateHandler.register
       module PredicateHandler
         class UnhandledPredicateError < RuntimeError
           def initialize(predicate, urls)
@@ -38,6 +43,9 @@ module ROF
         end
 
         # @api public
+        #
+        # Register a map of an RDF Predicate URL to it's spot in the ROF Hash.
+        #
         # @param [String] url - The URL that we want to match against
         # @yield The block to configure how we handle RDF Predicates that match the gvien URL
         # @yieldparam [ROF::JsonldToRof::PredicateHandler::UrlHandler]
