@@ -5,9 +5,11 @@ module ROF
     module JsonldToRof
       RSpec.describe PredicateHandler do
         around do |spec|
-          # Ensuring that we preserve duplication of
+          # Ensuring that we preserve duplication of registry.
+          # We take a snap-shot of the registry, clear, do our tests, then restore the registry
           previous_registry = described_class.send(:registry)
           described_class.send(:clear_registry!)
+
           described_class.register('https://library.nd.edu/ns/terms/') do |handler|
             handler.map('accessRead', to: ['rights', 'read'])
           end
@@ -26,6 +28,7 @@ module ROF
             handler.map('something', to: ['another', 'somewhere'])
           end
           spec.run
+
           described_class.send(:clear_registry!, previous_registry)
         end
 

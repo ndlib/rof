@@ -5,6 +5,8 @@ module ROF
   module Translators
     module JsonldToRof
       # We need to handle the Predicate / Object pair as one (thank you RDF blank nodes for this nuance)
+      #
+      # @see ROF::Translators::JsonldToRof::PredicateObjectHandler.call
       module PredicateObjectHandler
         # @api public
         #
@@ -39,6 +41,7 @@ module ROF
         def self.new(predicate, object, accumulator, options)
           klass_for(object).new(predicate, object, accumulator, options)
         end
+        private_class_method :new
 
         class UnknownRdfObjectTypeError < RuntimeError
         end
@@ -56,6 +59,7 @@ module ROF
             raise UnknownRdfObjectTypeError, "Unable to determine object handler for #{object.inspect}"
           end
         end
+        private_class_method :klass_for
 
         # @api private
         class UriPredicateObjectHandler

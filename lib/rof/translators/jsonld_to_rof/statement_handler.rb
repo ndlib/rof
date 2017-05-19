@@ -4,6 +4,8 @@ module ROF
   module Translators
     module JsonldToRof
       # Responsible for parsing an RDF statement and adding to the accumulator.
+      #
+      # @see ROF::Translators::JsonldToRof::StatementHandler.call
       module StatementHandler
         # @api public
         #

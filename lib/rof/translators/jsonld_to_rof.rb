@@ -8,7 +8,7 @@ module ROF
   module Translators
     # @api public
     #
-    # Responsible for converting JSON LD into an ROF Hash via registered URI maps.
+    # Responsible for converting JSON LD into an ROF Hash via registered URI maps via the `.call` method
     #
     # @note Some predicates require explicit mapping where as others have an assumed mapping. At present all URLs for @context of JSON-LD documents must be registered.
     #
