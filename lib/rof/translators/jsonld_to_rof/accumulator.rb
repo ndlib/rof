@@ -24,7 +24,6 @@ module ROF
           rof = @rof.deep_dup
           expand_blank_node_locations!(rof)
           rof = append_properties_to(rof)
-          rof = force_cardinality_for_backwards_compatability(rof)
           rof
         end
 
@@ -72,34 +71,9 @@ module ROF
         end
 
         class TooManyElementsError < RuntimeError
-          def initialize(context, expected_count, got_count)
-            super(%(Expected #{expected_count} in "#{context}" but instead got #{got_count}))
+          def initialize(context)
+            super(%(Attempted to set more than one value for #{context}))
           end
-        end
-
-        def force_cardinality_for_backwards_compatability(rof)
-          rof = force_rights_cardinality(rof)
-          rof = force_bendo_cardinality(rof)
-          rof
-        end
-
-        def force_rights_cardinality(rof)
-          rights = rof.fetch('rights', {})
-          if rights.key?('embargo-date')
-            embargo_dates = Array.wrap(rights['embargo-date'])
-            raise TooManyElementsError.new('rights > embargo-date', 1, embargo_dates.size) if embargo_dates.size > 1
-            rof['rights']['embargo-date'] = embargo_dates.first
-          end
-          rof
-        end
-
-        def force_bendo_cardinality(rof)
-          if rof.key?('bendo-item')
-            bendo_items = Array.wrap(rof['bendo-item'])
-            raise TooManyElementsError.new('bendo-item', 1, bendo_items.size) if bendo_items.size > 1
-            rof['bendo-item'] = bendo_items.first
-          end
-          rof
         end
 
         public
@@ -156,40 +130,49 @@ module ROF
         # @param [Array<String>, String] location - a list of nested hash keys (or a single string)
         # @param [String] value - a translated value for the original RDF Statement
         # @param [false, RDF::Node] blank_node
+        # @param multiple [Boolean] (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
         # @return [Array] location, value
-        def add_predicate_location_and_value(location, value, blank_node = false)
+        def add_predicate_location_and_value(location, value, blank_node = false, multiple: true)
           # Because I am making transformation on the location via #shift method, I need a duplication.
           location = Array.wrap(location)
           if location == ['pid']
             return add_pid(value)
           end
           if blank_node
-            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple: multiple)
           else
-            add_predicate_location_and_value_direct_for_non_blank_node(location, value)
+            add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple: multiple)
           end
           [location, value]
         end
 
-        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+        private
+
+        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple:)
           fetch_blank_node(blank_node) # Ensure the node exists
           @blank_node_locations[blank_node] ||= {}
           @blank_node_locations[blank_node][location[0..-2]] ||= []
           @blank_node_locations[blank_node][location[0..-2]] << { location[-1] => Array.wrap(coerce_object_to_string(value)) }
         end
 
-        def add_predicate_location_and_value_direct_for_non_blank_node(location, value)
+        def add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple:)
           data = @rof
           location[0..-2].each do |slug|
             data[slug] ||= {}
             data = data[slug]
           end
           slug = location[-1]
-          data[slug] ||= []
-          data[slug] << coerce_object_to_string(value)
+          if multiple
+            data[slug] ||= []
+            data[slug] << coerce_object_to_string(value)
+          else
+            if data[slug].present?
+              raise TooManyElementsError.new(location)
+            else
+              data[slug] = coerce_object_to_string(value)
+            end
+          end
         end
-
-        private
 
         def coerce_object_to_string(object)
           return object if object.nil?

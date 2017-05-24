@@ -34,20 +34,23 @@ module ROF
       end
 
       PredicateHandler.register('https://library.nd.edu/ns/terms/') do |handler|
-        handler.map('accessEdit', to: ['rights', 'edit'])
-        handler.map('accessRead', to: ['rights', 'read'])
-        handler.map('accessEditGroup', to: ['rights', 'edit-groups'])
-        handler.map('accessReadGroup', to: ['rights', 'read-groups'])
-        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'])
-        handler.map('afmodel', to: ["af-model"])
-        handler.map('bendoitem', to: ["bendo-item"])
+        handler.namespace_prefix('nd:')
+        handler.within(['metadata'])
+        handler.map('accessEdit', to: ['rights', 'edit'], force: true)
+        handler.map('accessRead', to: ['rights', 'read'], force: true)
+        handler.map('accessEditGroup', to: ['rights', 'edit-groups'], force: true)
+        handler.map('accessReadGroup', to: ['rights', 'read-groups'], force: true)
+        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'], multiple: false, force: true)
+        handler.map('afmodel', to: ["af-model"], force: true)
+        handler.map('alephIdentifier', to: ['alephIdentifier'], multiple: false)
+        handler.map('bendoitem', to: ["bendo-item"], multiple: false, force: true)
         handler.map('depositor') do |object, accumulator|
           accumulator.register_properties('depositor', object)
         end
         handler.map('owner') do |object, accumulator|
           accumulator.register_properties('owner', object)
         end
-        handler.map('representativeFile') do |object, accumulator|
+        handler.map('representativeFile', multiple: false) do |object, accumulator|
           accumulator.register_properties('representative', object)
         end
       end

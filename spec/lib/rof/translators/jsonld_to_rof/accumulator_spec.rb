@@ -44,6 +44,19 @@ module ROF
             expect(subject.to_rof).to eq({ "hello" => { "world" => ["value"] }, "kitchen" => ["another"] } )
           end
 
+          context 'with multiple: true' do
+            it 'will raise an error if too many' do
+              subject.add_predicate_location_and_value(['hello', 'world'], "value", multiple: false)
+              expect do
+                subject.add_predicate_location_and_value(['hello', 'world'], "another", multiple: false)
+              end.to raise_error(described_class::TooManyElementsError)
+            end
+            it 'will not be an array (but instead a String)' do
+              subject.add_predicate_location_and_value(['hello', 'world'], "value", multiple: false)
+              expect(subject.to_rof.fetch('hello').fetch('world')).to eq('value')
+            end
+          end
+
           context 'handling blank nodes' do
             context 'for the same node' do
               it 'collects values for the same location' do
@@ -111,70 +124,6 @@ module ROF
                     "child" => ["another"]
                   }]
                 })
-              end
-            end
-          end
-        end
-
-        describe '#to_rof' do
-          describe 'for embargo-date' do
-            let(:initial_rof) do
-              {
-                "rights"=> {
-                  "edit"=>["curate_batch_user"],
-                  "embargo-date"=>["2016-11-16"],
-                  "read"=>["wma1"],
-                  "read-groups"=>["public"]
-                }
-              }
-            end
-            context 'with one embargo-date' do
-              it 'will have a single embargo date' do
-                rof = initial_rof
-                rof['rights']['embargo-date'] = ['2016-1-2']
-                expect(described_class.new(rof).to_rof['rights'].fetch('embargo-date')).to eq('2016-1-2')
-              end
-            end
-            context 'with more than one embargo-date' do
-              it 'will raise an exception' do
-                rof = initial_rof
-                rof['rights']['embargo-date'] = ['2016-1-2', '2016-2-3']
-                expect { described_class.new(rof).to_rof }.to raise_error(described_class::TooManyElementsError)
-              end
-            end
-            context 'no embargo-date' do
-              it 'will not have an embargo-date' do
-                rof = initial_rof
-                rof['rights'].delete('embargo-date')
-                expect { described_class.new(rof).to_rof['rights'].fetch('embargo-date') }.to raise_error(KeyError)
-              end
-            end
-          end
-          describe 'bendo-item' do
-            let(:initial_rof) do
-              {
-                "bendo-item"=> ['abcd1']
-              }
-            end
-            context 'with one embargo-date' do
-              it 'will have a single embargo date' do
-                rof = initial_rof
-                rof['bendo-item'] = ['abcd1']
-                expect(described_class.new(rof).to_rof.fetch('bendo-item')).to eq('abcd1')
-              end
-            end
-            context 'with more than one embargo-date' do
-              it 'will raise an exception' do
-                rof = initial_rof
-                rof['bendo-item'] = ['abcd1', 'efgh1']
-                expect { described_class.new(rof).to_rof }.to raise_error(described_class::TooManyElementsError)
-              end
-            end
-            context 'no embargo-date' do
-              it 'will not have an embargo-date' do
-                rof = initial_rof
-                rof.delete('bendo-item')
-                expect { described_class.new(rof).to_rof.fetch('bendo-item') }.to raise_error(KeyError)
               end
             end
           end

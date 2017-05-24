@@ -115,6 +115,7 @@
       "ms:degree": {
         "@id": "_:b3"
       },
+      "nd:bendoItem": "bendo1234",
       "nd:accessEdit": "curate_batch_user",
       "nd:accessReadGroup": "public",
       "nd:afmodel": "Etd",
