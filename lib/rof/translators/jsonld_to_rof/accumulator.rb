@@ -129,33 +129,36 @@ module ROF
         # @api public
         # @param [Array<String>, String] location - a list of nested hash keys (or a single string)
         # @param [String] value - a translated value for the original RDF Statement
-        # @param [false, RDF::Node] blank_node
-        # @param multiple [Boolean] (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
+        # @param [Hash] options
+        # @option options [false, RDF::Node] blank_node
+        # @option options [Boolean] multiple  (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
         # @return [Array] location, value
-        def add_predicate_location_and_value(location, value, blank_node = false, multiple: true)
+        def add_predicate_location_and_value(location, value, options = {})
+          blank_node = options.fetch(:blank_node, false)
+          multiple = options.fetch(:multiple, true)
           # Because I am making transformation on the location via #shift method, I need a duplication.
           location = Array.wrap(location)
           if location == ['pid']
             return add_pid(value)
           end
           if blank_node
-            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple: multiple)
+            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple)
           else
-            add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple: multiple)
+            add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple)
           end
           [location, value]
         end
 
         private
 
-        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple:)
+        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple)
           fetch_blank_node(blank_node) # Ensure the node exists
           @blank_node_locations[blank_node] ||= {}
           @blank_node_locations[blank_node][location[0..-2]] ||= []
           @blank_node_locations[blank_node][location[0..-2]] << { location[-1] => Array.wrap(coerce_object_to_string(value)) }
         end
 
-        def add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple:)
+        def add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple)
           data = @rof
           location[0..-2].each do |slug|
             data[slug] ||= {}

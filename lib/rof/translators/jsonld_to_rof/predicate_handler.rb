@@ -181,7 +181,7 @@ module ROF
             def call(object, accumulator, blank_node)
               to = @url_handler.within + Array.wrap(slug)
               to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
-              accumulator.add_predicate_location_and_value(to, object, blank_node)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node)
             end
           end
           private_constant :ImplicitLocationHandler
@@ -217,7 +217,7 @@ module ROF
                 to = @url_handler.within + Array.wrap(to)
                 to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
               end
-              accumulator.add_predicate_location_and_value(to, object, blank_node, multiple: multiple)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node, multiple: multiple)
             end
 
             def force?
