@@ -1,0 +1,62 @@
+{
+  "@context": {
+    "und": "https://curatesvrpprd.library.nd.edu/show/",
+    "bibo": "http://purl.org/ontology/bibo/",
+    "dc": "http://purl.org/dc/terms/",
+    "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "mrel": "http://id.loc.gov/vocabulary/relators/",
+    "nd": "https://library.nd.edu/ns/terms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "vracore": "http://purl.org/vra/",
+    "frels": "info:fedora/fedora-system:def/relations-external#",
+    "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+    "pav": "http://purl.org/pav/",
+    "fedora-model": "info:fedora/fedora-system:def/model#",
+    "hydra": "http://projecthydra.org/ns/relations#",
+    "hasModel": {
+      "@id": "fedora-model:hasModel",
+      "@type": "@id"
+    },
+    "hasEditor": {
+      "@id": "hydra:hasEditor",
+      "@type": "@id"
+    },
+    "hasEditorGroup": {
+      "@id": "hydra:hasEditorGroup",
+      "@type": "@id"
+    },
+    "hasViewer": {
+      "@id": "hydra:hasViewer",
+      "@type": "@id"
+    },
+    "hasViewerGroup": {
+      "@id": "hydra:hasViewerGroup",
+      "@type": "@id"
+    },
+    "isPartOf": {
+      "@id": "frels:isPartOf",
+      "@type": "@id"
+    },
+    "isMemberOfCollection": {
+      "@id": "frels:isMemberOfCollection",
+      "@type": "@id"
+    },
+    "isEditorOf": {
+      "@id": "hydra:isEditorOf",
+      "@type": "@id"
+    },
+    "hasMember": {
+      "@id": "frels:hasMember",
+      "@type": "@id"
+    },
+    "previousVersion": "pav:previousVersion"
+  },
+  "@id": "und:9g54xg96r27",
+  "nd:alephIdentifier": "aleph123",
+  "nd:accessEmbargoDate": "2016-11-16",
+  "nd:bendoitem": "bendo123",
+  "nd:representativeFile": {
+    "@id": "und:representative123"
+  }
+}

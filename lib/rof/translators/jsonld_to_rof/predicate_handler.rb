@@ -141,6 +141,7 @@ module ROF
           # @param [Hash] options (with symbol keys)
           # @option options [Boolean] :force - don't apply the within nor namespace prefix
           # @option options [Array] :to - an array that will be nested Hash keys
+          # @option options [Boolean] :multiple (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
           # @yield If a block is given, call the block (and skip all other configuration)
           # @yieldparam [String] object
           # @see BlockSlugHandler for details concerning a mapping via a block
@@ -180,7 +181,7 @@ module ROF
             def call(object, accumulator, blank_node)
               to = @url_handler.within + Array.wrap(slug)
               to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
-              accumulator.add_predicate_location_and_value(to, object, blank_node)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node)
             end
           end
           private_constant :ImplicitLocationHandler
@@ -211,11 +212,12 @@ module ROF
 
             def call(object, accumulator, blank_node)
               to = @options.fetch(:to)
+              multiple = @options.fetch(:multiple, true)
               unless force?
                 to = @url_handler.within + Array.wrap(to)
                 to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
               end
-              accumulator.add_predicate_location_and_value(to, object, blank_node)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node, multiple: multiple)
             end
 
             def force?

@@ -28,6 +28,19 @@ module ROF
         end
       end
 
+      describe 'DLTP-1015 regression verification' do
+        it 'converts bendo-item, embargo-date, representative and alephNumber to string' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1015/dltp1015.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1)
+          object = output.first
+          expect(object.fetch('properties')).to include('<representative>und:representative123</representative>')
+          expect(object.fetch('rights').fetch('embargo-date')).to eq("2016-11-16")
+          expect(object.fetch('metadata').fetch('nd:alephIdentifier')).to eq("aleph123")
+          expect(object.fetch('bendo-item')).to eq("bendo123")
+        end
+      end
+
       describe '::REGEXP_FOR_A_CURATE_RDF_SUBJECT' do
         it 'handles data as expected' do
           [
