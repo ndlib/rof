@@ -20,6 +20,9 @@ module ROF
         #
         # Parse the RDF predicate and RDF object and add it's contents to the accumulator
         #
+        # @see ./spec/lib/rof/translators/jsonld_to_rof/predicate_handler_spec.rb for details and usage usage
+        # @see ROF::Translators::JsonldToRof::PredicateHandler.register for setup
+        #
         # @example
         #   Given the following 4 RDF N-Triples (subject, predicate, object). The first two, with subject "_:b0" represent blank nodes.
         #   The last one with subject "<https://curate.nd.edu/show/zk51vd69n1r>" has an object that points to the "_:b0" blank node.
@@ -46,6 +49,8 @@ module ROF
         #
         # Register a map of an RDF Predicate URL to it's spot in the ROF Hash.
         #
+        # @see ROF::Translators::JsonldToRof::PredicateHandler.call for usage
+        #
         # @param [String] url - The URL that we want to match against
         # @yield The block to configure how we handle RDF Predicates that match the gvien URL
         # @yieldparam [ROF::JsonldToRof::PredicateHandler::UrlHandler]
@@ -65,6 +70,8 @@ module ROF
         end
         private_class_method :clear_registry!
 
+        # @api private
+        # Responsible for capturing each of the predicate namespaces URLs that we are handling
         class RegistrySet
           def initialize
             @set = []
@@ -86,6 +93,7 @@ module ROF
         end
         private_constant :RegistrySet
 
+        # @api private
         # For a given URL map all of the predicates; Some predicates require explicit mapping, while others
         # may use implicit mapping.
         class UrlHandler
@@ -156,7 +164,8 @@ module ROF
             end
           end
 
-          # Responsible for coordinating the extraction of the
+          # @api private
+          # Responsible for coordinating the extraction of the location
           class LocationExtractor
             def initialize(predicate, handlers)
               @predicate = predicate
@@ -172,6 +181,7 @@ module ROF
           end
           private_constant :LocationExtractor
 
+          # @api private
           class ImplicitLocationHandler
             def initialize(url_handler, slug)
               @url_handler = url_handler
@@ -186,6 +196,7 @@ module ROF
           end
           private_constant :ImplicitLocationHandler
 
+          # @api private
           class BlockSlugHandler
             def initialize(url_handler, slug, options, block)
               @url_handler = url_handler
@@ -202,6 +213,7 @@ module ROF
           end
           private_constant :BlockSlugHandler
 
+          # @api private
           class ExplicitLocationSlugHandler
             def initialize(url_handler, slug, options)
               @url_handler = url_handler
