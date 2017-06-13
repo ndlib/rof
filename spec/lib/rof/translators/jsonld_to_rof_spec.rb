@@ -41,6 +41,33 @@ module ROF
         end
       end
 
+      describe 'DLTP-1021 regression verification' do
+        context 'for non-ETDs' do
+          it 'does not have blank nodes for dc:contributor' do
+            jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1021/dltp-1021-document.jsonld")))
+            expect(jsonld_from_curatend["@graph"]["nd:afmodel"]).to eq('Document')
+            output = described_class.call(jsonld_from_curatend, {})
+            expect(output.size).to eq(1)
+            object = output.first
+            expect(object.fetch('metadata').fetch('dc:contributor')).to eq(['Ilan Stavans'])
+          end
+        end
+        context 'for ETDs' do
+          it 'keeps the blank nodes for dc:contributor' do
+            jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1021/dltp-1021-etd.jsonld")))
+            expect(jsonld_from_curatend["@graph"].last['nd:afmodel']).to eq('Etd')
+            output = described_class.call(jsonld_from_curatend, {})
+            expect(output.size).to eq(1)
+            object = output.first
+            expect(object.fetch('metadata').fetch('dc:contributor')).to eq([
+              { "dc:contributor" => ["Dr. Spock"], "ms:role" => ["Committee Member"] },
+              { "dc:contributor" => ["Dr. Quinn"], "ms:role" => ["Committee Chair"] },
+              { "dc:contributor" => ["Dr. Zhivago"], "ms:role" => ["Committee Member"] }
+            ])
+          end
+        end
+      end
+
       describe '::REGEXP_FOR_A_CURATE_RDF_SUBJECT' do
         it 'handles data as expected' do
           [

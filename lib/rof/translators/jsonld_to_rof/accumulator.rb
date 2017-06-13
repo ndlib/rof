@@ -9,6 +9,7 @@ module ROF
       # The accumulator is a "passive" object. Things happen to it. All in the name of building the
       # hash that is ROF.
       #
+      # @note The #to_rof will convert blank nodes to arrays of strings for objects that don't have blank node dc:contributor.
       # @note The accumulator is only for one PID. See [ROF::Translators::JsonldToRof::Accumulator#add_pid]
       class Accumulator
         # @param [Hash] initial_rof - The base ROF document to which we will be adding elements.
@@ -22,7 +23,8 @@ module ROF
         # @return [Hash]
         def to_rof
           rof = @rof.deep_dup
-          expand_blank_node_locations!(rof)
+          rof = expand_blank_node_locations!(rof)
+          rof = normalize_contributor!(rof)
           rof = append_properties_to(rof)
           rof
         end
@@ -56,6 +58,32 @@ module ROF
               data[slug] << hash if slug
             end
           end
+          rof
+        end
+
+        MODELS_THAT_HAVE_DC_CONTRIBUTOR_BLANK_NODES = ['etd'].freeze
+
+        # Convert dc:contributor from blank node to array for non-ETDs - DLTP1021
+        # The implementation that was developed started from the perspective that
+        # the dc:contributor was always a blank node (as implemented in ETDs).
+        # However that is not the case.
+        def normalize_contributor!(rof)
+          return rof unless rof.key?('af-model')
+          return rof unless rof.fetch('metadata', {}).key?('dc:contributor')
+          return rof if MODELS_THAT_HAVE_DC_CONTRIBUTOR_BLANK_NODES.include?(rof['af-model'].first.downcase)
+          contributors = []
+          Array.wrap(rof['metadata']['dc:contributor']).each do |contributor|
+            case contributor
+            when String
+              contributors << contributor
+            when Hash
+              contributors += Array.wrap(contributor.fetch('dc:contributor'))
+            else
+              raise "Unexpected rof['metadata']['contributor'] value #{contributor.inspect}"
+            end
+          end
+          rof['metadata']['dc:contributor']= contributors
+          rof
         end
 
         def append_properties_to(rof)

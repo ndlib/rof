@@ -1,0 +1,112 @@
+{
+  "@context": {
+    "und": "https://curatesvrpprd.library.nd.edu/show/",
+    "bibo": "http://purl.org/ontology/bibo/",
+    "dc": "http://purl.org/dc/terms/",
+    "ebucore": "http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "mrel": "http://id.loc.gov/vocabulary/relators/",
+    "nd": "https://library.nd.edu/ns/terms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "vracore": "http://purl.org/vra/",
+    "frels": "info:fedora/fedora-system:def/relations-external#",
+    "ms": "http://www.ndltd.org/standards/metadata/etdms/1.1/",
+    "pav": "http://purl.org/pav/",
+    "fedora-model": "info:fedora/fedora-system:def/model#",
+    "hydra": "http://projecthydra.org/ns/relations#",
+    "hasModel": {
+      "@id": "fedora-model:hasModel",
+      "@type": "@id"
+    },
+    "hasEditor": {
+      "@id": "hydra:hasEditor",
+      "@type": "@id"
+    },
+    "hasEditorGroup": {
+      "@id": "hydra:hasEditorGroup",
+      "@type": "@id"
+    },
+    "hasViewer": {
+      "@id": "hydra:hasViewer",
+      "@type": "@id"
+    },
+    "hasViewerGroup": {
+      "@id": "hydra:hasViewerGroup",
+      "@type": "@id"
+    },
+    "isPartOf": {
+      "@id": "frels:isPartOf",
+      "@type": "@id"
+    },
+    "isMemberOfCollection": {
+      "@id": "frels:isMemberOfCollection",
+      "@type": "@id"
+    },
+    "isEditorOf": {
+      "@id": "hydra:isEditorOf",
+      "@type": "@id"
+    },
+    "hasMember": {
+      "@id": "frels:hasMember",
+      "@type": "@id"
+    },
+    "previousVersion": "pav:previousVersion"
+  },
+  "@graph":
+    {
+      "@id": "und:h989r21070t",
+      "dc:abstract": "_Barrio Boy_ is the remarkable story of one boy's journey from a Mexican village so small its main street didn't have a name, to the barrio of Sacramento, California, bustling and thriving in the early decades of the twentieth century. With vivid imagery and a rare gift for re-creating a child's sense of time and place, Ernesto Galarza gives an account of the early experiences of his extraordinary life—from revolution in Mexico to segregation in the United States—that will continue to delight readers for generations to come. Since it was first published in 1971, Galarza's classic work has been assigned in high school and undergraduate classrooms across the country, profoundly affecting thousands of students who read this true story of acculturation into American life. To celebrate the 40th anniversary of the publication of Barrio Boy, the University of Notre Dame Press is proud to reissue this best-selling book with a new text design and cover, as well an introduction—by Ilan Stavans, the distinguished cultural critic and editor of the Norton Anthology of Latino Literature—which places Ernesto Galarza and Barrio Boy in historical context.\n\n© University of Notre Dame\n\nCopyright for all content is held by The University of Notre Dame. Reproduction of all or any portion of content constitutes a violation of copyright. You must obtain permission from The University of Notre Dame Press in order to reprint (or adapt) content. p: (574) 631-6346 / e: undpress@nd.edu",
+      "dc:alternative": "Barrio Boy",
+      "dc:contributor": ["Ilan Stavans"],
+      "dc:created": {
+        "@value": "2014-04-30",
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:creator#administrative_unit": "University of Notre Dame::University of Notre Dame Press",
+      "dc:creator#author": "Ernesto Galarza",
+      "dc:dateSubmitted": {
+        "@value": "2017-03-24Z",
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:extent": "336 pages",
+      "dc:identifier#isbn": "9780268158613",
+      "dc:issued": "2014-04-30",
+      "dc:modified": {
+        "@value": "2017-05-24Z",
+        "@type": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "dc:publisher": "University of Notre Dame Press",
+      "dc:source": "http://undpress.nd.edu/books/P01458",
+      "dc:subject": [
+        "Immigration",
+        "Mexico",
+        "Ethnic Studies",
+        "U.S.",
+        "Social Science"
+      ],
+      "dc:subject#lcsh": [
+        "Sacramento (Calif)--Biography",
+        "Immigrants--United States--Biography",
+        "Mexican American neighborhoods--California--Sacramento--History--20th century",
+        "Mexican Americans--Biography",
+        "Mexican Americans--Social life and customs--20th century",
+        "Sacramento (Calif)--Social life and customs--20th century",
+        "Nayarit (Mexico)--Biography"
+      ],
+      "dc:title": "Barrio Boy: 40th Anniversary Edition",
+      "dc:type": "Book Chapter",
+      "frels:isMemberOfCollection": {
+        "@id": "und:3f462516q01"
+      },
+      "nd:accessEdit": "rtillman",
+      "nd:accessReadGroup": "public",
+      "nd:afmodel": "Document",
+      "nd:alephIdentifier": "002699482",
+      "nd:bendoitem": "h415p843n84",
+      "nd:depositor": "batch_ingest",
+      "nd:owner": "rtillman",
+      "nd:representativeFile": {
+        "@id": "und:hd76rx93h18"
+      }
+    }
+}
