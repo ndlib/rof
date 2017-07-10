@@ -21,8 +21,9 @@ module ROF
         handler.namespace_prefix('bibo:')
         handler.within(['metadata'])
       end
-      PredicateHandler.register('info:fedora/fedora-system:def/relations-external') do |handler|
-        handler.map('#isMemberOfCollection', to: ['rels-ext', 'isMemberOfCollection'])
+      PredicateHandler.register('info:fedora/fedora-system:def/relations-external#') do |handler|
+        handler.namespace_prefix('')
+        handler.within(['rels-ext'])
       end
       PredicateHandler.register('http://id.loc.gov/vocabulary/relators/') do |handler|
         handler.namespace_prefix('mrel:')
@@ -53,6 +54,13 @@ module ROF
         handler.map('representativeFile', multiple: false) do |object, accumulator|
           accumulator.register_properties('representative', object)
         end
+        handler.map('characterization', to: ['characterization'], multiple: false, force: true)
+
+        # Discard these keys when mapping from JSON-LD to ROF
+        handler.skip('content')
+        handler.skip('thumbnail')
+        handler.skip('filename')
+        handler.skip('mimetype')
       end
 
       PredicateHandler.register('http://purl.org/dc/terms/') do |handler|

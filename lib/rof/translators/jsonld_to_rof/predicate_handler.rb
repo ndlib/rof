@@ -164,6 +164,12 @@ module ROF
             end
           end
 
+          # Skip the given slug
+          # @param [String] slug
+          def skip(slug)
+            map(slug) { |*| }
+          end
+
           # @api private
           # Responsible for coordinating the extraction of the location
           class LocationExtractor

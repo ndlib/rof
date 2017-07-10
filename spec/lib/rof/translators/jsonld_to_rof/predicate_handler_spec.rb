@@ -12,6 +12,7 @@ module ROF
 
           described_class.register('https://library.nd.edu/ns/terms/') do |handler|
             handler.map('accessRead', to: ['rights', 'read'])
+            handler.skip('to_my_loo')
           end
           described_class.register('http://purl.org/dc/terms/') do |handler|
             handler.namespace_prefix('dc:')
@@ -51,6 +52,12 @@ module ROF
               "metadata" => { "ms:something" => [object] },
               "ms:degree" => { "another" => { "ms:somewhere" => [object] } }
             })
+          end
+
+          it 'handles skip imperative' do
+            described_class.call('https://library.nd.edu/ns/terms/accessRead', object, accumulator)
+            described_class.call('https://library.nd.edu/ns/terms/to_my_loo', object, accumulator)
+            expect(accumulator.to_rof).to eq({ "rights" => { "read" => ["my-object"] } })
           end
 
           it 'handles option without namespace' do
