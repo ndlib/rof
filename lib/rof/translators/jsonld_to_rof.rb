@@ -55,11 +55,12 @@ module ROF
           accumulator.register_properties('representative', object)
         end
         handler.map('characterization', to: ['characterization'], multiple: false, force: true)
-        # how to discard?
-        handler.map('content') { |object, accumulator| }
-        handler.map('thumbnail') { |object, accumulator| }
-        handler.map('filename') { |object, accumulator| }
-        handler.map('mimetype') { |object, accumulator| }
+
+        # Discard these keys when mapping from JSON-LD to ROF
+        handler.skip('content')
+        handler.skip('thumbnail')
+        handler.skip('filename')
+        handler.skip('mimetype')
       end
 
       PredicateHandler.register('http://purl.org/dc/terms/') do |handler|
