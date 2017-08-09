@@ -21,7 +21,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rdf", "~> 2.0.1"
-  spec.add_dependency "rdf-rdfxml"
+  spec.add_dependency "rdf-rdfxml", "~> 2.0.0"
+  spec.add_dependency "rdf-aggregate-repo", "~> 2.0.0"
   # constrain rdf-turtle since the newer version wants rdf 2.2
   spec.add_dependency "rdf-turtle", '~> 2.0.0'
   spec.add_dependency "rdf-isomorphic"
