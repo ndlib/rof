@@ -44,13 +44,26 @@ module ROF
             expect(subject.to_rof).to eq({ "hello" => { "world" => ["value"] }, "kitchen" => ["another"] } )
           end
 
+          context 'with multiple: true' do
+            it 'will raise an error if too many' do
+              subject.add_predicate_location_and_value(['hello', 'world'], "value", multiple: false)
+              expect do
+                subject.add_predicate_location_and_value(['hello', 'world'], "another", multiple: false)
+              end.to raise_error(described_class::TooManyElementsError)
+            end
+            it 'will not be an array (but instead a String)' do
+              subject.add_predicate_location_and_value(['hello', 'world'], "value", multiple: false)
+              expect(subject.to_rof.fetch('hello').fetch('world')).to eq('value')
+            end
+          end
+
           context 'handling blank nodes' do
             context 'for the same node' do
               it 'collects values for the same location' do
                 blank_node = RDF::Node.new('_b0')
                 subject.add_blank_node(RDF::Statement.new(blank_node, nil, nil))
-                subject.add_predicate_location_and_value(['parent', 'child'], "value", blank_node)
-                subject.add_predicate_location_and_value(['parent', 'child'], "another", blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child'], "value", blank_node: blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child'], "another", blank_node: blank_node)
                 expect(subject.to_rof).to eq({
                   "parent" => [{
                     "child" => ["value", "another"]
@@ -61,8 +74,8 @@ module ROF
               it 'collects values for the same deep location' do
                 blank_node = RDF::Node.new('_b0')
                 subject.add_blank_node(RDF::Statement.new(blank_node, nil, nil))
-                subject.add_predicate_location_and_value(['parent', 'child', 'grandchild'], "value", blank_node)
-                subject.add_predicate_location_and_value(['parent', 'child', 'grandchild'], "another", blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child', 'grandchild'], "value", blank_node: blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child', 'grandchild'], "another", blank_node: blank_node)
                 expect(subject.to_rof).to eq({
                   "parent" => {
                     "child" => [{
@@ -75,8 +88,8 @@ module ROF
               it 'collects values for the same location' do
                 blank_node = RDF::Node.new('_b0')
                 subject.add_blank_node(RDF::Statement.new(blank_node, nil, nil))
-                subject.add_predicate_location_and_value(['parent'], "value", blank_node)
-                subject.add_predicate_location_and_value(['parent'], "another", blank_node)
+                subject.add_predicate_location_and_value(['parent'], "value", blank_node: blank_node)
+                subject.add_predicate_location_and_value(['parent'], "another", blank_node: blank_node)
                 expect(subject.to_rof).to eq({
                   "parent" => ["value", "another"]
                 })
@@ -85,8 +98,8 @@ module ROF
               it 'merges different locations' do
                 blank_node = RDF::Node.new('_b0')
                 subject.add_blank_node(RDF::Statement.new(blank_node, nil, nil))
-                subject.add_predicate_location_and_value(['parent', 'child_one'], "value", blank_node)
-                subject.add_predicate_location_and_value(['parent', 'child_two'], "another", blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child_one'], "value", blank_node: blank_node)
+                subject.add_predicate_location_and_value(['parent', 'child_two'], "another", blank_node: blank_node)
                 expect(subject.to_rof).to eq({
                   "parent" => [{
                     "child_one" => ["value"],
@@ -102,8 +115,8 @@ module ROF
                 blank_node_2 = RDF::Node.new('_b1')
                 subject.add_blank_node(RDF::Statement.new(blank_node_1, nil, nil))
                 subject.add_blank_node(RDF::Statement.new(blank_node_2, nil, nil))
-                subject.add_predicate_location_and_value(['parent', 'child'], "value", blank_node_1)
-                subject.add_predicate_location_and_value(['parent', 'child'], "another", blank_node_2)
+                subject.add_predicate_location_and_value(['parent', 'child'], "value", blank_node: blank_node_1)
+                subject.add_predicate_location_and_value(['parent', 'child'], "another", blank_node: blank_node_2)
                 expect(subject.to_rof).to eq({
                   "parent" => [{
                     "child" => ["value"]

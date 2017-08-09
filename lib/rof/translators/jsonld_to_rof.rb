@@ -8,7 +8,7 @@ module ROF
   module Translators
     # @api public
     #
-    # Responsible for converting JSON LD into an ROF Hash via registered URI maps.
+    # Responsible for converting JSON LD into an ROF Hash through the `.call` method (using the URI maps defined by the `.register` method)
     #
     # @note Some predicates require explicit mapping where as others have an assumed mapping. At present all URLs for @context of JSON-LD documents must be registered.
     #
@@ -21,8 +21,9 @@ module ROF
         handler.namespace_prefix('bibo:')
         handler.within(['metadata'])
       end
-      PredicateHandler.register('info:fedora/fedora-system:def/relations-external') do |handler|
-        handler.map('#isMemberOfCollection', to: ['rels-ext', 'isMemberOfCollection'])
+      PredicateHandler.register('info:fedora/fedora-system:def/relations-external#') do |handler|
+        handler.namespace_prefix('')
+        handler.within(['rels-ext'])
       end
       PredicateHandler.register('http://id.loc.gov/vocabulary/relators/') do |handler|
         handler.namespace_prefix('mrel:')
@@ -34,22 +35,32 @@ module ROF
       end
 
       PredicateHandler.register('https://library.nd.edu/ns/terms/') do |handler|
-        handler.map('accessEdit', to: ['rights', 'edit'])
-        handler.map('accessRead', to: ['rights', 'read'])
-        handler.map('accessEditGroup', to: ['rights', 'edit-groups'])
-        handler.map('accessReadGroup', to: ['rights', 'read-groups'])
-        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'])
-        handler.map('afmodel', to: ["af-model"])
-        handler.map('bendoitem', to: ["bendo-item"])
+        handler.namespace_prefix('nd:')
+        handler.within(['metadata'])
+        handler.map('accessEdit', to: ['rights', 'edit'], force: true)
+        handler.map('accessRead', to: ['rights', 'read'], force: true)
+        handler.map('accessEditGroup', to: ['rights', 'edit-groups'], force: true)
+        handler.map('accessReadGroup', to: ['rights', 'read-groups'], force: true)
+        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'], multiple: false, force: true)
+        handler.map('afmodel', to: ["af-model"], force: true)
+        handler.map('alephIdentifier', to: ['alephIdentifier'], multiple: false)
+        handler.map('bendoitem', to: ["bendo-item"], multiple: false, force: true)
         handler.map('depositor') do |object, accumulator|
           accumulator.register_properties('depositor', object)
         end
         handler.map('owner') do |object, accumulator|
           accumulator.register_properties('owner', object)
         end
-        handler.map('representativeFile') do |object, accumulator|
+        handler.map('representativeFile', multiple: false) do |object, accumulator|
           accumulator.register_properties('representative', object)
         end
+        handler.map('characterization', to: ['characterization'], multiple: false, force: true)
+
+        # Discard these keys when mapping from JSON-LD to ROF
+        handler.skip('content')
+        handler.skip('thumbnail')
+        handler.skip('filename')
+        handler.skip('mimetype')
       end
 
       PredicateHandler.register('http://purl.org/dc/terms/') do |handler|
@@ -70,6 +81,10 @@ module ROF
         handler.namespace_prefix('ms:')
         handler.map('role', to: ['metadata', 'dc:contributor', 'ms:role'], force: true)
       end
+
+      # The $1 will be the PID
+      # @see Related specs for expected behavior
+      REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{\Ahttps?://curate(?:[\w\.]*).nd.edu/show/([[:alnum:]]+)/?}.freeze
 
       # @api public
       #

@@ -5,27 +5,40 @@ module ROF
     module JsonldToRof
       RSpec.describe PredicateHandler do
         around do |spec|
-          # Ensuring that we preserve duplication of
+          # Ensuring that we preserve duplication of registry.
+          # We take a snap-shot of the registry, clear, do our tests, then restore the registry
           previous_registry = described_class.send(:registry)
           described_class.send(:clear_registry!)
+
           described_class.register('https://library.nd.edu/ns/terms/') do |handler|
             handler.map('accessRead', to: ['rights', 'read'])
+            handler.skip('to_my_loo')
           end
           described_class.register('http://purl.org/dc/terms/') do |handler|
             handler.namespace_prefix('dc:')
-            handler.map('dateTime', to: ['nested', 'dateTime'])
             handler.within(['metadata'])
+
+            handler.map('dateTime', to: ['nested', 'dateTime'])
           end
           described_class.register('http://www.ndltd.org/standards/metadata/etdms/1.1/') do |handler|
-            handler.within(['ms:degree'])
             handler.namespace_prefix('ms:')
+            handler.within(['ms:degree'])
+
             handler.map('block-key') do |object, accumulator|
               accumulator.add_predicate_location_and_value('from-block', object)
             end
             handler.map('something', to: ['metadata', 'ms:something'], force: true)
             handler.map('something', to: ['another', 'somewhere'])
           end
+          described_class.register('https://jedi.com/') do |handler|
+            handler.namespace_prefix('jedi:')
+            handler.within(['jedi:rank', 'lucas:meta'])
+
+            handler.map('knight', to: ['metadata', 'a-knight'], force: true)
+            handler.map('savant', to: ['metadata'])
+          end
           spec.run
+
           described_class.send(:clear_registry!, previous_registry)
         end
 
@@ -41,9 +54,24 @@ module ROF
             })
           end
 
-          it 'handles force option' do
+          it 'handles skip imperative' do
+            described_class.call('https://library.nd.edu/ns/terms/accessRead', object, accumulator)
+            described_class.call('https://library.nd.edu/ns/terms/to_my_loo', object, accumulator)
+            expect(accumulator.to_rof).to eq({ "rights" => { "read" => ["my-object"] } })
+          end
+
+          it 'handles option without namespace' do
             described_class.call('https://library.nd.edu/ns/terms/accessRead', object, accumulator)
             expect(accumulator.to_rof).to eq({ "rights" => { "read" => ["my-object"] } })
+          end
+
+          it 'handles force option by disregarding the prefix and within imperative' do
+            described_class.call('https://jedi.com/knight', 'the-knight', accumulator)
+            described_class.call('https://jedi.com/savant', 'the-savant', accumulator)
+            expect(accumulator.to_rof).to eq({
+              "jedi:rank" => { "lucas:meta" => { "jedi:metadata" => ['the-savant'] } },
+              "metadata" => { "a-knight" => ["the-knight"] }
+            })
           end
 
           it 'handles the block option' do

@@ -9,6 +9,7 @@ module ROF
       # The accumulator is a "passive" object. Things happen to it. All in the name of building the
       # hash that is ROF.
       #
+      # @note The #to_rof will convert blank nodes to arrays of strings for objects that don't have blank node dc:contributor.
       # @note The accumulator is only for one PID. See [ROF::Translators::JsonldToRof::Accumulator#add_pid]
       class Accumulator
         # @param [Hash] initial_rof - The base ROF document to which we will be adding elements.
@@ -22,15 +23,16 @@ module ROF
         # @return [Hash]
         def to_rof
           rof = @rof.deep_dup
-          expand_blank_node_locations(rof)
-          append_properties_to(rof)
+          rof = expand_blank_node_locations!(rof)
+          rof = normalize_contributor!(rof)
+          rof = append_properties_to(rof)
           rof
         end
 
         private
 
         # The antics of the blank node! See the specs for blank nodes to see the expected behavior.
-        def expand_blank_node_locations(rof)
+        def expand_blank_node_locations!(rof)
           @blank_node_locations.each_pair do |node, locations|
             locations.each_pair do |location, key_value_pairs|
               data = rof
@@ -56,6 +58,32 @@ module ROF
               data[slug] << hash if slug
             end
           end
+          rof
+        end
+
+        MODELS_THAT_HAVE_DC_CONTRIBUTOR_BLANK_NODES = ['etd'].freeze
+
+        # Convert dc:contributor from blank node to array for non-ETDs - DLTP1021
+        # The implementation that was developed started from the perspective that
+        # the dc:contributor was always a blank node (as implemented in ETDs).
+        # However that is not the case.
+        def normalize_contributor!(rof)
+          return rof unless rof.key?('af-model')
+          return rof unless rof.fetch('metadata', {}).key?('dc:contributor')
+          return rof if MODELS_THAT_HAVE_DC_CONTRIBUTOR_BLANK_NODES.include?(rof['af-model'].first.downcase)
+          contributors = []
+          Array.wrap(rof['metadata']['dc:contributor']).each do |contributor|
+            case contributor
+            when String
+              contributors << contributor
+            when Hash
+              contributors += Array.wrap(contributor.fetch('dc:contributor'))
+            else
+              raise "Unexpected rof['metadata']['contributor'] value #{contributor.inspect}"
+            end
+          end
+          rof['metadata']['dc:contributor']= contributors
+          rof
         end
 
         def append_properties_to(rof)
@@ -68,6 +96,12 @@ module ROF
           xml += '</fields>'
           rof['properties'] = xml
           rof
+        end
+
+        class TooManyElementsError < RuntimeError
+          def initialize(context)
+            super(%(Attempted to set more than one value for #{context}))
+          end
         end
 
         public
@@ -123,45 +157,57 @@ module ROF
         # @api public
         # @param [Array<String>, String] location - a list of nested hash keys (or a single string)
         # @param [String] value - a translated value for the original RDF Statement
-        # @param [false, RDF::Node] blank_node
+        # @param [Hash] options
+        # @option options [false, RDF::Node] blank_node
+        # @option options [Boolean] multiple  (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
         # @return [Array] location, value
-        def add_predicate_location_and_value(location, value, blank_node = false)
+        def add_predicate_location_and_value(location, value, options = {})
+          blank_node = options.fetch(:blank_node, false)
+          multiple = options.fetch(:multiple, true)
           # Because I am making transformation on the location via #shift method, I need a duplication.
           location = Array.wrap(location)
           if location == ['pid']
             return add_pid(value)
           end
           if blank_node
-            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+            add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple)
           else
-            add_predicate_location_and_value_direct_for_non_blank_node(location, value)
+            add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple)
           end
           [location, value]
         end
 
-        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node)
+        private
+
+        def add_predicate_location_and_value_direct_for_blank_node(location, value, blank_node, multiple)
           fetch_blank_node(blank_node) # Ensure the node exists
           @blank_node_locations[blank_node] ||= {}
           @blank_node_locations[blank_node][location[0..-2]] ||= []
           @blank_node_locations[blank_node][location[0..-2]] << { location[-1] => Array.wrap(coerce_object_to_string(value)) }
         end
 
-        def add_predicate_location_and_value_direct_for_non_blank_node(location, value)
+        def add_predicate_location_and_value_direct_for_non_blank_node(location, value, multiple)
           data = @rof
           location[0..-2].each do |slug|
             data[slug] ||= {}
             data = data[slug]
           end
           slug = location[-1]
-          data[slug] ||= []
-          data[slug] << coerce_object_to_string(value)
+          if multiple
+            data[slug] ||= []
+            data[slug] << coerce_object_to_string(value)
+          else
+            if data[slug].present?
+              raise TooManyElementsError.new(location)
+            else
+              data[slug] = coerce_object_to_string(value)
+            end
+          end
         end
-
-        private
 
         def coerce_object_to_string(object)
           return object if object.nil?
-          if object.to_s =~ %r{https?://curate.nd.edu/show/([^\\]+)/?}
+          if object.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
             return "und:#{$1}"
           elsif object.respond_to?(:value)
             return object.value

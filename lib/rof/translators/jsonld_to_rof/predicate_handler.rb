@@ -4,6 +4,11 @@ module ROF
   module Translators
     module JsonldToRof
       # Responsible for dealing with registered predicates and how those are handled.
+      #
+      # The two primary entry points are `.call` and `.register`
+      #
+      # @see ROF::Translators::JsonldToRof::PredicateHandler.call
+      # @see ROF::Translators::JsonldToRof::PredicateHandler.register
       module PredicateHandler
         class UnhandledPredicateError < RuntimeError
           def initialize(predicate, urls)
@@ -14,6 +19,9 @@ module ROF
         # @api public
         #
         # Parse the RDF predicate and RDF object and add it's contents to the accumulator
+        #
+        # @see ./spec/lib/rof/translators/jsonld_to_rof/predicate_handler_spec.rb for details and usage usage
+        # @see ROF::Translators::JsonldToRof::PredicateHandler.register for setup
         #
         # @example
         #   Given the following 4 RDF N-Triples (subject, predicate, object). The first two, with subject "_:b0" represent blank nodes.
@@ -38,6 +46,11 @@ module ROF
         end
 
         # @api public
+        #
+        # Register a map of an RDF Predicate URL to it's spot in the ROF Hash.
+        #
+        # @see ROF::Translators::JsonldToRof::PredicateHandler.call for usage
+        #
         # @param [String] url - The URL that we want to match against
         # @yield The block to configure how we handle RDF Predicates that match the gvien URL
         # @yieldparam [ROF::JsonldToRof::PredicateHandler::UrlHandler]
@@ -57,6 +70,8 @@ module ROF
         end
         private_class_method :clear_registry!
 
+        # @api private
+        # Responsible for capturing each of the predicate namespaces URLs that we are handling
         class RegistrySet
           def initialize
             @set = []
@@ -78,6 +93,7 @@ module ROF
         end
         private_constant :RegistrySet
 
+        # @api private
         # For a given URL map all of the predicates; Some predicates require explicit mapping, while others
         # may use implicit mapping.
         class UrlHandler
@@ -133,6 +149,7 @@ module ROF
           # @param [Hash] options (with symbol keys)
           # @option options [Boolean] :force - don't apply the within nor namespace prefix
           # @option options [Array] :to - an array that will be nested Hash keys
+          # @option options [Boolean] :multiple (default true) - if true will append values to an Array; if false will have a singular (non-Array) value
           # @yield If a block is given, call the block (and skip all other configuration)
           # @yieldparam [String] object
           # @see BlockSlugHandler for details concerning a mapping via a block
@@ -147,7 +164,14 @@ module ROF
             end
           end
 
-          # Responsible for coordinating the extraction of the
+          # Skip the given slug
+          # @param [String] slug
+          def skip(slug)
+            map(slug) { |*| }
+          end
+
+          # @api private
+          # Responsible for coordinating the extraction of the location
           class LocationExtractor
             def initialize(predicate, handlers)
               @predicate = predicate
@@ -163,6 +187,7 @@ module ROF
           end
           private_constant :LocationExtractor
 
+          # @api private
           class ImplicitLocationHandler
             def initialize(url_handler, slug)
               @url_handler = url_handler
@@ -172,11 +197,12 @@ module ROF
             def call(object, accumulator, blank_node)
               to = @url_handler.within + Array.wrap(slug)
               to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
-              accumulator.add_predicate_location_and_value(to, object, blank_node)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node)
             end
           end
           private_constant :ImplicitLocationHandler
 
+          # @api private
           class BlockSlugHandler
             def initialize(url_handler, slug, options, block)
               @url_handler = url_handler
@@ -193,6 +219,7 @@ module ROF
           end
           private_constant :BlockSlugHandler
 
+          # @api private
           class ExplicitLocationSlugHandler
             def initialize(url_handler, slug, options)
               @url_handler = url_handler
@@ -203,11 +230,12 @@ module ROF
 
             def call(object, accumulator, blank_node)
               to = @options.fetch(:to)
+              multiple = @options.fetch(:multiple, true)
               unless force?
                 to = @url_handler.within + Array.wrap(to)
                 to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
               end
-              accumulator.add_predicate_location_and_value(to, object, blank_node)
+              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node, multiple: multiple)
             end
 
             def force?

@@ -8,6 +8,104 @@ module ROF
     # find . -maxdepth 2 -name '*.rof' -type f | xargs grep -l <pid>
     # ```
     RSpec.describe JsonldToRof do
+      describe 'DLTP-999 regression' do
+        it 'converts @graph > @id keys to pid' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-999/pr76f190f54.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1) # We have one item
+          expect(output.first.fetch('pid')).to eq('und:pr76f190f54')
+          expect(output.first['rights'].fetch('embargo-date')).to eq("2016-11-16")
+        end
+      end
+
+      describe 'DLTP-1007 regression' do
+        it 'converts representative XML correctly' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1007/remediated-z029p269r94.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1)
+          properties = output.first.fetch('properties')
+          expect(properties).to include('<representative>und:z603qv36b1d</representative>')
+        end
+      end
+
+      describe 'DLTP-1015 regression verification' do
+        it 'converts bendo-item, embargo-date, representative and alephNumber to string' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1015/dltp1015.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1)
+          object = output.first
+          expect(object.fetch('properties')).to include('<representative>und:representative123</representative>')
+          expect(object.fetch('rights').fetch('embargo-date')).to eq("2016-11-16")
+          expect(object.fetch('metadata').fetch('nd:alephIdentifier')).to eq("aleph123")
+          expect(object.fetch('bendo-item')).to eq("bendo123")
+        end
+      end
+
+      describe 'DLTP-1021 regression verification' do
+        context 'for non-ETDs' do
+          it 'does not have blank nodes for dc:contributor' do
+            jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1021/dltp-1021-document.jsonld")))
+            expect(jsonld_from_curatend["@graph"]["nd:afmodel"]).to eq('Document')
+            output = described_class.call(jsonld_from_curatend, {})
+            expect(output.size).to eq(1)
+            object = output.first
+            expect(object.fetch('metadata').fetch('dc:contributor')).to eq(['Ilan Stavans'])
+          end
+        end
+        context 'for ETDs' do
+          it 'keeps the blank nodes for dc:contributor' do
+            jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/DLTP-1021/dltp-1021-etd.jsonld")))
+            expect(jsonld_from_curatend["@graph"].last['nd:afmodel']).to eq('Etd')
+            output = described_class.call(jsonld_from_curatend, {})
+            expect(output.size).to eq(1)
+            object = output.first
+            expect(object.fetch('metadata').fetch('dc:contributor')).to eq([
+              { "dc:contributor" => ["Dr. Spock"], "ms:role" => ["Committee Member"] },
+              { "dc:contributor" => ["Dr. Quinn"], "ms:role" => ["Committee Chair"] },
+              { "dc:contributor" => ["Dr. Zhivago"], "ms:role" => ["Committee Member"] }
+            ])
+          end
+        end
+      end
+
+      describe 'jsonld-translation regression verification' do
+        it 'discards content, thumbnail, filename, and mimetype' do
+          jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld-translation/5h73pv65x8x.jsonld")))
+          output = described_class.call(jsonld_from_curatend, {})
+          expect(output.size).to eq(1)
+          object = output.first
+          expect(object.fetch('characterization')).to be_a(String)
+          expect(object.fetch('characterization')).to eq(jsonld_from_curatend.fetch('nd:characterization'))
+
+          # Checking that we don't include the following keys.
+          json_doc = JSON.dump(object)
+          ['content', 'thumbnail', 'filename', 'mimetype'].each do |key|
+            value = "#{key.upcase}_SHOULD_NOT_BE_IN_ROF"
+            expect(json_doc).not_to include(value)
+          end
+        end
+      end
+
+      describe '::REGEXP_FOR_A_CURATE_RDF_SUBJECT' do
+        it 'handles data as expected' do
+          [
+            ["https://curate.nd.edu/downloads/abcd123", nil],
+            ["http://curate.nd.edu/downloads/abcd123", nil],
+            ["http://curatepprd.nd.edu/downloads/abcd123", nil],
+            ["http://curatepprd.nd.edu/show/abcd123", "abcd123"],
+            ["https://curatepprd.nd.edu/show/abcd123", "abcd123"],
+            ["https://curatepprd.library.nd.edu/show/abcd123", "abcd123"],
+            ["https://curate.nd.edu/show/abcd123", "abcd123"],
+            ["http://curate.nd.edu/show/abcd123", "abcd123"],
+            ["http://mycurate.nd.edu/show/abcd123", nil],
+            ["http://curate.nd.edu/show/abcd123/extra", 'abcd123'],
+          ].each do |input, expected|
+            input =~ described_class::REGEXP_FOR_A_CURATE_RDF_SUBJECT
+            expect($1).to eq(expected)
+          end
+        end
+      end
+
       describe '.call' do
         [
           '2j62s467216',

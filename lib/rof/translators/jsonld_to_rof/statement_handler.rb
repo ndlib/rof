@@ -4,6 +4,8 @@ module ROF
   module Translators
     module JsonldToRof
       # Responsible for parsing an RDF statement and adding to the accumulator.
+      #
+      # @see ROF::Translators::JsonldToRof::StatementHandler.call
       module StatementHandler
         # @api public
         #
@@ -63,8 +65,10 @@ module ROF
             PredicateObjectHandler.call(@statement.predicate, @statement.object, @accumulator)
           end
 
+          # Handle the various CurateND environments instead of just curate.nd.edu
+
           def handle_subject
-            return nil unless @statement.subject.to_s =~ %r{https://curate.nd.edu/show/([^\\]+)/?}
+            return nil unless @statement.subject.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
             pid = "und:#{$1}"
             @accumulator.add_pid(pid)
           end
