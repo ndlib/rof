@@ -92,7 +92,7 @@ module ROF
     def self.check_solr_for_previous(config, osf_project_identifier)
       solr_url = config.fetch('solr_url', nil)
       return nil if solr_url.nil?
-      solr = RSolr.connect url: "#{solr_url}/curatend"
+      solr = RSolr.connect url: "#{solr_url}"
       query = solr.get 'select', params: {
         q: "desc_metadata__osf_project_identifier_ssi:#{osf_project_identifier}",
         rows: 1,

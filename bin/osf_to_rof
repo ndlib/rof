@@ -10,7 +10,7 @@ file_path = STDOUT
 config['project_file'] = './osf_projects'
 config['package_dir'] = './FROM_OSF'
 config['output_dir'] = '.'
-config['solr_url'] = 'http://localhost:8080/solr'
+config['solr_url'] = 'http://localhost:8080/solr/curatend'
 
 # parse the command line
 #
@@ -27,7 +27,7 @@ opt = OptionParser.new do |opts|
   opts.on("", "--output_dir output_dir", "Directory to save ROF to (defaults to .)") do |output_dir|
     config['output_dir'] = output_dir
   end
-  opts.on("", "--solr_url solr_url", "URL of  SOLR to use  (defaults to http://localhost:8080/solr)") do |solr_url|
+  opts.on("", "--solr_url solr_url", "URL of  SOLR to use  (defaults to http://localhost:8080/solr/curatend)") do |solr_url|
     config['solr_url'] = solr_url
   end
 end
