@@ -15,6 +15,7 @@ module ROF
       "bendo" => ROF::Filters::Bendo,
       "datestamp" => ROF::Filters::DateStamp,
       "file-to-url" => ROF::Filters::FileToUrl,
+      "filename-normalize" => ROF::Filters::FilenameNormalize,
       "label" => ROF::Filters::Label,
       "work" => ROF::Filters::Work,
       "access-to-relsext" => ROF::Filters::AccessToRelsext

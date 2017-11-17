@@ -19,7 +19,7 @@ opt = OptionParser.new do |opts|
   Filtering sends transformed objects to stdout.
 
   Possible filters are:
-    bendo, collections, datestamp, file-to-url, label, work}
+    bendo, collections, datestamp, file-to-url, label, work, filename-normalize}
 
   opts.on("", "--fedora URL", "Base Fedora URL") do |url|
     fedora_info[:url] = url
