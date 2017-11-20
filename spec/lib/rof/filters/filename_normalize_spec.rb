@@ -68,6 +68,25 @@ module ROF
 	  }
         })
       end
+
+      it "maps accented characters" do
+        items = [{
+          "content-meta" => {
+            "mime-type" => "application/pdf",
+            "label" => "àèìòùa.pdf",
+            "URL" => "bendo:/item/9306sx63m9v/àèìòùåååå™.pdf"
+	  }
+        }]
+        after = @w.process(items)
+        expect(after.length).to eq(1)
+        expect(after.first).to eq({
+          "content-meta" => {
+            "mime-type" => "application/pdf",
+            "label" => "aeioua.pdf",
+            "URL" => "bendo:/item/9306sx63m9v/aeiouaaaa-.pdf"
+	  }
+        })
+      end
     end
   end
 end
