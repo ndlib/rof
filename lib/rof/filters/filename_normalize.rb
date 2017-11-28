@@ -44,12 +44,16 @@ module ROF
       end
 
       # rename file associated with label
+      # If JOBPATH is defined, use that directory as a base;
+      # otherwise, start in the current directory
+      # Send exception errors to STDERR for calling task to handle.
       def rename_file(old_name, new_name)
         return false if old_name == new_name
         begin
-          File.rename(old_name, new_name)
-        rescue
-          # Log something?         
+	  job_dir = ENV.fetch('JOBPATH', '.')
+          File.rename(File.join(job_dir ,old_name), File.join(job_dir ,new_name))
+        rescue StandardError=>e
+          STDERR.puts "\tError: #{e}"
         end
 	return true
       end
