@@ -48,6 +48,7 @@ module ROF
       # otherwise, start in the current directory
       # Send exception errors to STDERR for calling task to handle.
       def rename_file(old_name, new_name)
+        return false if old_name == new_name
         begin
 	  job_dir = ENV.fetch('JOBPATH', '.')
           File.rename(File.join(job_dir ,old_name), File.join(job_dir ,new_name))
