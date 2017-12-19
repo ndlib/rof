@@ -13,12 +13,10 @@ module ROF
         obj_list.map! do |obj|
           if obj.key?('content-meta')
             if obj['content-meta'].key?('label')
-	      file_renamed = rename_file(obj['content-meta']['label'],  make_url_friendly(obj['content-meta']['label']))
-	      if file_renamed
-                obj['content-meta']['label'] = make_url_friendly(obj['content-meta']['label'])
-	      end
+              obj['content-meta']['label'] = make_url_friendly(obj['content-meta']['label'])
             end
             if obj['content-meta'].key?('URL')
+              rename_file(File.basename(obj['content-meta']['URL']), make_url_friendly(File.basename(obj['content-meta']['URL'])))
               obj['content-meta']['URL'] = File.join(File.dirname(obj['content-meta']['URL']), make_url_friendly(File.basename(obj['content-meta']['URL'])))
             end
           end
@@ -50,12 +48,12 @@ module ROF
       def rename_file(old_name, new_name)
         return false if old_name == new_name
         begin
-	  job_dir = ENV.fetch('JOBPATH', '.')
-          File.rename(File.join(job_dir ,old_name), File.join(job_dir ,new_name))
-        rescue StandardError=>e
+          job_dir = ENV.fetch('JOBPATH', '.')
+          File.rename(File.join(job_dir, old_name), File.join(job_dir, new_name))
+        rescue StandardError => e
           STDERR.puts "\tError: #{e}"
         end
-	return true
+        true
       end
     end
   end
