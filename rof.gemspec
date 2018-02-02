@@ -35,7 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '~> 1.6.8.1' # Need this version for older rubies
   # only needed because we use ruby < 2.2.2 in production and that doesn't play
   # nice with rails 5
-  spec.add_dependency 'activesupport', '< 5.0'
+  spec.add_dependency "activesupport", '>= 4.0', "< 6.0"
   spec.add_dependency 'ebnf', '< 1.0.2'
   # adding this only because bundler selects version 2.1 and it breaks things
   spec.add_dependency 'rdf-xsd', '~> 2.0.0'
