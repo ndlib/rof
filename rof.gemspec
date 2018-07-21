@@ -25,7 +25,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rdf-aggregate-repo", "~> 2.0.0"
   # constrain rdf-turtle since the newer version wants rdf 2.2
   spec.add_dependency "rdf-turtle", '~> 2.0.0'
-  spec.add_dependency "rdf-isomorphic"
+  spec.add_dependency 'rdf-rdfa', '~>2.0.1'
+  spec.add_dependency "rdf-isomorphic", "~> 2.0.0"
   spec.add_dependency "json-ld", "~> 2.0.0"
   spec.add_dependency "mime-types", "~> 2.4"
   spec.add_dependency "rubydora", "~> 1.8.1"
