@@ -88,3 +88,17 @@ the `pid` field from every object in a file, and return it as a JSON array:
 ```
 jq '[.[]|.pid]' < spec/fixtures/vecnet-citation.json
 ```
+
+# Testing
+The full test suite is run via `bundle exec rake`.
+
+## Testing/Using Different Gemfiles
+
+If you want to run your tests via a different gemfile, see the following:
+
+```console
+$ BUNDLE_GEMFILE=gemfiles/activesupport4.gemfile bundle install
+$ BUNDLE_GEMFILE=gemfiles/activesupport4.gemfile bundle exec rspec
+```
+
+See the [Bundler `bundle config` documentation](https://bundler.io/v1.16/bundle_config.html) for further information.
