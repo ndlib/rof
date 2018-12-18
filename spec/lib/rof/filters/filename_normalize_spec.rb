@@ -20,7 +20,7 @@ module ROF
 	     "URL" => "bendo:/item/9306sx63m9v/9w032229v7d-RightsLink - Inorg. Chim. Acta.pdf"
 	  }
         }]
-        after = @w.process(items)
+        after = @w.process(items, false)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "content-meta"  => {
@@ -39,7 +39,7 @@ module ROF
 	     "URL" => "bendo:/item/9306sx63m9v/9z902z1348c-Rightslink®carbene.pdf"
           }
         }]
-        after = @w.process(items)
+        after = @w.process(items, false)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "content-meta" => {
@@ -58,7 +58,7 @@ module ROF
             "URL" => "bendo:/item/9306sx63m9v/9593tt46x2s-BarrettBJ042017D.pdf"
 	  }
         }]
-        after = @w.process(items)
+        after = @w.process(items, false)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "content-meta" => {
@@ -77,7 +77,7 @@ module ROF
             "URL" => "bendo:/item/9306sx63m9v/àèìòùåååå™.pdf"
 	  }
         }]
-        after = @w.process(items)
+        after = @w.process(items, false)
         expect(after.length).to eq(1)
         expect(after.first).to eq({
           "content-meta" => {

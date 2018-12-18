@@ -8,20 +8,40 @@ module ROF
       def initialize(options = {})
       end
 
-      def process(obj_list)
+      # Adjust the content labels and URL of all items in the obj_list.
+      # If move_files is true, then also try to rename the files in the filesystem.
+      def process(obj_list, move_files=true)
+        nerr = 0
         # We need to map access with pid to rels-ext predicates
         obj_list.map! do |obj|
-          if obj.key?('content-meta')
-            if obj['content-meta'].key?('label')
-              obj['content-meta']['label'] = make_url_friendly(obj['content-meta']['label'])
-            end
-            if obj['content-meta'].key?('URL')
-              rename_file(File.basename(obj['content-meta']['URL']), make_url_friendly(File.basename(obj['content-meta']['URL'])))
-              obj['content-meta']['URL'] = File.join(File.dirname(obj['content-meta']['URL']), make_url_friendly(File.basename(obj['content-meta']['URL'])))
+          content_meta = obj.fetch('content-meta', nil)
+          next obj if content_meta.nil?
+          label = content_meta.fetch('label', nil)
+          if !label.nil?
+            content_meta['label'] = make_url_friendly(label)
+          end
+          url = content_meta.fetch('URL', nil)
+          if !url.nil?
+            old_name = File.basename(url)
+            new_name = make_url_friendly(old_name)
+            content_meta['URL'] = File.join(File.dirname(url), new_name)
+            if old_name != new_name && move_files
+              begin
+                rename_file(old_name, new_name)
+              rescue StandardError => e
+                # in case of an error, try to keep going so we can report as many
+                # errors as possible. And then raise an error at the end.
+                STDERR.puts "\tError: #{e}"
+                nerr += 1
+              end
             end
           end
           obj
         end
+        if nerr > 0
+          raise "Problem Renaming Files"
+        end
+        obj_list
       end
 
       # make_url_friendly is identical to ActiveSupport::Inflector.parameterize
@@ -46,14 +66,8 @@ module ROF
       # otherwise, start in the current directory
       # Send exception errors to STDERR for calling task to handle.
       def rename_file(old_name, new_name)
-        return false if old_name == new_name
-        begin
-          job_dir = ENV.fetch('JOBPATH', '.')
-          File.rename(File.join(job_dir, old_name), File.join(job_dir, new_name))
-        rescue StandardError => e
-          STDERR.puts "\tError: #{e}"
-        end
-        true
+        job_dir = ENV.fetch('JOBPATH', '.')
+        File.rename(File.join(job_dir, old_name), File.join(job_dir, new_name))
       end
     end
   end
