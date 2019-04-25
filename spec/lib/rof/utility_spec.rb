@@ -86,11 +86,6 @@ module ROF
 	it { is_expected.to eq('Document')}
       end
 
-      context 'decode collection' do
-	subject { util.decode_work_type({'type' => 'collection'})  }
-	it { is_expected.to eq('Collection')}
-      end
-
       context 'decode etd' do
 	subject { util.decode_work_type({'type' => 'etd'})  }
 	it { is_expected.to eq('Etd')}
