@@ -3,7 +3,6 @@ require 'rof/compare_rof'
 require 'json'
 require 'rubydora'
 require 'rof/ingest'
-require 'rof/collection'
 require 'rof/translators'
 require 'rof/utility'
 module ROF

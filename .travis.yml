@@ -1,7 +1,5 @@
 language: ruby
 rvm:
-  - "2.1.10"
-  - "2.2.8"
   - "2.3.5"
   - "2.4.2"
 cache: bundler
@@ -10,10 +8,6 @@ env:
   global:
     - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
 
-matrix:
-  exclude:
-  - rvm: 2.1.10
-    gemfile: gemfiles/activesupport5.gemfile
 gemfile:
   - gemfiles/activesupport5.gemfile
   - gemfiles/activesupport4.gemfile

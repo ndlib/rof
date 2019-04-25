@@ -30,7 +30,6 @@ module ROF
       def process_one_work(input_obj)
         model = @utility.decode_work_type(input_obj)
         return [input_obj] if model.nil?
-        return [ROF::Collection.process_one_collection(input_obj, @utility)] if model == 'Collection'
 
         main_obj = set_main_obj(input_obj, model)
 

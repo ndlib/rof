@@ -13,16 +13,11 @@ module ROF
 
     WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/
 
-    # Strictly speaking, a Collection is not a Work-
-    # it's included here to cull out and pass down
-    # the batch processing pipeline
-
     WORK_TYPES = {
       # csv name => af-model
       'article' => 'Article',
       'dataset' => 'Dataset',
       'document' => 'Document',
-      'collection' => 'Collection',
       'etd' => 'Etd',
       'image' => 'Image',
       'gtar' => 'Gtar',
