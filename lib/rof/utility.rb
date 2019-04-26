@@ -58,6 +58,16 @@ module ROF
       s += "</fields>\n"
       s
     end
+    
+    def self.prop_ds_to_values(ds_value)
+      owner = nil
+      representative = nil
+      m = ds_value.match(/<owner>(.*)<\/owner>/)
+      owner = m[1] if m
+      m = ds_value.match(/<representative>(.*)<\/representative>/)
+      representative = m[1] if m
+      { owner: owner, representative: representative }        
+    end
 
     # test for embargo xml cases
     def self.has_embargo_date?(embargo_xml)

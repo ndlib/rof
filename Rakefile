@@ -28,16 +28,15 @@ namespace :commitment do
   task :code_coverage do
     require 'json'
     # Our goal is to stay at this coverage level or higher; As the level increases, we bump up the goal
-    # Added the conditional for Travis and RUBY_VERSION because something is weird upstream
-    COVERAGE_GOAL = ENV['TRAVIS'] && RUBY_VERSION =~ /\A2\.[01]/ ? 90 : 95
+    COVERAGE_GOAL = 95
     $stdout.puts "Checking code_coverage"
     lastrun_filename = File.expand_path('../coverage/.last_run.json', __FILE__)
     if File.exist?(lastrun_filename)
       coverage_percentage = JSON.parse(File.read(lastrun_filename)).fetch('result').fetch('covered_percent').to_i
+      $stdout.puts "\t#{COVERAGE_GOAL}%\tExpected\n"
+      $stdout.puts "\t#{coverage_percentage}%\tActual\n"
       if coverage_percentage < COVERAGE_GOAL
-        abort("ERROR: Code Coverage Goal Not Met:\n\t#{coverage_percentage}%\tExpected\n\t#{COVERAGE_GOAL}%\tActual")
-      else
-        $stdout.puts "Code Coverage Goal Met (#{COVERAGE_GOAL}%)"
+        abort("ERROR: Code Coverage Goal Not Met")
       end
     else
       abort "Expected #{lastrun_filename} to exist for code coverage"

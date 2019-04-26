@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'rof'
+require 'optparse'
+require 'json'
+
+opt = OptionParser.new do |opts|
+  opts.banner = %q{Usage: rof_to_csv
+  Reads a ROF file from stdin.
+  Writes a CSV file to stdout.
+
+  In case of an error, a message is written to stderr and the program
+  exits with a non-zero status.
+}
+end
+
+opt.parse!
+
+if ARGV.length != 0
+  abort opt.help
+end
+
+STDIN.set_encoding("UTF-8")
+file_contents = STDIN.read
+rof = JSON.parse(file_contents)
+ROF::CLI.rof_to_csv(rof, {}, STDOUT)

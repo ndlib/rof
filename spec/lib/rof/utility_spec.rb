@@ -15,6 +15,17 @@ module ROF
         it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n" }
       end
     end
+    
+    describe 'prop_ds_to_value' do
+      context 'decode properties datastream' do
+        subject { described_class.prop_ds_to_values("<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n<representative>temp:1234</representative>\n</fields>\n") }
+        it { is_expected.to eq({ owner: "msuhovec", representative: "temp:1234"}) }
+      end
+      context 'decode without representative' do
+        subject { described_class.prop_ds_to_values("<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n") }
+        it { is_expected.to eq({ owner: "msuhovec", representative: nil}) }
+      end
+    end
     describe 'next_label' do
        let(:id) { util.next_label}
 

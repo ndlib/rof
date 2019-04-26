@@ -53,9 +53,6 @@ module ROF::Translators
       CSV.parse(csv_contents) do |row|
         if first_line.nil?
           first_line = row
-          unless first_line.include?('type') && first_line.include?('owner')
-            raise MissingOwnerOrType
-          end
           next
         end
         next if row.length <= 1
@@ -64,8 +61,10 @@ module ROF::Translators
           next if item.nil?
           column_name = first_line[i]
           case column_name
-          when 'type', 'owner', 'access', 'bendo-item'
+          when 'owner', 'access', 'bendo-item', 'representative', 'file-URL', 'file-mime-type', 'filename', 'file-with-path', 'af-model'
             result[column_name] = item.strip
+          when 'type', 'rof-type'
+            result['type'] = item.strip
           when 'curate_id', 'pid'
             result['pid'] = item.strip
           when 'collections'
@@ -79,6 +78,10 @@ module ROF::Translators
         result['rights'] = ROF::Access.decode(result.fetch('access', 'private'), result['owner'])
         result.delete('access')
         result = collect_metadata(result)
+        if result['type'] == 'fobject'
+          # this is an already processed item, so populate all of the datastreams
+          result = collect_other_datastreams(result)
+        end
         # is this a generic file which should be attached to the previous work?
         if result['type'] == '+'
           raise NoPriorWork if previous_work.nil?
@@ -107,6 +110,38 @@ module ROF::Translators
       # TODO(dbrower): check there are no unknown namespaces
       metadata['@context'] = ROF::RdfContext
       rof['metadata'] = metadata
+      rof
+    end
+    
+    RELS_EXT_FIELDS = ["isPartOf", "isMemberOfCollection"]
+    
+    def self.collect_other_datastreams(rof)
+      # need to populate the rels-ext, the properties, and (maybe) the content
+      rels = {}
+      RELS_EXT_FIELDS.each do |field|
+        next unless rof[field]
+        rels[field] = rof.delete(field)
+      end
+      rof['rels-ext'] = rels
+      
+      rof['properties'] = ROF::Utility.prop_ds(rof['owner'], rof['representative'])
+      rof['properties-meta'] = { 'mime-type' => 'text/xml' }
+      rof.delete('representative')
+      
+      if rof['file-URL']
+        rof['content-meta'] = {
+          'label' => rof.delete('filename'),
+          'mime-type' => rof.delete('file-mime-type'),
+          'URL' => rof.delete('file-URL'),
+        }
+      elsif rof['filename']
+        rof['content-meta'] = {
+          'label' => rof.delete('filename'),
+          'mime-type' => rof.delete('file-mime-type')
+        }
+        rof['content-file'] = rof.delete('filename')
+      end
+      rof.delete('file-with-path')
       rof
     end
   end

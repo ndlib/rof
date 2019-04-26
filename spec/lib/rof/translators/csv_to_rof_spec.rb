@@ -2,17 +2,6 @@ require 'spec_helper'
 
 module ROF::Translators
   describe "translate CSV" do
-    it "requires the columns type and owner" do
-      s = "dc:title,access,owner"
-      expect{CsvToRof.call(s)}.to raise_error(ROF::Translators::CsvToRof::MissingOwnerOrType)
-
-      s = "dc:title,access,type"
-      expect{CsvToRof.call(s)}.to raise_error(ROF::Translators::CsvToRof::MissingOwnerOrType)
-
-      s = "dc:title,type,owner,access"
-      expect(CsvToRof.call(s)).to eq([])
-    end
-
     it "requires rows to have an owner and type" do
       s = %q{type,owner
       Work,
