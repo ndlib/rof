@@ -110,6 +110,13 @@ module ROF
       end
     end
 
+    def self.rof_to_csv(items, config = {}, outfile = STDOUT)
+      result = ROF::Translators::RofToCsv.call(items, config)
+      with_outfile_handling(outfile) do |writer|
+        writer.write(result)
+      end
+    end
+
     # Convert the given JSON-LD to ROF JSON document
     # @param [Hash] jsonld - contents of a CSV file
     # @param [Hash] config

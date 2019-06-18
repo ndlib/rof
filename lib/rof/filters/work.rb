@@ -40,7 +40,7 @@ module ROF
 
       # make the first file be the representative thumbnail
       def make_thumbnail(result, main_obj, input_obj)
-        thumb_rep = nil
+        thumb_rep = input_obj['representative']  # might be nil
         input_obj['files'].each do |finfo|
           if finfo.is_a?(String)
             fname = finfo
@@ -101,7 +101,7 @@ module ROF
         result['pid'] = input_obj.fetch('pid', @utility.next_label)
         result['bendo-item'] = input_obj['bendo-item']
         result['rights'] = input_obj['rights']
-        result['properties'] = ROF::Utility.prop_ds(input_obj['owner'])
+        result['properties'] = ROF::Utility.prop_ds(input_obj['owner'], input_obj['representative'])
         result['properties-meta'] = { 'mime-type' => 'text/xml' }
         result['rels-ext'] = input_obj.fetch('rels-ext', {})
         result['metadata'] = input_obj['metadata']
