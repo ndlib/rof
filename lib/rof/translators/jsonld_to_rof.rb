@@ -43,6 +43,8 @@ module ROF
         handler.map('accessReadGroup', to: ['rights', 'read-groups'], force: true)
         handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'], multiple: false, force: true)
         handler.map('afmodel', to: ["af-model"], force: true)
+        # map nd:filename to content-file 
+        handler.map('filename', to: [ 'content-file' ], multiple: false, force: true)
         handler.map('alephIdentifier', to: ['alephIdentifier'], multiple: false)
         handler.map('bendoitem', to: ["bendo-item"], multiple: false, force: true)
         handler.map('depositor') do |object, accumulator|
@@ -59,7 +61,6 @@ module ROF
         # Discard these keys when mapping from JSON-LD to ROF
         handler.skip('content')
         handler.skip('thumbnail')
-        handler.skip('filename')
         handler.skip('mimetype')
       end
 
