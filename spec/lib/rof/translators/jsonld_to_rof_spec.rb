@@ -69,7 +69,7 @@ module ROF
       end
 
       describe 'jsonld-translation regression verification' do
-        it 'discards content, thumbnail, filename, and mimetype' do
+        it 'discards content, thumbnail, and mimetype' do
           jsonld_from_curatend = JSON.load(File.read(File.join(GEM_ROOT, "spec/fixtures/jsonld-translation/5h73pv65x8x.jsonld")))
           output = described_class.call(jsonld_from_curatend, {})
           expect(output.size).to eq(1)
@@ -79,7 +79,7 @@ module ROF
 
           # Checking that we don't include the following keys.
           json_doc = JSON.dump(object)
-          ['content', 'thumbnail', 'filename', 'mimetype'].each do |key|
+          ['content', 'thumbnail',  'mimetype'].each do |key|
             value = "#{key.upcase}_SHOULD_NOT_BE_IN_ROF"
             expect(json_doc).not_to include(value)
           end
