@@ -15,7 +15,7 @@ module ROF
         it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n" }
       end
     end
-    
+
     describe 'prop_ds_to_value' do
       context 'decode properties datastream' do
         subject { described_class.prop_ds_to_values("<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n<representative>temp:1234</representative>\n</fields>\n") }
@@ -76,6 +76,32 @@ module ROF
           root = xml_doc.root
           rights = described_class.has_embargo_date?(root)
           expect(rights).to eq(this_test[1])
+        end
+      end
+    end
+
+    describe 'DoubleCaret' do
+      test_cases = [
+        ["no caret", "no caret"],
+        ["no beginning caret ^^ here", "no beginning caret ^^ here"],
+        ["^^name Peter", {"name" => "Peter"}],
+        ["^^something-else can have ^single^ carets", {"something-else" => "can have ^single^ carets"}],
+        ["^^first there^^second can^^third be many items^^fourth encoded",
+          {"first" => "there", "second" => "can", "third" => "be many items", "fourth" => "encoded"}]
+      ]
+
+      it "decodes strings correctly" do
+        test_cases.each do |this_test|
+          result = described_class.DecodeDoubleCaret(this_test[0])
+          expect(result).to eq(this_test[1])
+        end
+      end
+
+      it "encodes strings correctly" do
+        test_cases.each do |this_test|
+          next if !this_test[1].is_a?(Hash)
+          result = described_class.EncodeDoubleCaret(this_test[1])
+          expect(result).to eq(this_test[0])
         end
       end
     end

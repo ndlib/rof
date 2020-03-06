@@ -31,7 +31,7 @@ RSpec.describe ROF::Translators::OsfToRof do
   end
 
   if !(ENV['TRAVIS'] && RUBY_VERSION =~ /\A2\.[01]\./)
-    it "converts  an OSF Registration tar,gz to an ROF", memfs: true do
+    it "converts an OSF Registration tar.gz to an ROF", memfs: true do
       expected_rof = [{"owner"=>"msuhovec",
                        "type"=>"OsfArchive",
                        "rights"=>{"read-groups"=>["public"]},

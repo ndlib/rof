@@ -1,6 +1,7 @@
 require 'rof/translator'
 require 'csv'
 require 'json'
+require 'json/ld'
 
 module ROF::Translators
   # translate a ROF file into a CSV file
@@ -35,6 +36,7 @@ module ROF::Translators
         item['rels-ext']&.each do |predicate, value|
           next if predicate == "hasModel"
           next if predicate == "@context"
+          next if predicate == "@id"
           value = value.join('|') if value.is_a?(Array)
           add_field.call(v, predicate, value)
         end
@@ -54,10 +56,11 @@ module ROF::Translators
           end
         end
 
-        item['metadata']&.each do |predicate, value|
-          next if predicate == "@context"
-          value = value.join('|') if value.is_a?(Array)
-          add_field.call(v, predicate, value)
+        # sometimes json-ld metadata gets serialized using a @graph.
+        # this complicates the decoding since we need to treat it as RDF data.
+        md = decode_metadata(item['metadata'], config.fetch(:sort_keys, nil))
+        md.each do |predicate, values|
+          add_field.call(v, predicate, values.join('|'))
         end
 
         results.push(v)
@@ -68,6 +71,7 @@ module ROF::Translators
       # column names could be reordered to some cannonical ordering.
       #
       # Returns a string containing the contents of the CSV file.
+      seen_names.sort!() if config.fetch(:sort_keys, nil) # for testing
       CSV.generate do |csv|
         csv << seen_names
         results.each do |v|
@@ -82,10 +86,10 @@ module ROF::Translators
       rights = {}
       if item['rels-ext']
         r = item['rels-ext']
-        rights['read'] = r.delete('hasViewer')
-        rights['read-groups'] = r.delete('hasViewerGroup')
-        rights['edit'] = r.delete('hasEditor')
-        rights['edit-groups'] = r.delete('hasEditorGroup')
+        rights['read'] = Array(r.delete('hasViewer'))
+        rights['read-groups'] = Array(r.delete('hasViewerGroup'))
+        rights['edit'] = Array(r.delete('hasEditor'))
+        rights['edit-groups'] = Array(r.delete('hasEditorGroup'))
         rights.delete_if {|k,v| v.nil? || v.empty?}
       end
 
@@ -108,5 +112,59 @@ module ROF::Translators
 
       ROF::Access.encode(rights)
     end
+
+    # treat the metadata as RDF data, and turn into a hash
+    # of key (string) => Array (of string).
+    def self.decode_metadata(metadata, sort_keys=false)
+      graph = RDF::Graph.new << JSON::LD::API.toRdf(metadata)
+      # first deal with statements with blank node subjects
+      blanks = {}
+      graph.each do |statement|
+        subject = statement.subject
+        next unless subject.node?
+        blanks[subject] = blanks.fetch(subject, []) << statement
+      end
+
+      # figure out which subject is the root
+      # Try to choose a non-blank node, but default to first subject otherwise
+      root = graph.subjects.detect (-> {graph.first_subject}) {|x| !x.node?}
+
+      # now deal with everything else
+      result = {}
+      graph.each do |statement|
+        next unless statement.subject == root
+        predicate = make_predicate_nice(statement.predicate.pname)
+        object = statement.object
+        objvalue = if object.literal?
+                      object.value
+                    elsif object.node?
+                      StatementsToDoubleCaret(blanks[object], sort_keys)
+                    end
+        result[predicate] = result.fetch(predicate, []) << objvalue unless objvalue.nil?
+      end
+      result
+    end
+
+    def self.StatementsToDoubleCaret(statement_list, sort_keys)
+      return nil if statement_list.nil?  # e.g. undefined blank node referenced
+      h = {}
+      statement_list.each do |statement|
+        predicate = make_predicate_nice(statement.predicate.pname)
+        h[predicate] = statement.object.value
+      end
+      ROF::Utility.EncodeDoubleCaret(h, sort_keys)
+    end
+
+    def self.make_predicate_nice(ugly_name)
+      ROF::RdfContext.each do |k,v|
+        next unless v.is_a?(String)
+        if ugly_name.start_with?(v)
+          return ugly_name.sub(v, k + ":")
+        end
+      end
+      ugly_name
+    end
+
+
   end
 end
