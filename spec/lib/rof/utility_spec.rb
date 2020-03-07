@@ -6,24 +6,24 @@ module ROF
 
     describe 'prop_ds' do
       context 'set properties with representative' do
-        subject { described_class.prop_ds('msuhovec', 'temp:1234') }
+        subject { described_class.prop_ds('msuhovec', 'temp:1234', 'batch_ingest') }
         it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n<representative>temp:1234</representative>\n</fields>\n" }
       end
 
       context 'set properties without representative' do
         subject { described_class.prop_ds('msuhovec') }
-        it { is_expected.to eq "<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n" }
+        it { is_expected.to eq "<fields><depositor></depositor>\n<owner>msuhovec</owner>\n</fields>\n" }
       end
     end
 
     describe 'prop_ds_to_value' do
       context 'decode properties datastream' do
         subject { described_class.prop_ds_to_values("<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n<representative>temp:1234</representative>\n</fields>\n") }
-        it { is_expected.to eq({ owner: "msuhovec", representative: "temp:1234"}) }
+        it { is_expected.to eq(owner: 'msuhovec', representative: 'temp:1234', depositor: 'batch_ingest') }
       end
       context 'decode without representative' do
         subject { described_class.prop_ds_to_values("<fields><depositor>batch_ingest</depositor>\n<owner>msuhovec</owner>\n</fields>\n") }
-        it { is_expected.to eq({ owner: "msuhovec", representative: nil}) }
+        it { is_expected.to eq(owner: 'msuhovec', representative: nil, depositor: 'batch_ingest') }
       end
     end
 

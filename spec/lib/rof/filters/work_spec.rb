@@ -45,7 +45,7 @@ module ROF
         expect(after[0]).to include('type' => 'fobject',
                                     'af-model' => 'GenericWork',
                                     'pid' => '$(pid--0)',
-                                    'properties' => ROF::Utility.prop_ds('user1', '$(pid--1)'))
+                                    'properties' => ROF::Utility.prop_ds('user1', '$(pid--1)', 'batch_ingest'))
         expect(after[1]).to include('type' => 'fobject',
                                     'af-model' => 'GenericFile',
                                     'pid' => '$(pid--1)')

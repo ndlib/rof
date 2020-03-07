@@ -7,8 +7,8 @@ module ROF
   # A few common utility methods
   class Utility
     # set 'properties'
-    def self.prop_ds(owner, representative = nil)
-      s = "<fields><depositor>batch_ingest</depositor>\n<owner>#{owner}</owner>\n"
+    def self.prop_ds(owner, representative = nil, depositor = nil)
+      s = "<fields><depositor>#{depositor}</depositor>\n<owner>#{owner}</owner>\n"
       if representative
         s += "<representative>#{representative}</representative>\n"
       end
@@ -17,13 +17,16 @@ module ROF
     end
 
     def self.prop_ds_to_values(ds_value)
+      depositor = nil
       owner = nil
       representative = nil
+      m = ds_value.match(/<depositor>(.*)<\/depositor>/)
+      depositor = m[1] if m
       m = ds_value.match(/<owner>(.*)<\/owner>/)
       owner = m[1] if m
       m = ds_value.match(/<representative>(.*)<\/representative>/)
       representative = m[1] if m
-      { owner: owner, representative: representative }
+      { owner: owner, representative: representative, depositor: depositor }
     end
 
     # test for embargo xml cases

@@ -126,7 +126,7 @@ module ROF::Translators
       end
       rof['rels-ext'] = rels
 
-      rof['properties'] = ROF::Utility.prop_ds(rof['owner'], rof['representative'])
+      rof['properties'] = ROF::Utility.prop_ds(rof['owner'], rof['representative'], "batch_ingest")
       rof['properties-meta'] = { 'mime-type' => 'text/xml' }
       rof.delete('representative')
 

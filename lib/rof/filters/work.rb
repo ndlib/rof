@@ -39,7 +39,7 @@ module ROF
           file_rof = make_file_rof(finfo, main_obj['pid'], input_obj)
           if thumb_rep.nil?
             thumb_rep = file_rof['pid']
-            main_obj['properties'] = ROF::Utility.prop_ds(input_obj['owner'], thumb_rep)
+            main_obj['properties'] = ROF::Utility.prop_ds(input_obj['owner'], thumb_rep, 'batch_ingest')
           end
           result << file_rof
         end
@@ -82,7 +82,7 @@ module ROF
           'pid' => input_obj.fetch('pid') { next_label }, # only make label if needed
           'bendo-item' => input_obj['bendo-item'],
           'rights' => input_obj['rights'],
-          'properties' => ROF::Utility.prop_ds(input_obj['owner'], input_obj['representative']),
+          'properties' => ROF::Utility.prop_ds(input_obj['owner'], input_obj['representative'], 'batch_ingest'),
           'properties-meta' => { 'mime-type' => 'text/xml' },
           'rels-ext' => input_obj.fetch('rels-ext', {}),
           'metadata' => input_obj['metadata']
