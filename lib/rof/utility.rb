@@ -115,6 +115,12 @@ module ROF
       File.open(targzfile, 'rb') do |file|
         Zlib::GzipReader.wrap(file) do |gz|
           Gem::Package::TarReader.new(gz) do |tar|
+            # FYI: The TarReader requires the tar file to be in strict POSIX
+            # compliance. But GNU tar will encode very large user IDs (as found
+            # on network filesystems) in a non-standard way, which causes a
+            # exception that XXX is "not an octal string". One can force files
+            # to be archived with a 0 UID using GNU tar with the command line
+            # option `--owner=0`.
             tar.seek(file_name) do |file_entry|
               file_dest_dir = File.join(File.dirname(targzfile),
                                         File.dirname(file_entry.full_name))
