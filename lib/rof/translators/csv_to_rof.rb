@@ -1,4 +1,5 @@
 require 'rof/translator'
+require 'rof/utility'
 require('csv')
 require('json')
 
@@ -100,7 +101,8 @@ module ROF::Translators
       metadata = {}
       rof = rof.delete_if do |field, v|
         if field =~ /([^:]+):.+/
-          metadata[field] = v.length == 1 ? v.first : v
+          vv = v.map{|x| ROF::Utility.DecodeDoubleCaret(x)}
+          metadata[field] = vv.length == 1 ? vv.first : vv
           true
         else
           false
@@ -112,9 +114,9 @@ module ROF::Translators
       rof['metadata'] = metadata
       rof
     end
-    
+
     RELS_EXT_FIELDS = ["isPartOf", "isMemberOfCollection"]
-    
+
     def self.collect_other_datastreams(rof)
       # need to populate the rels-ext, the properties, and (maybe) the content
       rels = {}
@@ -123,11 +125,11 @@ module ROF::Translators
         rels[field] = rof.delete(field)
       end
       rof['rels-ext'] = rels
-      
+
       rof['properties'] = ROF::Utility.prop_ds(rof['owner'], rof['representative'])
       rof['properties-meta'] = { 'mime-type' => 'text/xml' }
       rof.delete('representative')
-      
+
       if rof['file-URL']
         rof['content-meta'] = {
           'label' => rof.delete('filename'),

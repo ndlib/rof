@@ -93,6 +93,48 @@ module ROF::Translators
       expect {CsvToRof.call(s)}.to raise_error(ROF::Translators::CsvToRof::NoPriorWork)
     end
 
+    it "decodes the double caret encoding correctly" do
+      s = %q{type,owner,dc:title,dc:contributor
+      Work,user1,"a title","^^dc:contributor Jane Doe^^ms:role Committee Member"
+      }
+      rof = CsvToRof.call(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "rights" => {"edit" => ["user1"]},
+        "metadata" => {
+          "dc:title" => "a title",
+          "dc:contributor" => {
+            "dc:contributor" => "Jane Doe",
+            "ms:role" => "Committee Member"
+          },
+          "@context" => ROF::RdfContext
+        }
+      }])
+    end
+
+    it "decodes multiple values of double carets correctly" do
+      s = %q{type,owner,dc:title,dc:contributor
+      Work,user1,"a title","^^name Jane Doe^^ms:role Committee Member|^^name Hugo Easton Whitman, III^^ms:role Research Advisor"
+      }
+      rof = CsvToRof.call(s)
+      expect(rof).to eq([{
+        "type" => "Work",
+        "owner" => "user1",
+        "rights" => {"edit" => ["user1"]},
+        "metadata" => {
+          "dc:title" => "a title",
+          "dc:contributor" => [{
+            "name" => "Jane Doe",
+            "ms:role" => "Committee Member"
+          },{
+            "name" => "Hugo Easton Whitman, III",
+            "ms:role" => "Research Advisor"
+          }],
+          "@context" => ROF::RdfContext
+        }
+      }])
+    end
 
   end
 end

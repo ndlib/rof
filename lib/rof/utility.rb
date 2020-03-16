@@ -58,7 +58,7 @@ module ROF
       s += "</fields>\n"
       s
     end
-    
+
     def self.prop_ds_to_values(ds_value)
       owner = nil
       representative = nil
@@ -66,7 +66,7 @@ module ROF
       owner = m[1] if m
       m = ds_value.match(/<representative>(.*)<\/representative>/)
       representative = m[1] if m
-      { owner: owner, representative: representative }        
+      { owner: owner, representative: representative }
     end
 
     # test for embargo xml cases
@@ -127,6 +127,33 @@ module ROF
           end
         end
       end
+    end
+
+
+    # decode a double caret encoding to a hash
+    #
+    # example: decode "^^name Jane Doe^^age 45^^dc:relation und:123456" to
+    # { "name" => "Jane Doe", "age" => "45", "dc:relation" => "und:123456" }
+    def self.DecodeDoubleCaret(s)
+      return s unless s.start_with?("^^")
+      result = {}
+      s.scan(/\^\^([^ ]+) (([^^]|\^[^^])*)/) do |first, second|
+        result[first] = second
+      end
+      result
+    end
+
+    # encode a hash as a double caret encoding
+    #
+    # example: encode { "name" => "Jane Doe", "age" => "45", "dc:relation" => "und:123456" }
+    # as "^^age 45^^dc:relation und:123456^^name Jane Doe"
+    def self.EncodeDoubleCaret(hsh, sort_keys=false)
+      keys = hsh.keys
+      keys.sort! if sort_keys
+      pieces = keys.map do |k|
+        "^^" + k.to_s + " " + hsh[k].to_s
+      end
+      pieces.join("")
     end
   end
 end
