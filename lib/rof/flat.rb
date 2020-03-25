@@ -46,8 +46,17 @@ module ROF
       @fields[field_name].uniq! unless @fields[field_name].nil?
     end
 
+    def add_if_missing(field_name, value)
+      add(field_name, value) if @fields[field_name].nil?
+    end
+
+    def delete_all(field_name)
+      @fields.delete(field_name)
+    end
+
     def set(field_name, value)
-      @fields[field_name] = [value]
+      delete_all(field_name)
+      add(field_name, value)
     end
 
     def to_sexp

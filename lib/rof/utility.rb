@@ -17,15 +17,12 @@ module ROF
     end
 
     def self.prop_ds_to_values(ds_value)
-      depositor = nil
-      owner = nil
-      representative = nil
       m = ds_value.match(/<depositor>(.*)<\/depositor>/)
-      depositor = m[1] if m
+      depositor = if m then m[1] end
       m = ds_value.match(/<owner>(.*)<\/owner>/)
-      owner = m[1] if m
+      owner = if m then m[1] end
       m = ds_value.match(/<representative>(.*)<\/representative>/)
-      representative = m[1] if m
+      representative = if m then m[1] end
       { owner: owner, representative: representative, depositor: depositor }
     end
 

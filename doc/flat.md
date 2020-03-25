@@ -34,6 +34,7 @@ In the following,
 (=1) means there should be exactly one value for this field, and it shoud be present;
 (*1) means item is optional, but there is at most one entry if present;
 (0+) means the item is multi-valued and optional.
+Fields marked with an asterisk (*) are used only for internal processing
 
   Field                 | Description
   -----                 | -----------
@@ -59,4 +60,7 @@ In the following,
   representative        | PID of a representative image for this object (*1)
   rof-type              | The ROF type field (=1)
   thumbnail             | URL of thumbnail (? not sure how internal fedora desc look)
+  files *               | List of files that are a part of this work.
+  file-path *           | relative path to a file to upload
+
 

@@ -6,16 +6,16 @@ module ROF
     end
 
     # convert from a string to a hash
-    def self.decode(access_string, owner=nil)
+    def self.decode(access_string, owner = nil)
       result = {}
-      access_string.split(";").each do |clause|
-        t = self.decode_clause(clause, owner)
-        t.each do |k,v|
-          if v.is_a?(Array)
-            result[k] = (result.fetch(k, []) + v).uniq
-          else
-            result[k] = v
-          end
+      access_string.split(/[;|]/).each do |clause|
+        t = decode_clause(clause, owner)
+        t.each do |k, v|
+          result[k] = if v.is_a?(Array)
+                        (result.fetch(k, []) + v).uniq
+                      else
+                        v
+                      end
         end
       end
 
@@ -26,28 +26,28 @@ module ROF
     # simple because we do not try to recover "public", et al.
     def self.encode(access_hash)
       result = []
-      access_hash.each do |k,v|
-        xk = k.gsub("-groups", "group").gsub("embargo-date","embargo")
+      access_hash.each do |k, v|
+        xk = k.gsub('-groups', 'group').gsub('embargo-date', 'embargo')
         xv = v.join(',') if v.is_a?(Array)
         result << "#{xk}=#{xv}"
       end
-      result.join(";")
+      result.join('|')
     end
 
     def self.decode_clause(access, owner)
       case access
-      when "public"
-        {"read-groups" => ["public"], "edit" => [owner]}
-      when "restricted"
-        {"read-groups" => ["registered"], "edit" => [owner]}
-      when "private"
-        {"edit" => [owner]}
+      when 'public'
+        { 'read-groups' => ['public'], 'edit' => [owner] }
+      when 'restricted'
+        { 'read-groups' => ['registered'], 'edit' => [owner] }
+      when 'private'
+        { 'edit' => [owner] }
       when /^embargo=(.+)/
-        {"embargo-date" => $1}
+        { 'embargo-date' => Regexp.last_match(1) }
       when /^(read|readgroup|edit|editgroup|discover|discovergroup)=(.+)/
-        which = $1
-        who = $2.split(",")
-        xwhich = which.gsub("group", "-groups")
+        which = Regexp.last_match(1)
+        who = Regexp.last_match(2).split(',')
+        xwhich = which.gsub('group', '-groups')
         Hash[xwhich, who]
       else
         raise DecodeError

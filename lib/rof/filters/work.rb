@@ -26,67 +26,65 @@ module ROF
 
       # given a single object, return a list (possibly empty) of new objects
       # to replace the one given
-      def process_one_work(input_obj)
-        model = decode_work_type(input_obj)
-        return [input_obj] if model.nil?
+      def process_one_work(input_record)
+        model = decode_work_type(input_record)
+        return [input_record] if model.nil?
 
-        main_obj = input_to_rof(input_obj, model)
+        work_record = create_work_record(input_record, model)
 
         # make the first file be the representative thumbnail
-        thumb_rep = input_obj['representative'] # might be nil
-        result = [main_obj]
-        input_obj['files']&.each do |finfo|
-          file_rof = make_file_rof(finfo, main_obj['pid'], input_obj)
+        thumb_rep = input_record.find_first('representative') # might be nil
+
+        result = [work_record]
+        input_record.find_all('files')&.each do |finfo|
+          file_record = create_file_record(finfo, work_record, input_record)
           if thumb_rep.nil?
-            thumb_rep = file_rof['pid']
-            main_obj['properties'] = ROF::Utility.prop_ds(input_obj['owner'], thumb_rep, 'batch_ingest')
+            thumb_rep = file_record.fin_first('pid')
+            work_record.set('representative', thumb_rep)
           end
-          result << file_rof
+          result << file_record
         end
         result
       end
 
-      def make_file_rof(finfo, main_pid, input_obj)
-        if finfo.is_a?(String)
-          fname = finfo
-          finfo = { 'files' => [fname] }
-        else
-          fname = finfo['files'].first
-          raise NoFile if fname.nil?
-        end
-        finfo['rights'] ||= input_obj['rights']
-        finfo['owner'] ||= input_obj['owner']
-        finfo['bendo-item'] ||= input_obj['bendo-item']
-        finfo['metadata'] ||= {
-          '@context' => ROF::RdfContext
-        }
-        finfo['metadata']['dc:title'] ||= fname
-        finfo['representative'] = nil
-        finfo['rels-ext'] = { 'isPartOf' => [main_pid] }
-        f_obj = input_to_rof(finfo, 'GenericFile')
-        f_obj['content-file'] = fname
-        mimetype = MIME::Types.of(fname)&.first&.content_type || 'application/octet-stream'
-        f_obj['content-meta'] = {
-          'label' => fname,
-          'mime-type' => mimetype
-        }
-        f_obj['collections'] = finfo['collections']
-        f_obj.delete_if { |_k, v| v.nil? }
-        f_obj
+      def create_file_record(rec, work_record, input_record)
+          file_rec = ROF::Utility.DecodeDoubleCaret(rec)
+          if file_rec.is_a?(String)
+            fname = file_rec
+            target = Flat.new
+          else
+            fname = file_rec.delete('files')&.first
+            raise NoFile if fname.nil?
+            target = Flat.from_hash(file_rec)
+           end
+            target.add('pid', next_label) unless target.find_first('pid')
+          target.set('rof-type', 'fobject')
+          target.set('af-model', 'GenericFile')
+          target.add_if_missing('owner', work_record.find_all('owner'))
+          target.add_if_missing('bendo-item', work_record.find_first('bendo-item'))
+          target.add_if_missing('dc:title', fname)
+          target.add_if_missing('file-mime-type', MIME::Types.of(fname).first&.content_type || 'application/octet-stream')
+          target.add_if_missing('depositor', 'batch_ingest')
+          target.add('isPartOf', work_record.find_first('pid'))
+          target.add('content-file', fname)
+
+          target.add_if_missing('rights', work_record.find_all('rights'))
+        result
       end
 
-      def input_to_rof(input_obj, model)
-        {
-          'type' => 'fobject',
-          'af-model' => model,
-          'pid' => input_obj.fetch('pid') { next_label }, # only make label if needed
-          'bendo-item' => input_obj['bendo-item'],
-          'rights' => input_obj['rights'],
-          'properties' => ROF::Utility.prop_ds(input_obj['owner'], input_obj['representative'], 'batch_ingest'),
-          'properties-meta' => { 'mime-type' => 'text/xml' },
-          'rels-ext' => input_obj.fetch('rels-ext', {}),
-          'metadata' => input_obj['metadata']
-        }
+      def create_work_record(input_obj, model)
+        result = Flat.new
+        result.add('type', 'fobject')
+        result.add('af-model', model)
+        result.add('pid', input_obj.find_first('pid') || next_label)
+        result.add('bendo-item', input_obj.find_first('bendo-item'))
+        result.add('owner', input_record.find_all('owner'))
+        result.add('depositor', input_record.find_all('depositor'))
+        result.add('representative', input_record.find_all('representative'))
+        #result['rights'] = input_obj['rights']
+        #result['rels-ext'] = input_obj.fetch('rels-ext', {})
+        #result['metadata'] = input_obj['metadata']
+        result
       end
 
       # Issue pid label

@@ -26,10 +26,9 @@ module ROF
       # @raise NoPool if we don't have a means of determining the next_id
       def initialize(options = {})
         prefix = options.fetch(:prefix, nil)
-        @id_list =  case
-                    when options[:id_list]
+        @id_list =  if options[:id_list]
                       options[:id_list]
-                    when options[:noids]
+                    elsif options[:noids]
                       NoidsPool.new(options[:noids].fetch(:noid_server), options[:noids].fetch(:pool_name))
                     else
                       raise NoPool
@@ -59,15 +58,16 @@ module ROF
         end
 
         # now assign bendo ids
-        bendo_item = nil
+        bendo_item = obj_list.detect { |x| x.find_first('pid') }&.find_first('pid')
+            bendo_item = pid.gsub(/^.*:/, '')
         obj_list.each do |obj|
           # for now we just use the first item's pid stripped of any namespaces as the bendo item id
           if bendo_item.nil?
-            bendo_item = obj['pid'].gsub(/^.*:/, '') unless obj['pid'].nil?
-            next if bendo_item.nil?
+            pid = obj.find_first('pid')
+            next if pid.nil?
           end
           # don't touch if a bendo item has already been assigned
-          obj['bendo-item'] = bendo_item if obj['bendo-item'].nil? || obj['bendo-item'] == ''
+          obj.add_if_missing('bendo-item', bendo_item)
         end
 
         obj_list
@@ -123,7 +123,7 @@ module ROF
         obj.gsub(@label_re) do |match|
           pid = labels[Regexp.last_match(1)]
           raise MissingLabel if pid.nil? && force
-          pid.nil? ? match : pid
+          pid || match
         end
       end
 
