@@ -12,15 +12,12 @@ module ROF
       class NoFile < RuntimeError
       end
 
-      def initialize(options = {})
-        @file_name = options.fetch(:file_name)
-        @utility = ROF::Utility.new
+      def initialize(_options = {})
+        @seq = 0
       end
-      attr_reader :file_name
 
       # wade through object list
       def process(obj_list)
-        @utility.set_workdir(file_name)
         obj_list.map! { |x| process_one_work(x) }
         obj_list.flatten!
       end
@@ -28,7 +25,7 @@ module ROF
       # given a single object, return a list (possibly empty) of new objects
       # to replace the one given
       def process_one_work(input_obj)
-        model = @utility.decode_work_type(input_obj)
+        model = decode_work_type(input_obj)
         return [input_obj] if model.nil?
 
         main_obj = set_main_obj(input_obj, model)
@@ -40,7 +37,7 @@ module ROF
 
       # make the first file be the representative thumbnail
       def make_thumbnail(result, main_obj, input_obj)
-        thumb_rep = input_obj['representative']  # might be nil
+        thumb_rep = input_obj['representative'] # might be nil
         input_obj['files'].each do |finfo|
           if finfo.is_a?(String)
             fname = finfo
@@ -83,7 +80,7 @@ module ROF
           if thumb_rep.nil?
             thumb_rep = f_obj['pid']
             if thumb_rep.nil?
-              thumb_rep = @utility.next_label
+              thumb_rep = next_label
               f_obj['pid'] = thumb_rep
             end
             main_obj['properties'] = ROF::Utility.prop_ds(input_obj['owner'], thumb_rep)
@@ -98,7 +95,7 @@ module ROF
 
         result['type'] = 'fobject'
         result['af-model'] = model
-        result['pid'] = input_obj.fetch('pid', @utility.next_label)
+        result['pid'] = input_obj.fetch('pid', next_label)
         result['bendo-item'] = input_obj['bendo-item']
         result['rights'] = input_obj['rights']
         result['properties'] = ROF::Utility.prop_ds(input_obj['owner'], input_obj['representative'])
@@ -106,6 +103,36 @@ module ROF
         result['rels-ext'] = input_obj.fetch('rels-ext', {})
         result['metadata'] = input_obj['metadata']
         result
+      end
+
+      # Issue pid label
+      def next_label
+        "$(pid--#{@seq})".tap { |_| @seq += 1 }
+      end
+
+      WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/
+
+      WORK_TYPES = {
+        # csv name => af-model
+        'article' => 'Article',
+        'dataset' => 'Dataset',
+        'document' => 'Document',
+        'etd' => 'Etd',
+        'image' => 'Image',
+        'gtar' => 'Gtar',
+        'osfarchive' => 'OsfArchive'
+      }.freeze
+
+      # Given an object's type, detrmine and return its af-model
+      def decode_work_type(obj)
+        if obj['type'] =~ WORK_TYPE_WITH_PREFIX_PATTERN
+          return 'GenericWork' if Regexp.last_match(2).nil?
+          Regexp.last_match(2)
+        else
+          # this will return nil if key t does not exist
+          work_type = obj['type'].downcase
+          WORK_TYPES[work_type]
+        end
       end
     end
   end

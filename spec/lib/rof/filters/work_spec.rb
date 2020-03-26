@@ -4,10 +4,10 @@ require 'support/an_rof_filter'
 module ROF
   module Filters
     describe Work do
-      it_behaves_like "an ROF::Filter"
-      let(:valid_options) { { file_name: '' } }
-      it "handles variant work types" do
-        w = Work.new(valid_options)
+      it_behaves_like 'an ROF::Filter'
+      let(:valid_options) { {} }
+      it 'handles variant work types' do
+        w = Work.new
 
         item = {"type" => "Work", "owner" => "user1"}
         after = w.process_one_work(item)
@@ -35,7 +35,7 @@ module ROF
       end
 
       it "makes the first file be the representative" do
-        w = Work.new(valid_options)
+        w = Work.new
 
         item = {"type" => "Work", "owner" => "user1", "files" => ["a.txt", "b.jpeg"]}
         after = w.process_one_work(item)
@@ -53,7 +53,7 @@ module ROF
       end
 
       it "decodes files correctly" do
-        w = Work.new(valid_options)
+        w = Work.new
 
         item = {
           "type" => "Work",
@@ -84,6 +84,26 @@ module ROF
         expect(after[2]).to include("type" => "fobject",
                                     "af-model" => "GenericFile",
                                     "content-file" => "extra file.txt")
+    describe 'decode_work_type' do
+      [{ input: 'article', output: 'Article' },
+       { input: 'dataset', output: 'Dataset' },
+       { input: 'document', output: 'Document' },
+       { input: 'etd', output: 'Etd' },
+       { input: 'ETD', output: 'Etd' },
+       { input: 'image', output: 'Image' }].each do |t|
+        it 'decode ' + t[:input] do
+          w = Work.new
+          result = w.decode_work_type('type' => t[:input])
+          expect(result).to eq(t[:output])
+        end
+      end
+    end
+
+    describe 'next_label' do
+      it 'assigns initial label' do
+        w = Work.new
+        id = w.next_label
+        expect(id).to eq '$(pid--0)'
       end
     end
   end
