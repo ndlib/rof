@@ -5,23 +5,20 @@ module ROF
   module Filters
     # Make Filename and its label URL-legal
     class FilenameNormalize < ROF::Filter
-      def initialize(options = {})
-      end
+      def initialize(_options = {}); end
 
       # Adjust the content labels and URL of all items in the obj_list.
       # If move_files is true, then also try to rename the files in the filesystem.
-      def process(obj_list, move_files=true)
+      def process(obj_list, move_files = true)
         nerr = 0
         # We need to map access with pid to rels-ext predicates
         obj_list.map! do |obj|
           content_meta = obj.fetch('content-meta', nil)
           next obj if content_meta.nil?
           label = content_meta.fetch('label', nil)
-          if !label.nil?
-            content_meta['label'] = make_url_friendly(label)
-          end
+          content_meta['label'] = make_url_friendly(label) unless label.nil?
           url = content_meta.fetch('URL', nil)
-          if !url.nil?
+          unless url.nil?
             old_name = File.basename(url)
             new_name = make_url_friendly(old_name)
             content_meta['URL'] = File.join(File.dirname(url), new_name)
@@ -38,9 +35,7 @@ module ROF
           end
           obj
         end
-        if nerr > 0
-          raise "Problem Renaming Files"
-        end
+        raise 'Problem Renaming Files' if nerr > 0
         obj_list
       end
 
