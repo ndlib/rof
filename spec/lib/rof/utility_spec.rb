@@ -26,13 +26,6 @@ module ROF
         it { is_expected.to eq({ owner: "msuhovec", representative: nil}) }
       end
     end
-    describe 'next_label' do
-       let(:id) { util.next_label}
-
-       it 'assigns initial label' do
-         expect(id).to eq '$(pid--0)'
-       end
-    end
 
     describe '.load_items_from_json_file' do
       let(:logger) { double(puts: true) }
@@ -103,39 +96,6 @@ module ROF
           result = described_class.EncodeDoubleCaret(this_test[1])
           expect(result).to eq(this_test[0])
         end
-      end
-    end
-
-    describe 'decode_work_type' do
-
-      context 'decode article' do
-	subject { util.decode_work_type({'type' => 'article'})  }
-	it { is_expected.to eq('Article')}
-      end
-
-      context 'decode dataset' do
-	subject { util.decode_work_type({'type' => 'dataset'})  }
-	it { is_expected.to eq('Dataset')}
-      end
-
-      context 'decode document' do
-	subject { util.decode_work_type({'type' => 'document'})  }
-	it { is_expected.to eq('Document')}
-      end
-
-      context 'decode etd' do
-	subject { util.decode_work_type({'type' => 'etd'})  }
-	it { is_expected.to eq('Etd')}
-      end
-
-      context 'test downcase etd' do
-	subject { util.decode_work_type({'type' => 'ETD'})  }
-	it { is_expected.to eq('Etd')}
-      end
-
-      context 'test image' do
-	subject { util.decode_work_type({'type' => 'image'})  }
-	it { is_expected.to eq('Image')}
       end
     end
   end

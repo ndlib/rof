@@ -55,7 +55,7 @@ when "ingest", "validate"
 when "filter"
   filter_name = ARGV[1]
   file_name = ARGV[2]
-  filter = ROF::Filters.for(filter_name, file_name: file_name, bendo_info: bendo_info, prefix: prefix, noids: noids)
+  filter = ROF::Filters.for(filter_name, bendo_info: bendo_info, prefix: prefix, noids: noids)
   ROF::CLI.filter_file(filter, file_name, STDOUT)
 else
   STDERR.puts "Unknown command #{ARGV[0]}"

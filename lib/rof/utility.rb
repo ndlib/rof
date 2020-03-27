@@ -6,49 +6,6 @@ require 'rubygems/package'
 module ROF
   # A few common utility methods
   class Utility
-    def initialize
-      @seq = 0
-      @workdir = '.'
-    end
-
-    WORK_TYPE_WITH_PREFIX_PATTERN = /^[Ww]ork(-(.+))?/
-
-    WORK_TYPES = {
-      # csv name => af-model
-      'article' => 'Article',
-      'dataset' => 'Dataset',
-      'document' => 'Document',
-      'etd' => 'Etd',
-      'image' => 'Image',
-      'gtar' => 'Gtar',
-      'osfarchive' => 'OsfArchive'
-    }.freeze
-
-    # use base directory of given file for workdir
-    def set_workdir(filename)
-      @workdir = File.dirname(filename)
-    end
-
-    # give base directory of given file for workdir
-    attr_reader :workdir
-
-    # Given an object's type, detrmine and return its af-model
-    def decode_work_type(obj)
-      if obj['type'] =~ WORK_TYPE_WITH_PREFIX_PATTERN
-        return 'GenericWork' if Regexp.last_match(2).nil?
-        Regexp.last_match(2)
-      else
-        # this will return nil if key t does not exist
-        work_type = obj['type'].downcase
-        WORK_TYPES[work_type]
-      end
-    end
-
-    # Issue pid label
-    def next_label
-      "$(pid--#{@seq})".tap { |_| @seq += 1 }
-    end
-
     # set 'properties'
     def self.prop_ds(owner, representative = nil)
       s = "<fields><depositor>batch_ingest</depositor>\n<owner>#{owner}</owner>\n"
@@ -97,7 +54,7 @@ module ROF
     def self.check_solr_for_previous(config, osf_project_identifier)
       solr_url = config.fetch('solr_url', nil)
       return nil if solr_url.nil?
-      solr = RSolr.connect url: "#{solr_url}"
+      solr = RSolr.connect url: solr_url.to_s
       query = solr.get 'select', params: {
         q: "desc_metadata__osf_project_identifier_ssi:#{osf_project_identifier}",
         rows: 1,
@@ -135,13 +92,12 @@ module ROF
       end
     end
 
-
     # decode a double caret encoding to a hash
     #
     # example: decode "^^name Jane Doe^^age 45^^dc:relation und:123456" to
     # { "name" => "Jane Doe", "age" => "45", "dc:relation" => "und:123456" }
     def self.DecodeDoubleCaret(s)
-      return s unless s.start_with?("^^")
+      return s unless s.start_with?('^^')
       result = {}
       s.scan(/\^\^([^ ]+) (([^^]|\^[^^])*)/) do |first, second|
         result[first] = second
@@ -153,13 +109,13 @@ module ROF
     #
     # example: encode { "name" => "Jane Doe", "age" => "45", "dc:relation" => "und:123456" }
     # as "^^age 45^^dc:relation und:123456^^name Jane Doe"
-    def self.EncodeDoubleCaret(hsh, sort_keys=false)
+    def self.EncodeDoubleCaret(hsh, sort_keys = false)
       keys = hsh.keys
       keys.sort! if sort_keys
       pieces = keys.map do |k|
-        "^^" + k.to_s + " " + hsh[k].to_s
+        '^^' + k.to_s + ' ' + hsh[k].to_s
       end
-      pieces.join("")
+      pieces.join('')
     end
   end
 end
