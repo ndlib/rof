@@ -39,7 +39,7 @@ module ROF
         input_record.find_all('files')&.each do |finfo|
           file_record = create_file_record(finfo, work_record, input_record)
           if thumb_rep.nil?
-            thumb_rep = file_record.fin_first('pid')
+            thumb_rep = file_record.find_first('pid')
             work_record.set('representative', thumb_rep)
           end
           result << file_record
@@ -48,16 +48,17 @@ module ROF
       end
 
       def create_file_record(rec, work_record, _input_record)
-        file_rec = ROF::Utility.DecodeDoubleCaret(rec)
-        if file_rec.is_a?(String)
-          fname = file_rec
-          target = Flat.new
-        else
-          fname = file_rec.delete('files')&.first
+        if rec.start_with?('(record')
+          target, = Flat.read_sexp(rec)
+          fname = target.find_first('files')
           raise NoFile if fname.nil?
 
-          target = Flat.from_hash(file_rec)
-         end
+          target.delete_all('files')
+          target.delete_all('type')
+        else
+          fname = rec
+          target = Flat.new
+        end
         target.add('pid', next_label) unless target.find_first('pid')
         target.set('rof-type', 'fobject')
         target.set('af-model', 'GenericFile')
@@ -75,7 +76,7 @@ module ROF
 
       def create_work_record(input_record, model)
         result = Flat.new
-        result.add('type', 'fobject')
+        result.add('rof-type', 'fobject')
         result.add('af-model', model)
         result.add('pid', input_record.find_first('pid') || next_label)
         result.add('bendo-item', input_record.find_first('bendo-item'))

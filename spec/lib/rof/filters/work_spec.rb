@@ -13,25 +13,27 @@ module ROF
 
         item = Flat.from_hash('type' => 'Work', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'GenericWork', owner => 'user1'))
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'GenericWork', 'owner' => 'user1',
+                                                 'pid' => '$(pid--0)'))
 
         item = Flat.from_hash('type' => 'Work-Image', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to include('type' => 'fobject', 'af-model' => 'Image')
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image',
+                                                 'owner' => 'user1', 'pid' => '$(pid--1)'))
 
         item = Flat.from_hash('type' => 'work-image', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to include('type' => 'fobject', 'af-model' => 'image')
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'image', 'owner' => 'user1', 'pid' => '$(pid--2)'))
 
         item = Flat.from_hash('type' => 'Image', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to include('type' => 'fobject', 'af-model' => 'Image')
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image', 'owner' => 'user1', 'pid' => '$(pid--3)'))
 
-        item = { 'type' => 'image', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'image', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to include('type' => 'fobject', 'af-model' => 'Image')
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image', 'owner' => 'user1', 'pid' => '$(pid--4)'))
 
-        item = { 'type' => 'Other', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'Other', 'owner' => 'user1')
         after = w.process_one_work(item)
         expect(after.first).to eq(item)
       end
@@ -39,19 +41,32 @@ module ROF
       it 'makes the first file be the representative' do
         w = Work.new
 
-        item = { 'type' => 'Work', 'owner' => 'user1', 'files' => ['a.txt', 'b.jpeg'] }
+        item = Flat.from_hash('type' => 'Work', 'owner' => 'user1', 'files' => ['a.txt', 'b.jpeg'])
         after = w.process_one_work(item)
         expect(after.length).to eq(3)
-        expect(after[0]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericWork',
-                                    'pid' => '$(pid--0)',
-                                    'properties' => ROF::Utility.prop_ds('user1', '$(pid--1)', 'batch_ingest'))
-        expect(after[1]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericFile',
-                                    'pid' => '$(pid--1)')
-        expect(after[2]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericFile')
-        expect(after[2]['metadata']).to include('dc:title' => 'b.jpeg')
+        expect(after[0]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'af-model' => 'GenericWork',
+                                              'pid' => '$(pid--0)',
+                                              'representative' => '$(pid--1)',
+                                              'owner' => 'user1'))
+        expect(after[1]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'af-model' => 'GenericFile',
+                                              'pid' => '$(pid--1)',
+                                              'content-file' => 'a.txt',
+                                              'dc:title' => 'a.txt',
+                                              'depositor' => 'batch_ingest',
+                                              'file-mime-type' => 'text/plain',
+                                              'isPartOf' => '$(pid--0)',
+                                              'owner' => 'user1'))
+        expect(after[2]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'dc:title' => 'b.jpeg',
+                                              'af-model' => 'GenericFile',
+                                              'content-file' => 'b.jpeg',
+                                              'depositor' => 'batch_ingest',
+                                              'file-mime-type' => 'image/jpeg',
+                                              'isPartOf' => '$(pid--0)',
+                                              'owner' => 'user1',
+                                              'pid' => '$(pid--2)'))
       end
 
       it 'decodes files correctly' do
@@ -69,16 +84,30 @@ module ROF
         )
         after = w.process_one_work(item)
         expect(after.length).to eq(3)
-        expect(after[0]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericWork',
-                                    'pid' => '$(pid--0)')
-        expect(after[1]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericFile',
-                                    'pid' => '$(pid--1)',
-                                    'content-file' => 'thumb')
-        expect(after[2]).to include('type' => 'fobject',
-                                    'af-model' => 'GenericFile',
-                                    'content-file' => 'extra file.txt')
+        expect(after[0]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'af-model' => 'GenericWork',
+                                              'pid' => '$(pid--0)',
+                                              'owner' => 'user1',
+                                              'representative' => '$(pid--1)'))
+        expect(after[1]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'af-model' => 'GenericFile',
+                                              'pid' => '$(pid--1)',
+                                              'content-file' => 'thumb',
+                                              'dc:title' => 'thumb',
+                                              'depositor' => 'batch_ingest',
+                                              'file-mime-type' => 'application/octet-stream',
+                                              'isPartOf' => '$(pid--0)',
+                                              'owner' => 'user1'))
+        expect(after[2]).to eq(Flat.from_hash('rof-type' => 'fobject',
+                                              'af-model' => 'GenericFile',
+                                              'content-file' => 'extra file.txt',
+                                              'dc:title' => 'extra file.txt',
+                                              'depositor' => 'batch_ingest',
+                                              'file-mime-type' => 'text/plain',
+                                              'edit-person' => 'user1',
+                                              'isPartOf' => '$(pid--0)',
+                                              'owner' => 'user1',
+                                              'pid' => '$(pid--2)'))
       end
     end
 
