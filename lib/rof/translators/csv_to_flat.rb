@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rof/translator'
 require 'rof/utility'
 require('csv')
@@ -48,10 +50,12 @@ module ROF::Translators
           next
         end
         next if row.length <= 1 # skip blank lines
+
         result = Flat.new
         access = nil
         row.each_with_index do |field, i|
           next if field.nil? || field.empty?
+
           column_name = first_line[i]
           field.strip!
           case column_name
@@ -80,7 +84,11 @@ module ROF::Translators
         # is this a generic file which should be attached to the previous work?
         if result.find_first('type') == '+'
           raise NoPriorWork if previous_work.nil?
-          previous_work.add('files', result)
+
+          # HACK: we need to pass a structured flat record to the work decoder
+          # but values should only be strings. So we sexp encode it, and on the
+          # other side the work processer is smart enough to decode it.
+          previous_work.add('files', result.to_sexp)
         else
           previous_work = result
           flat_records << result

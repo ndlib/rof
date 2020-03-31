@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 module ROF
@@ -14,9 +16,9 @@ module ROF
     end
 
     it 'decodes s-expressions' do
-      output, rest = described_class.from_sexp("(record (first
-      value) (pid und:12345) (dc:title an approach to (something) that
-      we don't like))")
+      output, rest = described_class.from_sexp(%q{(record (first
+      value) (pid und:12345) (dc:title "an approach to (something) that
+      we don't like"))})
       record = described_class.from_hash('first' => 'value',
                                          'pid' => 'und:12345',
                                          'dc:title' => "an approach to (something) that\n      we don't like")

@@ -1,8 +1,18 @@
+# frozen_string_literal: true
+
+require 'strscan'
+
 module ROF
   # Flat is our internal unit for representing a CurateND record.
   # It is conceptually, a PID along with a sequence of key-value pairs
   # where keys and values are strings, and keys may be repeated.
   class Flat
+    class NotString < RuntimeError
+    end
+
+    class NotSexp < RuntimeError
+    end
+
     attr_accessor :fields # do not access directly
 
     def initialize
@@ -11,6 +21,7 @@ module ROF
 
     def ==(other)
       return false unless self.class == other.class
+
       @fields == other.fields
     end
 
@@ -26,6 +37,21 @@ module ROF
       @fields.each(&block)
     end
 
+    # block is given each field name and an array of field values.
+    # It returns the new field name and array of new field values.
+    # retuen a nil field value to remove the field altogether.
+    def update!
+      n = {}
+      @fields.each do |k, v|
+        x = yield(k, v)
+        k_n = x.length > 1 ? x[0] : k
+        v_n = x.length > 1 ? x[1] : x
+        n[k_n] = v_n unless v_n.nil?
+        raise NotString if v_n&.detect { |x| !x.is_a?(String) }
+      end
+      @fields = n
+    end
+
     # add creats a new (field_name, value) entry.
     # nil or empty values will not be added.
     # if value is an array, many such pairs are created.
@@ -33,17 +59,19 @@ module ROF
     def add(field_name, value)
       value = value.reject { |x| x.nil? || x.empty? } if value.is_a?(Array)
       return if value.nil? || value.empty?
+
       v = @fields.fetch(field_name, [])
       @fields[field_name] = if value.is_a?(Array)
                               v + value
                             else
                               v << value
                             end
+      raise NotString if @fields[field_name].detect { |x| !x.is_a?(String) }
     end
 
     def add_uniq(field_name, value)
       add(field_name, value)
-      @fields[field_name].uniq! unless @fields[field_name].nil?
+      @fields[field_name]&.uniq!
     end
 
     def add_if_missing(field_name, value)
@@ -60,13 +88,18 @@ module ROF
     end
 
     def to_sexp
-      s = "(record\n"
+      out = ["(record\n"]
       @fields.keys.sort.each do |k|
         @fields[k].each do |vv|
-          s << "  (#{k} #{vv})\n"
+          out << if vv.index(/\s|[()]/)
+                   "  (#{k} \"#{vv}\")\n"
+                 else
+                   "  (#{k} #{vv})\n"
+                 end
         end
       end
-      s + ')'
+      out << ')'
+      out.join('')
     end
 
     def pretty_print(pp)
@@ -77,6 +110,7 @@ module ROF
       result = Flat.new
       h.each do |k, v|
         next unless k.is_a?(String)
+
         v = Array.wrap(v)
         result.add(k, v)
       end
@@ -89,38 +123,54 @@ module ROF
 
     # read_sexp() parses one record out of s and returns
     # the pair [new Flat, rest of s]
-    def self.read_sexp(s)
+    def self.read_sexp(str)
       # as we all learned, regexp cannot match balanced parens
       # so we're going to need to do it by hand
-      # levels:
-      #    0 -- outside of record
-      #    1 -- inside record
-      # >= 2 -- inside field
-      level = 0
+      s = StringScanner.new(str)
       result = Flat.new
-      buffer = ''
+      token = next_token(s)
+      return result, str unless token == '('
+
+      token = next_token(s)
+      return result, str unless token == 'record'
+
       loop do
-        before, paren, s = s.partition(/[()]/)
-        case paren
-        when '('
-          buffer.concat(before + paren) if level >= 2
-          level += 1
-        when ')'
-          buffer << before if level >= 2
-          buffer << paren if level >= 3 # don't consume parens for higher levels
-          level -= 1
-          case level
-          when 1
-            name, value = buffer.split(/\s+/, 2)
-            result.add(name.strip, value.strip)
-            buffer = ''
-          when 0
-            return result, s
-          end
+        token = next_token(s)
+        if token == '('
+          val = read_paren(s)
+          result.add(val[0], val[1..-1]) if val.length > 1
+        elsif token == ')'
+          return result, s.rest
         else
-          return result, 'unmatched parens'
+          # error
+          return result, s
         end
       end
+    end
+
+    def self.read_paren(s)
+      result = []
+      loop do
+        token = next_token(s)
+        if token == '('
+          val = read_paren(s)
+          result << val
+        elsif token.nil? || token == ')'
+          return result
+        else
+          result << token
+        end
+      end
+    end
+
+    def self.next_token(s)
+      # s is a StringScanner object
+      s.skip(/\s+/)
+      tok = s.scan(/[()]|[^[:space:]()"]+|("([^"]|\\")*")/)
+      if tok && tok[0] == '"'
+        tok = tok[1...-1].gsub(/[\\](.)/, '"' => '"', 'n' => '\n')
+      end
+      tok
     end
   end
 end

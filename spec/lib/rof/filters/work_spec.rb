@@ -11,19 +11,19 @@ module ROF
       it 'handles variant work types' do
         w = Work.new
 
-        item = { 'type' => 'Work', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'Work', 'owner' => 'user1')
         after = w.process_one_work(item)
-        expect(after.first).to include('type' => 'fobject', 'af-model' => 'GenericWork')
+        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'GenericWork', owner => 'user1'))
 
-        item = { 'type' => 'Work-Image', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'Work-Image', 'owner' => 'user1')
         after = w.process_one_work(item)
         expect(after.first).to include('type' => 'fobject', 'af-model' => 'Image')
 
-        item = { 'type' => 'work-image', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'work-image', 'owner' => 'user1')
         after = w.process_one_work(item)
         expect(after.first).to include('type' => 'fobject', 'af-model' => 'image')
 
-        item = { 'type' => 'Image', 'owner' => 'user1' }
+        item = Flat.from_hash('type' => 'Image', 'owner' => 'user1')
         after = w.process_one_work(item)
         expect(after.first).to include('type' => 'fobject', 'af-model' => 'Image')
 
@@ -57,29 +57,20 @@ module ROF
       it 'decodes files correctly' do
         w = Work.new
 
-        item = {
+        item = Flat.from_hash(
           'type' => 'Work',
           'owner' => 'user1',
-          'rights' => { 'edit' => ['user1'] },
-          'metadata' => {
-            '@context' => RdfContext,
-            'dc:title' => 'Q, A Letter'
-          },
+          'edit-person' => 'user1',
+          'dc:title' => 'Q, A Letter',
           'files' => [
             'thumb',
-            {
-              'type' => '+',
-              'owner' => 'user1',
-              'files' => ['extra file.txt'],
-              'rights' => { 'edit' => ['user1'] }
-            }
+            '(record (type +)(owner user1)(files "extra file.txt")(edit-person user1))'
           ]
-        }
+        )
         after = w.process_one_work(item)
         expect(after.length).to eq(3)
         expect(after[0]).to include('type' => 'fobject',
                                     'af-model' => 'GenericWork',
-                                    'rels-ext' => {},
                                     'pid' => '$(pid--0)')
         expect(after[1]).to include('type' => 'fobject',
                                     'af-model' => 'GenericFile',
@@ -100,7 +91,7 @@ module ROF
        { input: 'image', output: 'Image' }].each do |t|
         it 'decodes ' + t[:input] do
           w = Work.new
-          result = w.decode_work_type('type' => t[:input])
+          result = w.decode_work_type(Flat.from_hash('type' => t[:input]))
           expect(result).to eq(t[:output])
         end
       end

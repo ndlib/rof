@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rof/filter'
 require 'noids_client'
 
@@ -38,9 +40,9 @@ module ROF
         @label_re = /\$\(([^)]+)\)/
       end
 
-      # mutate obj_list by assigning labels and resolving labels where needed
+      # mutate rec_list by assigning labels and resolving labels where needed
       # Every fobject will be assigned an pid and a bendo_item
-      def process(obj_list)
+      def process(rec_list)
         labels = {}
 
         # Use two passes. First assign ids, and then resolve labels
@@ -48,91 +50,71 @@ module ROF
 
         # Assign pids to each fobject. If we find any labels in the pid field, then
         # record a mapping of label => pid into the labels hash.
-        obj_list.each do |obj|
-          assign_pid(obj, labels)
+        # Take first item's pid as the default bendo id.
+        default_bendo_item = nil
+        rec_list.each do |rec|
+          assign_pid(rec, labels)
+          default_bendo_item = rec.find_first('pid') if default_bendo_item.nil?
         end
 
         # now replace any reference labels with the pids we've assigned them
-        obj_list.each do |obj|
-          replace_labels_in_obj(obj, labels)
+        rec_list.each do |rec|
+          rec.add_if_missing('bendo-item', default_bendo_item)
+          replace_labels_in_record(rec, labels)
         end
 
-        # now assign bendo ids
-        bendo_item = obj_list.detect { |x| x.find_first('pid') }&.find_first('pid')
-            bendo_item = pid.gsub(/^.*:/, '')
-        obj_list.each do |obj|
-          # for now we just use the first item's pid stripped of any namespaces as the bendo item id
-          if bendo_item.nil?
-            pid = obj.find_first('pid')
-            next if pid.nil?
-          end
-          # don't touch if a bendo item has already been assigned
-          obj.add_if_missing('bendo-item', bendo_item)
-        end
-
-        obj_list
+        rec_list
       end
 
       # assign pids, recording any labels we find.
       # obj is mutated
-      def assign_pid(obj, labels)
-        return if obj['type'] != 'fobject'
+      def assign_pid(rec, labels)
+        return if rec.find_first('rof-type') != 'fobject'
 
         label = nil
-        unless obj['pid'].nil?
-          label = find_label(obj['pid'])
+        pid = rec.find_first('pid')
+        unless pid.nil?
+          label = parse_label(pid)
           # skip if the "pid" is not a label
           return if label.nil?
         end
         pid = "#{@prefix}#{next_id}"
-        obj['pid'] = pid
+        rec.set('pid', pid)
         labels[label] = pid unless label.nil?
       end
 
       # replace any label references we find in obj.
       # obj is mutated
-      def replace_labels_in_obj(obj, labels)
-        return if obj['type'] != 'fobject'
-        obj.each do |k, v|
-          # only force labels to exist if we are looking in the rels-ext
-          obj[k] = replace_labels(v, labels, k == 'rels-ext')
+      def replace_labels_in_record(rec, labels)
+        return if rec.find_first('rof-type') != 'fobject'
+
+        rec.update! do |k, v|
+          # This used to "force" labels in rels-ext. maybe that can be moved
+          # to a validation rule to make sure everything in rels-ext is a pid?
+          [k, v.map { |vv| replace_match(vv, labels, false) }]
         end
       end
 
-      # recurse through obj replacing any labels in strings
-      # with the id in labels, which is a hash.
-      # The relacement is done in place.
-      # Hash keys are not touched (only hash values).
-      # if force is true, labels which don't resolve will raise
-      # a MissingLabel error.
-      def replace_labels(obj, labels, force = false)
-        if obj.is_a?(Array)
-          obj.map! { |x| replace_labels(x, labels, force) }
-        elsif obj.is_a?(Hash)
-          obj.each { |k, v| obj[k] = replace_labels(v, labels, force) }
-          obj
-        elsif obj.is_a?(String)
-          replace_match(obj, labels, force)
-        else
-          obj
-        end
-      end
-
-      # small matching function- uses regular expression
-      def replace_match(obj, labels, force)
-        obj.gsub(@label_re) do |match|
+      # look for any labels in s and replace them with their resolution as
+      # given in `labels`. If the flag `force` is true, an MissingLabel
+      # exception will be raised if a found label is not in `labels`.
+      # Returns the new string.
+      def replace_match(s, labels, force)
+        s.gsub(@label_re) do |match|
           pid = labels[Regexp.last_match(1)]
           raise MissingLabel if pid.nil? && force
+
           pid || match
         end
       end
 
-      def find_label(s)
+      def parse_label(s)
         s[@label_re, 1]
       end
 
       def next_id
         raise OutOfIdentifiers if @id_list.empty?
+
         @id_list.shift
       end
 

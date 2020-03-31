@@ -13,7 +13,7 @@ module ROF::Translators
         }
       }
       rights = RofToCsv.decode_rights(input)
-      expect(rights).to eq("readgroup=und:0,und:1,some_people;edit=jdoe")
+      expect(rights).to eq("readgroup=und:0,und:1,some_people|edit=jdoe")
     end
 
     it "decodes rof into correct fields" do
@@ -30,7 +30,7 @@ module ROF::Translators
       }
       result = RofToCsv.call([input])
       expect(result).to eq(%q{pid,rof-type,af-model,bendo-item,access,isPartOf,owner,file-URL,file-mime-type,filename,file-with-path,dc:title
-temp:01,fobject,GenericFile,0123456789,editgroup=temp:02;readgroup=public;edit=jdoe,temp:03,jdoe,bendo:/item/01/some_file/here.pdf,text/json,here.pdf,some_file/here.pdf,here
+temp:01,fobject,GenericFile,0123456789,editgroup=temp:02|readgroup=public|edit=jdoe,temp:03,jdoe,bendo:/item/01/some_file/here.pdf,text/json,here.pdf,some_file/here.pdf,here
 } )
     end
 
@@ -133,7 +133,7 @@ temp:01,fobject,GenericFile,0123456789,editgroup=temp:02;readgroup=public;edit=j
           }
       result = RofToCsv.call([input], {sort_keys: true})
       expect(result).to eq(%q{access,af-model,bendo-item,dc:contributor,dc:creator,dc:creator#administrative_unit,dc:date#approved,dc:dateSubmitted,dc:description#abstract,dc:identifier#local,dc:modified,dc:rights,dc:title,ms:degree,nd:alephIdentifier,pid,representative,rof-type
-"edit=und:qb98mc9021z,curate_batch_user;editgroup=und:q524jm23g92;read=wgan;readgroup=public",Etd,02,^^dc:contributor Jane Doe^^ms:role Research Director|^^dc:contributor Jane Doe^^ms:role Research Director,Zoe Braid,University of Notre Dame::College of Science::Chemistry and Biochemistry,2020-02-17,2020-01-09,a long abstract,0000000001,2020-02-22Z,All rights reserved,Adventures in Polymers,^^ms:discipline Chemistry and Biochemistry^^ms:level Doctoral Dissertation^^ms:name Doctor of Philosophy,000000001,temp:02,temp:03,fobject
+"edit=und:qb98mc9021z,curate_batch_user|editgroup=und:q524jm23g92|read=wgan|readgroup=public",Etd,02,^^dc:contributor Jane Doe^^ms:role Research Director|^^dc:contributor Jane Doe^^ms:role Research Director,Zoe Braid,University of Notre Dame::College of Science::Chemistry and Biochemistry,2020-02-17,2020-01-09,a long abstract,0000000001,2020-02-22Z,All rights reserved,Adventures in Polymers,^^ms:discipline Chemistry and Biochemistry^^ms:level Doctoral Dissertation^^ms:name Doctor of Philosophy,000000001,temp:02,temp:03,fobject
 } )
     end
   end

@@ -47,43 +47,44 @@ module ROF
         result
       end
 
-      def create_file_record(rec, work_record, input_record)
-          file_rec = ROF::Utility.DecodeDoubleCaret(rec)
-          if file_rec.is_a?(String)
-            fname = file_rec
-            target = Flat.new
-          else
-            fname = file_rec.delete('files')&.first
-            raise NoFile if fname.nil?
-            target = Flat.from_hash(file_rec)
-           end
-            target.add('pid', next_label) unless target.find_first('pid')
-          target.set('rof-type', 'fobject')
-          target.set('af-model', 'GenericFile')
-          target.add_if_missing('owner', work_record.find_all('owner'))
-          target.add_if_missing('bendo-item', work_record.find_first('bendo-item'))
-          target.add_if_missing('dc:title', fname)
-          target.add_if_missing('file-mime-type', MIME::Types.of(fname).first&.content_type || 'application/octet-stream')
-          target.add_if_missing('depositor', 'batch_ingest')
-          target.add('isPartOf', work_record.find_first('pid'))
-          target.add('content-file', fname)
+      def create_file_record(rec, work_record, _input_record)
+        file_rec = ROF::Utility.DecodeDoubleCaret(rec)
+        if file_rec.is_a?(String)
+          fname = file_rec
+          target = Flat.new
+        else
+          fname = file_rec.delete('files')&.first
+          raise NoFile if fname.nil?
 
-          target.add_if_missing('rights', work_record.find_all('rights'))
-        result
+          target = Flat.from_hash(file_rec)
+         end
+        target.add('pid', next_label) unless target.find_first('pid')
+        target.set('rof-type', 'fobject')
+        target.set('af-model', 'GenericFile')
+        target.add_if_missing('owner', work_record.find_all('owner'))
+        target.add_if_missing('bendo-item', work_record.find_first('bendo-item'))
+        target.add_if_missing('dc:title', fname)
+        target.add_if_missing('file-mime-type', MIME::Types.of(fname).first&.content_type || 'application/octet-stream')
+        target.add_if_missing('depositor', 'batch_ingest')
+        target.add('isPartOf', work_record.find_first('pid'))
+        target.add('content-file', fname)
+
+        target.add_if_missing('rights', work_record.find_all('rights'))
+        target
       end
 
-      def create_work_record(input_obj, model)
+      def create_work_record(input_record, model)
         result = Flat.new
         result.add('type', 'fobject')
         result.add('af-model', model)
-        result.add('pid', input_obj.find_first('pid') || next_label)
-        result.add('bendo-item', input_obj.find_first('bendo-item'))
+        result.add('pid', input_record.find_first('pid') || next_label)
+        result.add('bendo-item', input_record.find_first('bendo-item'))
         result.add('owner', input_record.find_all('owner'))
         result.add('depositor', input_record.find_all('depositor'))
         result.add('representative', input_record.find_all('representative'))
-        #result['rights'] = input_obj['rights']
-        #result['rels-ext'] = input_obj.fetch('rels-ext', {})
-        #result['metadata'] = input_obj['metadata']
+        # result['rights'] = input_obj['rights']
+        # result['rels-ext'] = input_obj.fetch('rels-ext', {})
+        # result['metadata'] = input_obj['metadata']
         result
       end
 
@@ -107,13 +108,14 @@ module ROF
 
       # Given an object's type, detrmine and return its af-model
       def decode_work_type(obj)
-        if obj['type'] =~ WORK_TYPE_WITH_PREFIX_PATTERN
+        t = obj.find_first('type')
+        if t =~ WORK_TYPE_WITH_PREFIX_PATTERN
           return 'GenericWork' if Regexp.last_match(2).nil?
 
           Regexp.last_match(2)
         else
           # this will return nil if key t does not exist
-          work_type = obj['type'].downcase
+          work_type = t.downcase
           WORK_TYPES[work_type]
         end
       end

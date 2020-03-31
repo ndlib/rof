@@ -34,7 +34,7 @@ In the following,
 (=1) means there should be exactly one value for this field, and it shoud be present;
 (*1) means item is optional, but there is at most one entry if present;
 (0+) means the item is multi-valued and optional.
-Fields marked with an asterisk (*) are used only for internal processing
+Fields marked with an asterisk `*` are used for internal processing only.
 
   Field                 | Description
   -----                 | -----------
@@ -43,7 +43,7 @@ Fields marked with an asterisk (*) are used only for internal processing
   depositor             | The netid of the depositor of this object (=1)
   discover-group        | PID or netid of group having discover rights (0+)
   discover-person       | PID or netid of person having discover rights (0+)
-  depositor             | Netid of person depositing this record
+  depositor             | Netid of person depositing this record (=1)
   edit-group            | PID or netid of group having edit rights (0+)
   edit-person           | PID or netid of person having edit rights (0+)
   embargo-date          | Embargo date in YYYY-MM-DD (*1)
@@ -54,13 +54,11 @@ Fields marked with an asterisk (*) are used only for internal processing
   isMemberOfCollection  | PID of collection this object belongs to (0+)
   isPartOf              | PID of object this is a file of (*1)
   owner                 | The netid of the "owner" of this object (=1)
-  pid                   | The PID of this record (und:xxxx)
+  pid                   | The PID of this record (und:xxxx) (*1)
   read-group            | PID or netid of group having read rights (0+)
   read-person           | PID or netid of person having read rights (0+)
   representative        | PID of a representative image for this object (*1)
   rof-type              | The ROF type field (=1)
-  thumbnail             | URL of thumbnail (? not sure how internal fedora desc look)
-  files *               | List of files that are a part of this work.
-  file-path *           | relative path to a file to upload
-
-
+  thumbnail             | URL of thumbnail (? not sure how internal fedora desc look) (*1)
+  files *               | List of files that are a part of this work. (0+)
+  file-path *           | relative path to a file to upload (*1)
