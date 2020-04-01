@@ -8,36 +8,6 @@ module ROF
     describe Work do
       it_behaves_like 'an ROF::Filter'
       let(:valid_options) { {} }
-      it 'handles variant work types' do
-        w = Work.new
-
-        item = Flat.from_hash('type' => 'Work', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'GenericWork', 'owner' => 'user1',
-                                                 'pid' => '$(pid--0)'))
-
-        item = Flat.from_hash('type' => 'Work-Image', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image',
-                                                 'owner' => 'user1', 'pid' => '$(pid--1)'))
-
-        item = Flat.from_hash('type' => 'work-image', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'image', 'owner' => 'user1', 'pid' => '$(pid--2)'))
-
-        item = Flat.from_hash('type' => 'Image', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image', 'owner' => 'user1', 'pid' => '$(pid--3)'))
-
-        item = Flat.from_hash('type' => 'image', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(Flat.from_hash('rof-type' => 'fobject', 'af-model' => 'Image', 'owner' => 'user1', 'pid' => '$(pid--4)'))
-
-        item = Flat.from_hash('type' => 'Other', 'owner' => 'user1')
-        after = w.process_one_work(item)
-        expect(after.first).to eq(item)
-      end
-
       it 'makes the first file be the representative' do
         w = Work.new
 
@@ -69,7 +39,7 @@ module ROF
                                               'pid' => '$(pid--2)'))
       end
 
-      it 'decodes files correctly' do
+      it 'decodes file metadata correctly' do
         w = Work.new
 
         item = Flat.from_hash(
@@ -112,12 +82,17 @@ module ROF
     end
 
     describe 'decode_work_type' do
-      [{ input: 'article', output: 'Article' },
+      [{ input: 'Work', output: 'GenericWork' },
+       { input: 'Work-Image', output: 'Image' },
+       { input: 'Work-image', output: 'image' },
+       { input: 'Image', output: 'Image' },
+       { input: 'image', output: 'Image' },
+       { input: 'Other', output: nil },
+       { input: 'article', output: 'Article' },
        { input: 'dataset', output: 'Dataset' },
        { input: 'document', output: 'Document' },
        { input: 'etd', output: 'Etd' },
-       { input: 'ETD', output: 'Etd' },
-       { input: 'image', output: 'Image' }].each do |t|
+       { input: 'ETD', output: 'Etd' }].each do |t|
         it 'decodes ' + t[:input] do
           w = Work.new
           result = w.decode_work_type(Flat.from_hash('type' => t[:input]))
