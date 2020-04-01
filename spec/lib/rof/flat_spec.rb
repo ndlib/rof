@@ -15,15 +15,16 @@ module ROF
       expect(first).to eq(second)
     end
 
-    it 'decodes s-expressions' do
-      output, rest = described_class.from_sexp(%q{(record (first
-      value) (pid und:12345) (dc:title "an approach to (something) that
-      we don't like"))})
-      record = described_class.from_hash('first' => 'value',
-                                         'pid' => 'und:12345',
-                                         'dc:title' => "an approach to (something) that\n      we don't like")
-
-      expect(output).to eq(record)
+    [{ name: 'with no record', input: '()', output: {} },
+     { name: 'with escaped quotes', input: '(record (name "something \\" quotes"))', output: { 'name' => 'something " quotes' } },
+     { name: 'with multiline quotes', input: '(record (first value) (pid und:12345) (dc:title "an approach to (something) that
+      we like"))', output: { 'first' => 'value', 'pid' => 'und:12345',
+                             'dc:title' => "an approach to (something) that\n      we like" } }].each do |t|
+      it 'decodes s-expressions ' + t[:name] do
+        output, rest = described_class.from_sexp(t[:input])
+        record = described_class.from_hash(t[:output])
+        expect(output).to eq(record)
+      end
     end
   end
 end

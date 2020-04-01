@@ -92,7 +92,7 @@ module ROF
       @fields.keys.sort.each do |k|
         @fields[k].each do |vv|
           out << if vv.index(/\s|[()]/)
-                   "  (#{k} \"#{vv}\")\n"
+                   "  (#{k} #{vv.inspect})\n" # inspect includes double quotes
                  else
                    "  (#{k} #{vv})\n"
                  end
@@ -143,7 +143,7 @@ module ROF
           return result, s.rest
         else
           # error
-          return result, s
+          return result, s.rest
         end
       end
     end
@@ -165,12 +165,14 @@ module ROF
 
     def self.next_token(s)
       # s is a StringScanner object
-      s.skip(/\s+/)
-      tok = s.scan(/[()]|[^[:space:]()"]+|("([^"]|\\")*")/)
-      if tok && tok[0] == '"'
-        tok = tok[1...-1].gsub(/[\\](.)/, '"' => '"', 'n' => '\n')
+      s.skip(/\s+/) # skip any leading whitespace
+      # find next open paren, close paren, word with no space, or quoted string
+      token = s.scan(/[()]|[^[:space:]()"]+|"([^\\"]|\\.)*"/)
+      if token && token[0] == '"'
+        # resolve escapes for quoted strings
+        token = token[1...-1].gsub(/\\./, '\\"' => '"', '\\n' => "\n", '\\\\' => '\\')
       end
-      tok
+      token
     end
   end
 end
