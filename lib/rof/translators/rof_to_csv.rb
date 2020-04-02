@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rof/translator'
 require 'csv'
 require 'json'
@@ -21,6 +23,7 @@ module ROF::Translators
       seen_names = []
       add_field = lambda do |itm, col, val|
         return if val.nil?
+
         seen_names << col unless seen_names.include?(col)
         itm[col] = val
       end
@@ -34,9 +37,10 @@ module ROF::Translators
         add_field.call(v, 'access', decode_rights(item))
 
         item['rels-ext']&.each do |predicate, value|
-          next if predicate == "hasModel"
-          next if predicate == "@context"
-          next if predicate == "@id"
+          next if predicate == 'hasModel'
+          next if predicate == '@context'
+          next if predicate == '@id'
+
           value = value.join('|') if value.is_a?(Array)
           add_field.call(v, predicate, value)
         end
@@ -71,7 +75,7 @@ module ROF::Translators
       # column names could be reordered to some cannonical ordering.
       #
       # Returns a string containing the contents of the CSV file.
-      seen_names.sort!() if config.fetch(:sort_keys, nil) # for testing
+      seen_names.sort! if config.fetch(:sort_keys, nil) # for testing
       CSV.generate do |csv|
         csv << seen_names
         results.each do |v|
@@ -90,7 +94,7 @@ module ROF::Translators
         rights['read-groups'] = Array(r.delete('hasViewerGroup'))
         rights['edit'] = Array(r.delete('hasEditor'))
         rights['edit-groups'] = Array(r.delete('hasEditorGroup'))
-        rights.delete_if {|k,v| v.nil? || v.empty?}
+        rights.delete_if { |_k, v| v.nil? || v.empty? }
       end
 
       # now merge in anything in the rights block
@@ -107,46 +111,69 @@ module ROF::Translators
         extend_entry.call('edit', r['edit'])
         extend_entry.call('edit-groups', r['edit-groups'])
         rights['embargo-date'] = r['embargo-date']
-        rights.delete_if {|k,v| v.nil? || v.empty?}
+        rights.delete_if { |_k, v| v.nil? || v.empty? }
       end
 
       ROF::Access.encode(rights)
     end
 
-    # treat the metadata as RDF data, and turn into a hash
-    # of key (string) => Array (of string).
-    def self.decode_metadata(metadata, sort_keys=false)
+    # Decode the metadata and turn into a hash of
+    # key (string) => Array (of string).
+    def self.decode_metadata(metadata, sort_keys = false)
+      # Since interpreting the metadata as RDF loses the
+      # ordering of elements having the same property (e.g. the ordering
+      # of authors), only go the RDF route if we have to.
+      if metadata['@graph']
+        # this is json-ld. so we have to do this.
+        return decode_metadata_rdf(metadata, sort_keys)
+      end
+
+      metadata.delete_if { |k, _v| k == '@context' || k == '@id' }
+      # no Hash#transform_values in ruby 2.3.8
+      result = {}
+      metadata.each { |k, v| result[k] = Array.wrap(v) }
+      result
+    end
+
+    def self.decode_metadata_rdf(metadata, sort_keys = false)
       graph = RDF::Graph.new << JSON::LD::API.toRdf(metadata)
-      # first deal with statements with blank node subjects
+
+      # figure out which subject is the root
+      # Try to choose a non-blank node, but default to first subject otherwise
+      root = graph.subjects.detect (-> { graph.first_subject }) { |x| !x.node? }
+
+      # group statements by subject. we only care about those with a blank node
+      # as a subject
       blanks = {}
       graph.each do |statement|
         subject = statement.subject
         next unless subject.node?
+
         blanks[subject] = blanks.fetch(subject, []) << statement
       end
 
-      # figure out which subject is the root
-      # Try to choose a non-blank node, but default to first subject otherwise
-      root = graph.subjects.detect (-> {graph.first_subject}) {|x| !x.node?}
-
-      # now deal with everything else
+      # now look at those statements having the root as the subject.
       result = {}
       graph.each do |statement|
         next unless statement.subject == root
+
         predicate = make_predicate_nice(statement.predicate.pname)
         object = statement.object
         objvalue = if object.literal?
-                      object.value
-                    elsif object.node?
-                      StatementsToDoubleCaret(blanks[object], sort_keys)
+                     object.value
+                   elsif object.node?
+                     StatementsToDoubleCaret(blanks[object], sort_keys)
                     end
-        result[predicate] = result.fetch(predicate, []) << objvalue unless objvalue.nil?
+        unless objvalue.nil?
+          result[predicate] = result.fetch(predicate, []) << objvalue
+        end
       end
       result
     end
 
     def self.StatementsToDoubleCaret(statement_list, sort_keys)
-      return nil if statement_list.nil?  # e.g. undefined blank node referenced
+      return nil if statement_list.nil? # e.g. undefined blank node referenced
+
       h = {}
       statement_list.each do |statement|
         predicate = make_predicate_nice(statement.predicate.pname)
@@ -155,16 +182,15 @@ module ROF::Translators
       ROF::Utility.EncodeDoubleCaret(h, sort_keys)
     end
 
+    # try to replace an initial segment of `ugly_name` with a
+    # namespace prefix. return the whole thing if we can't find
+    # such a prefix.
     def self.make_predicate_nice(ugly_name)
-      ROF::RdfContext.each do |k,v|
+      ROF::RdfContext.each do |k, v|
         next unless v.is_a?(String)
-        if ugly_name.start_with?(v)
-          return ugly_name.sub(v, k + ":")
-        end
+        return ugly_name.sub(v, k + ':') if ugly_name.start_with?(v)
       end
       ugly_name
     end
-
-
   end
 end
