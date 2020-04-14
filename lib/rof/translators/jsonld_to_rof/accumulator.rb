@@ -26,6 +26,7 @@ module ROF
           rof = expand_blank_node_locations!(rof)
           rof = normalize_contributor!(rof)
           rof = append_properties_to(rof)
+          rof = add_content_meta_to(rof)
           rof
         end
 
@@ -95,6 +96,13 @@ module ROF
           end
           xml += '</fields>'
           rof['properties'] = xml
+          rof
+        end
+
+        def add_content_meta_to(rof)
+          return rof unless rof.key?('content-file')
+          rof['content-meta'] = {} unless rof.key?('content-meta')
+          rof['content-meta']['label']  = rof['content-file']
           rof
         end
 

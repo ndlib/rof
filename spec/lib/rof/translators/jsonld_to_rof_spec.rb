@@ -118,6 +118,7 @@ module ROF
           'm039k358q5c',
           'zk51vd69n1r',
           'nk322b9161g',
+          '5h73pv66f5t',
           'p8418k7430d'
         ].each do |noid|
           context "with JSON-LD from NOID=#{noid} CurateND work that was ingested via the batch ingester" do
