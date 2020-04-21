@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rubocop'
+gem 'bundler', '~> 1.17.3'
 
 group :test do
   gem 'byebug'
