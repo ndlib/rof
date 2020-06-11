@@ -7,9 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "rof"
   spec.version       = ROF::VERSION
   spec.authors       = [
-    "Jeremy Friesen"
+    "Jeremy Friesen",
+    "LaRita Robinson",
+    "Mark Suhovecky"
   ]
-  spec.email         = ["jeremy.n.friesen@gmail.com"]
+  spec.email         = ["jeremy.n.friesen@gmail.com", "LaRita.Robinson@nd.edu", "msuhovec@nd.edu"]
   spec.description   = %q{Raw Object Format}
   spec.summary       = %q{Raw Object Format}
   spec.homepage      = "https://github.com/ndlib/rof"
