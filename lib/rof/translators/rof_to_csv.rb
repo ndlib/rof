@@ -131,7 +131,15 @@ module ROF::Translators
       metadata.delete_if { |k, _v| k == '@context' || k == '@id' }
       # no Hash#transform_values in ruby 2.3.8
       result = {}
-      metadata.each { |k, v| result[k] = Array.wrap(v) }
+      metadata.each do |k, v|
+        result[k] = Array.wrap(v).map do |vv|
+          if vv.is_a?(Hash)
+            ROF::Utility.EncodeDoubleCaret(vv, true)
+          else
+            vv
+          end
+        end
+      end
       result
     end
 
