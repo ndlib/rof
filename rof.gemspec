@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "mime-types"
   spec.add_dependency "rubydora", "~> 1.8.1"
-  spec.add_dependency "noids_client"
+  spec.add_dependency "noids_client", "~> 0.0.2"
   spec.add_dependency "rsolr", "~> 1.1.2"
   spec.add_dependency 'deprecation', '~> 0.1'
   spec.add_dependency 'nokogiri'
