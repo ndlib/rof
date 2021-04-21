@@ -106,6 +106,26 @@ module ROF
         end
       end
 
+      describe 'handles blank nodes' do
+        let(:pid) { 'abcd1234' }
+        it 'accumulates the pid' do
+          input = {
+            "@id" => "https://curate.nd.edu/show/#{pid}",
+            "http://purl.org/dc/terms/title" => "Hello World"
+          }
+          actual_output = described_class.call(input, {})
+          expect(actual_output[0].fetch('pid')).to eq("und:#{pid}")
+        end
+        it 'is not fooled by blank nodes' do
+          input = {
+            "@id" => "_b1",
+            "http://purl.org/dc/terms/title" => "Hello World"
+          }
+          actual_output = described_class.call(input, {})
+          expect(actual_output[0].key?('pid')).to eq(false)
+        end
+      end
+
       describe '.call' do
         [
           '2j62s467216',

@@ -40,8 +40,27 @@ module ROF
         # @return [ROF::Translators::JsonldToRof::Accumulator] the given accumulator
         # @raise [ROF::Translators::JsonldToRof::UnhandledPredicateError] when we are unable to handle the given predicate
         def self.call(predicate, object, accumulator, blank_node = false)
-          handler = registry.handler_for(predicate)
-          handler.handle(object, accumulator, blank_node)
+          # do any handlers match a prefix of our URL?
+          handler = @set.detect do |handler|
+            predicate.to_s =~ %r{^#{Regexp.escape(handler.url)}(.*)}
+          end
+          raise UnhandledPredicateError.new(predicate, @set.map(&:url)) if handler.nil?
+          predicate.to_s =~ %r{^#{Regexp.escape(handler.url)}(.*)}
+          slug = $1
+          
+          # there is a match, so is there a special handler?
+          handlers = handler.slug_handlers.fetch(slug, nil)
+          if handlers.nil?
+            # no special handler
+            to = handler.within + Array.wrap(slug)
+            to[-1] = "#{handler.namespace_prefix}#{to[-1]}"
+            accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node)
+          else
+            # call all the special handlers
+            handlers.each do |handler|
+              handler.call(object, accumulator, blank_node)
+            end
+          end
           accumulator
         end
 
@@ -61,37 +80,14 @@ module ROF
 
         # @api private
         def self.registry
-          @registry ||= RegistrySet.new
+          @set ||= []
         end
         private_class_method :registry
 
-        def self.clear_registry!(set_with = RegistrySet.new)
-          @registry = set_with
+        def self.clear_registry!(set_with = [])
+          @set = set_with
         end
         private_class_method :clear_registry!
-
-        # @api private
-        # Responsible for capturing each of the predicate namespaces URLs that we are handling
-        class RegistrySet
-          def initialize
-            @set = []
-          end
-
-          def <<(value)
-            @set << value
-          end
-
-          def handler_for(predicate)
-            location_extractor = nil
-            @set.each do |handler|
-              location_extractor = handler.location_extractor_for(predicate)
-              break if location_extractor
-            end
-            raise UnhandledPredicateError.new(predicate, @set.map(&:url)) if location_extractor.nil?
-            location_extractor
-          end
-        end
-        private_constant :RegistrySet
 
         # @api private
         # For a given URL map all of the predicates; Some predicates require explicit mapping, while others
@@ -104,7 +100,7 @@ module ROF
             @slug_handlers = {}
             yield(self) if block_given?
           end
-          attr_reader :url
+          attr_reader :url, :slug_handlers
 
           # The final key in the location array should be prefixed with the namespace_prefix; By default this is ""
           # @param [String, nil] prefix - what is the namespace prefix to apply to the last location in the array.
@@ -122,29 +118,6 @@ module ROF
             @within = Array.wrap(location)
           end
 
-          # @param [#to_s] predicate
-          # @return [nil, LocationExtractor] if the given predicate does not match the url, return nil; Otherwise return a LocationExtractor
-          # @see LocationExtractor
-          def location_extractor_for(predicate)
-            return nil unless predicate.to_s =~ %r{^#{Regexp.escape(@url)}(.*)}
-            slug = $1
-            handlers = handlers_for(slug)
-            LocationExtractor.new(predicate, handlers)
-          end
-
-          private
-
-          # @param [String] slug - a slug that may or may not have been registered
-          # @return [Array<#call>] an array of handlers that each respond to #call
-          # @see ImplicitLocationHandler
-          # @see ExplicitLocationSlugHandler
-          # @see BlockSlugHandler
-          def handlers_for(slug)
-            Array.wrap(@slug_handlers.fetch(slug) { ImplicitLocationHandler.new(self, slug) })
-          end
-
-          public
-
           # @param [String] slug =
           # @param [Hash] options (with symbol keys)
           # @option options [Boolean] :force - don't apply the within nor namespace prefix
@@ -158,9 +131,9 @@ module ROF
             @slug_handlers ||= {}
             @slug_handlers[slug] ||= []
             if block_given?
-              @slug_handlers[slug] << BlockSlugHandler.new(self, slug, options, block)
+              @slug_handlers[slug] << BlockSlugHandler.new(self, options, block)
             else
-              @slug_handlers[slug] << ExplicitLocationSlugHandler.new(self, slug, options)
+              @slug_handlers[slug] << ExplicitLocationSlugHandler.new(self, options)
             end
           end
 
@@ -171,46 +144,12 @@ module ROF
           end
 
           # @api private
-          # Responsible for coordinating the extraction of the location
-          class LocationExtractor
-            def initialize(predicate, handlers)
-              @predicate = predicate
-              @handlers = Array.wrap(handlers)
-            end
-
-            def handle(object, accumulator, blank_node)
-              @handlers.each do |handler|
-                handler.call(object, accumulator, blank_node)
-              end
-              accumulator
-            end
-          end
-          private_constant :LocationExtractor
-
-          # @api private
-          class ImplicitLocationHandler
-            def initialize(url_handler, slug)
-              @url_handler = url_handler
-              @slug = slug
-            end
-            attr_reader :slug
-            def call(object, accumulator, blank_node)
-              to = @url_handler.within + Array.wrap(slug)
-              to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
-              accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node)
-            end
-          end
-          private_constant :ImplicitLocationHandler
-
-          # @api private
           class BlockSlugHandler
-            def initialize(url_handler, slug, options, block)
+            def initialize(url_handler, options, block)
               @url_handler = url_handler
-              @slug = slug
               @options = options
               @block = block
             end
-            attr_reader :slug
 
             # @todo Are there differences that need to be handled for the blank_node?
             def call(object, accumulator, _blank_node)
@@ -221,25 +160,19 @@ module ROF
 
           # @api private
           class ExplicitLocationSlugHandler
-            def initialize(url_handler, slug, options)
+            def initialize(url_handler, options)
               @url_handler = url_handler
-              @slug = slug
               @options = options
             end
-            attr_reader :slug
 
             def call(object, accumulator, blank_node)
               to = @options.fetch(:to)
               multiple = @options.fetch(:multiple, true)
-              unless force?
+              unless @options.fetch(:force, false)
                 to = @url_handler.within + Array.wrap(to)
                 to[-1] = "#{@url_handler.namespace_prefix}#{to[-1]}"
               end
               accumulator.add_predicate_location_and_value(to, object, blank_node: blank_node, multiple: multiple)
-            end
-
-            def force?
-              @options.fetch(:force, false)
             end
           end
           private_constant :ExplicitLocationSlugHandler

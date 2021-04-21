@@ -1,6 +1,5 @@
 require 'rof/rdf_context'
 require 'active_support/core_ext/array/wrap'
-require 'rof/translators/jsonld_to_rof/statement_handler'
 require 'rof/translators/jsonld_to_rof/predicate_handler'
 require 'rof/translators/jsonld_to_rof/accumulator'
 
@@ -8,7 +7,7 @@ module ROF
   module Translators
     # @api public
     #
-    # Responsible for converting JSON LD into an ROF Hash through the `.call` method (using the URI maps defined by the `.register` method)
+    # Converts JSON LD (as a hash) into an ROF Hash through the `.call` method.
     #
     # @note Some predicates require explicit mapping where as others have an assumed mapping. At present all URLs for @context of JSON-LD documents must be registered.
     #
@@ -85,7 +84,7 @@ module ROF
 
       # The $1 will be the PID
       # @see Related specs for expected behavior
-      REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{\Ahttps?://curate(?:[\w\.]*).nd.edu/show/([[:alnum:]]+)/?}.freeze
+      REGEXP_FOR_A_CURATE_RDF_SUBJECT = %r{\Ahttps?://curate(?:[\w.]*).nd.edu/show/([[:alnum:]]+)/?}.freeze
 
       # @api public
       #
@@ -96,33 +95,40 @@ module ROF
       # @return [Array<Hash>] An ROF document
       def self.call(jsonld, config)
         Array.wrap(jsonld).map! do |element|
-          Element.new(element).to_rof
-        end
-      end
-
-      # A single top-level element of a JSON-LD document
-      class Element
-        def initialize(element)
-          @element = element
-        end
-
-        def to_rof
-          @accumulator = Accumulator.new(base_rof)
+          # Translate one JSON-LD item to ROF.
+          #
+          # The difficulty is that we must deal with the JSON-LD data as RDF. So we need to handle
+          # it triple by triple. The first complexity is that there may be blank nodes. The second
+          # complexity is translating it to ROF. Rather than deal with both in one pass, we do three!
+          # The first pass looks at all the triples and organizes them by subject.
+          # The second pass recursively groups blank nodes and internal references.
+          # The thrid puts everything into ROF format.
+          accumulator = Accumulator.new(base_rof)
           JSON::LD::API.toRdf(element) do |statement|
-            StatementHandler.call(statement, accumulator)
+            case statement.subject
+            when RDF::URI
+              # Handle the various CurateND environments instead of just curate.nd.edu
+              if statement.subject.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
+                pid = "und:#{$1}"
+                accumulator.add_pid(pid)
+              end
+              PredicateObjectHandler.call(statement.predicate, statement.object, accumulator)
+            when RDF::Node
+              accumulator.add_blank_node(statement)
+            else
+              raise UnhandledRdfSubjectError, "Unable to determine subject handler for #{statement.inspect}"
+            end
           end
-          @accumulator.to_rof
-        end
-
-        private
-
-        attr_reader :element, :accumulator
-
-        def base_rof
-          { "type" => "fobject", "metadata" => { "@context" => ROF::RdfContext }, "rels-ext" => { "@context" => ROF::RelsExtRefContext } }
+          accumulator.to_rof
         end
       end
-      private_constant :Element
+
+      def self.base_rof
+        { "type" => "fobject", "metadata" => { "@context" => ROF::RdfContext }, "rels-ext" => { "@context" => ROF::RelsExtRefContext } }
+      end
+
+      class UnhandledRdfSubjectError < RuntimeError
+      end
     end
   end
 end
