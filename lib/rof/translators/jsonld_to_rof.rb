@@ -1,6 +1,5 @@
 require 'rof/rdf_context'
 require 'active_support/core_ext/array/wrap'
-require 'rof/translators/jsonld_to_rof/predicate_handler'
 require 'rof/translators/jsonld_to_rof/accumulator'
 
 module ROF
@@ -16,71 +15,20 @@ module ROF
     # @see ROF::Translators::JsonldToRof::PredicateHandler
     # @see ROF::Translators::JsonldToRof::StatementHandler
     module JsonldToRof
-      PredicateHandler.register('http://purl.org/ontology/bibo/') do |handler|
-        handler.namespace_prefix('bibo:')
-        handler.within(['metadata'])
-      end
-      PredicateHandler.register('info:fedora/fedora-system:def/relations-external#') do |handler|
-        handler.namespace_prefix('')
-        handler.within(['rels-ext'])
-      end
-      PredicateHandler.register('http://id.loc.gov/vocabulary/relators/') do |handler|
-        handler.namespace_prefix('mrel:')
-        handler.within(['metadata'])
-      end
-      PredicateHandler.register('http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#') do |handler|
-        handler.namespace_prefix('ebucore:')
-        handler.within(['metadata'])
-      end
-
-      PredicateHandler.register('https://library.nd.edu/ns/terms/') do |handler|
-        handler.namespace_prefix('nd:')
-        handler.within(['metadata'])
-        handler.map('accessEdit', to: ['rights', 'edit'], force: true)
-        handler.map('accessRead', to: ['rights', 'read'], force: true)
-        handler.map('accessEditGroup', to: ['rights', 'edit-groups'], force: true)
-        handler.map('accessReadGroup', to: ['rights', 'read-groups'], force: true)
-        handler.map('accessEmbargoDate', to: ['rights', 'embargo-date'], multiple: false, force: true)
-        handler.map('afmodel', to: ["af-model"], force: true)
-        # map nd:filename to content-file 
-        handler.map('filename', to: [ 'content-file' ], multiple: false, force: true)
-        handler.map('alephIdentifier', to: ['alephIdentifier'], multiple: false)
-        handler.map('bendoitem', to: ["bendo-item"], multiple: false, force: true)
-        handler.map('depositor') do |object, accumulator|
-          accumulator.register_properties('depositor', object)
-        end
-        handler.map('owner') do |object, accumulator|
-          accumulator.register_properties('owner', object)
-        end
-        handler.map('representativeFile', multiple: false) do |object, accumulator|
-          accumulator.register_properties('representative', object)
-        end
-        handler.map('characterization', to: ['characterization'], multiple: false, force: true)
-
-        # Discard these keys when mapping from JSON-LD to ROF
-        handler.skip('content')
-        handler.skip('thumbnail')
-        handler.skip('mimetype')
-      end
-
-      PredicateHandler.register('http://purl.org/dc/terms/') do |handler|
-        handler.namespace_prefix('dc:')
-        handler.within(['metadata'])
-        handler.map('contributor', to: ['metadata', 'dc:contributor', 'dc:contributor'], force: true)
-      end
-
-      PredicateHandler.register('http://projecthydra.org/ns/relations#') do |handler|
-        handler.map('hasEditor', to: ['rels-ext', 'hydramata-rel:hasEditor'])
-        # We need to map the hasEditorGroup predicate to two different locations in the ROF
-        handler.map('hasEditorGroup', to: ['rels-ext', 'hydramata-rel:hasEditorGroup'], force: true)
-        handler.map('hasEditorGroup', to: ['rights', 'edit-groups'], force: true)
-      end
-
-      PredicateHandler.register('http://www.ndltd.org/standards/metadata/etdms/1.1/') do |handler|
-        handler.within(['metadata', 'ms:degree'])
-        handler.namespace_prefix('ms:')
-        handler.map('role', to: ['metadata', 'dc:contributor', 'ms:role'], force: true)
-      end
+      # NAMESPACES maps URI initial segments to shorter tags. This is used
+      # since RDF nominally uses full URIs, but we prefer the shorter labels
+      # using the tags.
+      NAMESPACES = {
+        'http://purl.org/ontology/bibo/' => 'bibo:',
+        'info:fedora/fedora-system:def/relations-external#' => 'rels-ext:',
+        'http://id.loc.gov/vocabulary/relators/' => 'mrel:',
+        'http://www.ebu.ch/metadata/ontologies/ebucore/ebucore#' => 'ebucore:',
+        'https://library.nd.edu/ns/terms/' => 'nd:',
+        'http://purl.org/dc/terms/' => 'dc:',
+        'http://projecthydra.org/ns/relations#' => 'hydramata-rel:',
+        'http://www.ndltd.org/standards/metadata/etdms/1.1/' => 'ms:',
+        'https://curate.nd.edu/show/' => 'und:',
+      }
 
       # The $1 will be the PID
       # @see Related specs for expected behavior
@@ -97,37 +45,135 @@ module ROF
         Array.wrap(jsonld).map! do |element|
           # Translate one JSON-LD item to ROF.
           #
-          # The difficulty is that we must deal with the JSON-LD data as RDF. So we need to handle
-          # it triple by triple. The first complexity is that there may be blank nodes. The second
-          # complexity is translating it to ROF. Rather than deal with both in one pass, we do three!
-          # The first pass looks at all the triples and organizes them by subject.
-          # The second pass recursively groups blank nodes and internal references.
-          # The thrid puts everything into ROF format.
+          # We do it in two steps. First we group all the statements with the
+          # same subject and remove blank nodes. This is our intermediate
+          # representation.
+          #
+          # Then we turn that into an ROF object
           accumulator = Accumulator.new(base_rof)
-          JSON::LD::API.toRdf(element) do |statement|
-            case statement.subject
-            when RDF::URI
-              # Handle the various CurateND environments instead of just curate.nd.edu
-              if statement.subject.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
-                pid = "und:#{$1}"
-                accumulator.add_pid(pid)
-              end
-              PredicateObjectHandler.call(statement.predicate, statement.object, accumulator)
-            when RDF::Node
-              accumulator.add_blank_node(statement)
-            else
-              raise UnhandledRdfSubjectError, "Unable to determine subject handler for #{statement.inspect}"
+          ir = {}
+
+          statements = JSON::LD::API.toRdf(element)
+          # #to_h gives a hash of subject => { predicate => [object] }
+          statement_hash = statements.to_h
+          statement_hash.each do |subject, predicates|
+            # find the first subject that is a curate object.
+            next unless subject.to_s =~ ROF::Translators::JsonldToRof::REGEXP_FOR_A_CURATE_RDF_SUBJECT
+            pid = "und:#{$1}"
+
+            ir = self.reduce_blank_nodes(statement_hash, subject)
+            ir['pid'] = [pid]
+            break
+          end
+
+          #
+          # ir is a map with blank nodes removed. Turn it into ROF
+          # We reuse the accumulator code, so the next step is to map the ir
+          # into the accumulator.
+          #
+          # Define some helper functions to make it easier to add values
+          add_all_values = lambda do |location, values|
+            values.each do |v|
+              accumulator.add_predicate_location_and_value(location, v)
             end
           end
+          add_one_value = lambda do |location, values|
+            accumulator.add_predicate_location_and_value(location, values.first, multiple: false)
+          end
+
+          ir.each do |prop, values|
+            case prop
+            when 'pid'
+              accumulator.add_pid(values.first)
+            when 'nd:depositor'
+              accumulator.register_properties('depositor', values.first)
+            when 'nd:owner'
+              accumulator.register_properties('owner', values.first)
+            when 'nd:representativeFile'
+              accumulator.register_properties('representative', values.first)
+            when 'nd:accessEdit'
+              add_all_values.call(['rights', 'edit'], values)
+            when 'nd:accessRead'
+              add_all_values.call(['rights', 'read'], values)
+            when 'nd:accessEditGroup'
+              add_all_values.call(['rights', 'edit-groups'], values)
+            when 'nd:accessReadGroup'
+              add_all_values.call(['rights', 'read-groups'], values)
+            when 'nd:accessEmbargoDate'
+              add_one_value.call(['rights', 'embargo-date'], values)
+            when 'nd:afmodel'
+              add_all_values.call(['af-model'], values)
+            when 'nd:filename'
+              add_one_value.call(['content-file'], values)
+            when 'nd:alephIdentifier'
+              add_one_value.call(['metadata', 'nd:alephIdentifier'], values)
+            when 'nd:bendoitem'
+              add_one_value.call(['bendo-item'], values)
+            when 'nd:characterization'
+              add_one_value.call(['characterization'], values)
+            when 'nd:content', 'nd:thumbnail', 'nd:mimetype'
+              # Discard these keys when mapping from JSON-LD to ROF
+            when /^rels-ext:/
+              add_all_values.call(['rels-ext', prop.delete_prefix("rels-ext:")], values)
+            when 'hydramata-rel:hasEditorGroup'
+              add_all_values.call(['rels-ext', 'hydramata-rel:hasEditorGroup'], values)
+              add_all_values.call(['rights', 'edit-groups'], values)
+            when /^hydramata-rel:/
+              add_all_values.call(['rels-ext', prop], values)
+            else
+              add_all_values.call(['metadata', prop], values)
+            end
+          end
+
           accumulator.to_rof
         end
       end
 
-      def self.base_rof
-        { "type" => "fobject", "metadata" => { "@context" => ROF::RdfContext }, "rels-ext" => { "@context" => ROF::RelsExtRefContext } }
+      # reduce_blank_nodes converts all URIs into their shorter namespaced
+      # versions, and then replaces any objects that are labels for blank nodes
+      # with a hash of all the predicates having that blank node as a subject.
+      # This replacement is carried on recursively.
+      #
+      # e.g. The value
+      #   { "dc:creator" => "_:b1" }
+      # and in the everything_hash
+      #   "_:b1" => { "dc:identifier" => "1234", "rdf:label" => "Zissou" }
+      # is transformed into
+      # { "dc:creator" => { "dc:identifier" => "1234", "rdf:label" => "Zissou" }}
+      #
+      def self.reduce_blank_nodes(everything_hash, this_subject)
+        return '' unless everything_hash.key?(this_subject)
+        result = {}
+        predicates = everything_hash[this_subject]
+        predicates.each do |predicate, objects|
+          ns_predicate = self.shorten_predicate(predicate.to_s)
+          result[ns_predicate] = objects.map do |object|
+            if object.anonymous?
+              self.reduce_blank_nodes(everything_hash, object)
+            elsif object.uri?
+              self.shorten_predicate(object.to_s)
+            else
+              object.to_s
+            end
+          end
+        end
+        result
       end
 
-      class UnhandledRdfSubjectError < RuntimeError
+      # shorten_predicate turns a URI p into either a shorter namespaced
+      # version using the NAMESPACES hash as a mapping, or returns p if there
+      # is no matching namespace.
+      def self.shorten_predicate(p)
+        NAMESPACES.each do |prefix, abbrev|
+          if p.start_with?(prefix)
+            return abbrev + p.delete_prefix(prefix)
+          end
+        end
+        p
+      end
+
+      def self.base_rof
+        { "type" => "fobject", "metadata" => { "@context" => ROF::RdfContext }, "rels-ext" => { "@context" => ROF::RelsExtRefContext } }
       end
     end
   end
