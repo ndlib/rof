@@ -28,101 +28,24 @@ module ROF
         # @return [ROF::Translators::JsonldToRof::Accumulator] the given accumulator
         # @raise [ROF::Translators::JsonldToRof::UnknownRdfObjectTypeError] when the RDF::Object's subject is not a valid type
         def self.call(predicate, object, accumulator, options = {})
-          new(predicate, object, accumulator, options).call
-          accumulator
-        end
-
-        # @api private
-        #
-        # @param [RDF::Predicate] predicate - the RDF predicate that we will parse and add to the appropriate spot in the accumulator
-        # @param [RDF::Object] object - the RDF object that we will parse and add to the appropriate spot in the accumulator
-        # @param [ROF::Translators::JsonldToRof::Accumulator] accumulator - a data accumulator that will be changed in place
-        # @return [#call]
-        def self.new(predicate, object, accumulator, options)
-          klass_for(object).new(predicate, object, accumulator, options)
-        end
-        private_class_method :new
-
-        class UnknownRdfObjectTypeError < RuntimeError
-        end
-
-        # @api private
-        def self.klass_for(object)
           case object
-          when RDF::URI
-            UriPredicateObjectHandler
-          when RDF::Node
-            NodePredicateObjectHandler
-          when RDF::Literal
-            LiteralPredicateObjectHandler
-          else
-            raise UnknownRdfObjectTypeError, "Unable to determine object handler for #{object.inspect}"
-          end
-        end
-        private_class_method :klass_for
-
-        # @api private
-        class UriPredicateObjectHandler
-          def initialize(predicate, object, accumulator, options)
-            @predicate = predicate
-            @object = object
-            @accumulator = accumulator
-            @options = options
-          end
-
-          def call
+          when RDF::URI, RDF::Literal
             PredicateHandler.call(predicate, object, accumulator, options[:blank_node])
-            accumulator
-          end
-
-          private
-          attr_reader :predicate, :object, :accumulator, :options
-        end
-        private_constant :UriPredicateObjectHandler
-
-        # @api private
-        # Blank Nodes; Oh how we love thee. Let me count the ways
-        class NodePredicateObjectHandler
-          def initialize(predicate, object, accumulator, options)
-            @predicate = predicate
-            @object = object
-            @accumulator = accumulator
-            @options = options
-          end
-
-          def call
+          when RDF::Node
             blank_node = accumulator.fetch_blank_node(object)
             blank_node.each_pair do |blank_node_predicate, blank_node_objects|
               blank_node_objects.each do |blank_node_object|
                 PredicateObjectHandler.call(blank_node_predicate, blank_node_object, accumulator, blank_node: object)
               end
             end
-            accumulator
+          else
+            raise UnknownRdfObjectTypeError, "Unable to determine object handler for #{object.inspect}"
           end
-
-          private
-          attr_reader :predicate, :object, :accumulator, :options
+          accumulator
         end
-        private_constant :NodePredicateObjectHandler
 
-        # @api private
-        class LiteralPredicateObjectHandler
-          def initialize(predicate, object, accumulator, options)
-            @predicate = predicate
-            @object = object
-            @accumulator = accumulator
-            @options = options
-          end
-
-          def call
-            PredicateHandler.call(predicate, object, accumulator, options[:blank_node])
-            accumulator
-          end
-
-          private
-          attr_reader :predicate, :object, :accumulator, :options
+        class UnknownRdfObjectTypeError < RuntimeError
         end
-        private_constant :LiteralPredicateObjectHandler
       end
     end
   end

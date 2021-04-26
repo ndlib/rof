@@ -152,13 +152,10 @@ module ROF
         # @raise PidAlreadySetError - if you attempted to a different PID
         def add_pid(pid)
           pid = coerce_object_to_string(pid)
-          if @rof.key?('pid')
-            if @rof['pid'] != pid
-              raise PidAlreadySetError, "Attempted to set pid=#{pid}, but it is already set to #{@rof['pid']}"
-            end
-          else
-            @rof['pid'] = pid
+          if @rof.key?('pid') && @rof['pid'] != pid
+            raise PidAlreadySetError, "Attempted to set pid=#{pid}, but it is already set to #{@rof['pid']}"
           end
+          @rof['pid'] = pid
           pid
         end
 
