@@ -78,11 +78,11 @@ module ROF::Translators
         raise MissingOwnerOrType if result['type'].nil? || result['owner'].nil?
         result['rights'] = ROF::Access.decode(result.fetch('access', 'private'), result['owner'])
         result.delete('access')
-        if result['type'] != '+'
+        result = collect_metadata(result)
+        if result['type'] == 'fobject'
           # this is an already processed item, so populate all of the datastreams
           result = collect_other_datastreams(result)
         end
-        result = collect_metadata(result)
         # is this a generic file which should be attached to the previous work?
         if result['type'] == '+'
           raise NoPriorWork if previous_work.nil?
