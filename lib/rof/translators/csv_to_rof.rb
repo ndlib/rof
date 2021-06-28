@@ -78,8 +78,9 @@ module ROF::Translators
         raise MissingOwnerOrType if result['type'].nil? || result['owner'].nil?
         result['rights'] = ROF::Access.decode(result.fetch('access', 'private'), result['owner'])
         result.delete('access')
+        result = collect_rels_ext_datastream(result)
         result = collect_metadata(result)
-        if result['type'] == 'fobject'
+        if result['type'] == 'fobject' || result['type'].include?("Work") 
           # this is an already processed item, so populate all of the datastreams
           result = collect_other_datastreams(result)
         end
@@ -117,15 +118,22 @@ module ROF::Translators
 
     RELS_EXT_FIELDS = ["isPartOf", "isMemberOfCollection", "hydramata-rel:hasEditor", "hydramata-rel:hasEditorGroup"]
 
-    def self.collect_other_datastreams(rof)
-      # need to populate the rels-ext, the properties, and (maybe) the content
-      rels = {}
+    def self.collect_rels_ext_datastream(rof)
+      # if rels-ext has already been set , start with that; otherwise, build from scratch
+      if rof['rels-ext']
+        rels= rof['rels-ext']
+      else 
+        rels = {}
+      end
       RELS_EXT_FIELDS.each do |field|
         next unless rof[field]
         rels[field] = rof.delete(field)
       end
       rof['rels-ext'] = rels
+      rof
+    end
 
+    def self.collect_other_datastreams(rof)
       rof['properties'] = ROF::Utility.prop_ds(rof['owner'], rof['representative'])
       rof['properties-meta'] = { 'mime-type' => 'text/xml' }
       rof.delete('representative')
