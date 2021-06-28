@@ -129,7 +129,7 @@ module ROF::Translators
         next unless rof[field]
         rels[field] = rof.delete(field)
       end
-      rof['rels-ext'] = rels
+      rof['rels-ext'] = rels unless rels.empty?
       rof
     end
 
