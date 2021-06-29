@@ -14,24 +14,32 @@ module ROF::Translators
       Work,user1,"private;edit=user2,user3"
       }
       rof = CsvToRof.call(s)
-      expect(rof).to eq([{"type" => "Work", "owner" => "user1", "rights" => {"edit" => ["user1", "user2", "user3"]}}])
-    end
-
-    it "puts metadata into substructure" do
-      s = %q{type,owner,dc:title,foaf:name
-      Work,user1,"Q, A Letter",Jane Smith|Zander
-      }
-      rof = CsvToRof.call(s)
       expect(rof).to eq([{
         "type" => "Work",
-        "owner" => "user1",
-        "rights" => {"edit" => ["user1"]},
-        "metadata" => {
-          "@context" => ROF::RdfContext,
-          "dc:title" => "Q, A Letter",
-          "foaf:name" => ["Jane Smith", "Zander"]}
+        "owner" => "user1", 
+        "rights" => {"edit" => ["user1", "user2", "user3"]},
+        "properties-meta" => {"mime-type" => "text/xml"},
+        "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n"
       }])
     end
+
+     it "puts metadata into substructure" do
+       s = %q{type,owner,dc:title,foaf:name
+       Work,user1,"Q, A Letter",Jane Smith|Zander
+       }
+       rof = CsvToRof.call(s)
+       expect(rof).to eq([{
+         "type" => "Work",
+         "owner" => "user1",
+         "rights" => {"edit" => ["user1"]},
+         "metadata" => {
+           "@context" => ROF::RdfContext,
+           "dc:title" => "Q, A Letter",
+           "foaf:name" => ["Jane Smith", "Zander"]},
+         "properties-meta" => {"mime-type" => "text/xml"},
+         "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n"
+       }])
+     end
 
     it "renames curate_id to pid" do
       s = %q{type,owner,curate_id
@@ -42,7 +50,9 @@ module ROF::Translators
         "type" => "Work",
         "owner" => "user1",
         "pid" => "abcdefg",
-        "rights" => {"edit" => ["user1"]}
+        "rights" => {"edit" => ["user1"]},
+        "properties-meta" => {"mime-type" => "text/xml"},
+        "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n"
       }])
     end
 
@@ -58,7 +68,9 @@ module ROF::Translators
         "metadata" => {
           "@context" => ROF::RdfContext,
           "dc:title" => "Q, A Letter",
-          "foaf:name" => ["Jane Smith", "Zander"]}
+          "foaf:name" => ["Jane Smith", "Zander"]},
+          "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n",
+          "properties-meta" => {"mime-type" => "text/xml"}
       }])
     end
 
@@ -82,7 +94,9 @@ module ROF::Translators
             "owner" => "user1",
             "files" => ["extra file.txt"],
             "rights" => {"edit" => ["user1"]}
-          }]
+          }],
+          "properties-meta" => {"mime-type" => "text/xml"},
+          "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n"
       }])
     end
 
@@ -109,7 +123,9 @@ module ROF::Translators
             "ms:role" => "Committee Member"
           },
           "@context" => ROF::RdfContext
-        }
+        },
+        "properties-meta" => {"mime-type" => "text/xml"},
+        "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n"
       }])
     end
 
@@ -122,6 +138,8 @@ module ROF::Translators
         "type" => "Work",
         "owner" => "user1",
         "rights" => {"edit" => ["user1"]},
+        "properties-meta" => {"mime-type" => "text/xml"},
+        "properties" => "<fields><depositor>batch_ingest</depositor>\n<owner>user1</owner>\n</fields>\n",
         "metadata" => {
           "dc:title" => "a title",
           "dc:contributor" => [{
